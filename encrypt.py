@@ -30,7 +30,7 @@ def decrypt_file(file_path, key):
     with open(file_path, 'wb') as file:
         file.write(decrypted_data)
 
-if __name__ == "__main__":
+def encrypt_data():
     import sys
 
     ARCHIVOS = ["data/diccionario.xlsx", "data/representante.xlsx", "data/SELL_IN_OUT.csv"]
@@ -46,4 +46,4 @@ if __name__ == "__main__":
         encrypt_file(archivo, key)
         print(f"Archivo {archivo} encriptado.")
 
-        
+encrypt_data()

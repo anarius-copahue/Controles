@@ -7,8 +7,8 @@ import os
 import time
 import streamlit as st
 
-USER = st.secrets("DISPRO_USER")
-PASSWORD = st.secrets("DISPRO_PASSWORD")
+USER = st.secrets["DISPRO_USER"]
+PASSWORD = st.secrets["DISPRO_PASSWORD"]
 
 DOWNLOAD_DIR = os.path.join(os.getcwd(), "descargas")
 PREVENTA_REPORT_FILE_NAME = "preventa_por_cliente.csv"

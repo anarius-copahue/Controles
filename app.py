@@ -49,6 +49,21 @@ def run_scraping_if_needed():
 # Llamamos a la función para controlar el scraping
 run_scraping_if_needed()
 
+# Define la contraseña correcta
+PASSWORD = st.secrets["PASSWORD"]
+
+# Campo para ingresar contraseña
+st.title("Acceso restringido")
+password_input = st.text_input("Ingresá la contraseña:", type="password")
+
+# Verificación
+if password_input != PASSWORD:
+    st.warning("Acceso denegado. Ingresá la contraseña para continuar.")
+    st.stop()
+
+# Si la contraseña es correcta, muestra el contenido
+st.success("Acceso concedido")
+
 # Tabs
 tab1, tab2 = st.tabs(["Ventas", "Cuota"])
 

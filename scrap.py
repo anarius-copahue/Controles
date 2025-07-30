@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 import os
 import time
 import streamlit as st
@@ -37,7 +38,9 @@ def setup_driver():
     "safebrowsing.enabled": True
     })
     
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=Service(
+                ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+            ), options=options)
     return driver
 
 def login_to_dispro(driver):

@@ -14,7 +14,6 @@ def decrypt_files():
 
     for archivo in ARCHIVOS:
         decrypt_file(archivo, key.encode())
-        st.success(f"Archivo {archivo} desencriptado.")
 
 # Desencriptar archivos al iniciar la aplicación
 decrypt_files()

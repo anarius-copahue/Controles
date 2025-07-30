@@ -16,7 +16,7 @@ def main():
         tasa_crecimiento = (st.number_input("Tasa de crecimiento (%)", value=40) / 100)+1
 
     # --- CARGA DE DATOS ---
-    df = pd.read_csv("datas/SELL_IN_OUT.csv")
+    df = pd.read_csv("data/SELL_IN_OUT.csv")
     df = df.rename(columns={"Unnamed: 0": "CADENA"})
     df["FECHA"] = pd.to_datetime(df["FECHA"], errors="coerce")
     df.dropna(subset=["FECHA", "CADENA"], inplace=True)

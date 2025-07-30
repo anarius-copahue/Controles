@@ -15,9 +15,6 @@ def decrypt_files():
     for archivo in ARCHIVOS:
         decrypt_file(archivo, key.encode())
 
-# Desencriptar archivos al iniciar la aplicación
-decrypt_files()
-
 def get_last_scrape_time():
     if os.path.exists("last_scrape.txt"):
         with open("last_scrape.txt", "r") as f:
@@ -47,6 +44,9 @@ def run_scraping_if_needed():
 
 # Llamamos a la función para controlar el scraping
 run_scraping_if_needed()
+
+# Desencriptar archivos al iniciar la aplicación
+decrypt_files()
 
 # Define la contraseña correcta
 PASSWORD = st.secrets["PASSWORD"]

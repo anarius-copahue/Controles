@@ -12,6 +12,10 @@ def encrypt_file(file_path, key=None):
     encrypted_data = fernet.encrypt(file_data)
 
     # Write the encrypted data back to the file
+    # Add .encrypted extension
+    if not file_path.endswith('.encrypted'):
+        file_path += '.encrypted'
+
     with open(file_path, 'wb') as file:
         file.write(encrypted_data)
 
@@ -25,6 +29,10 @@ def decrypt_file(file_path, key):
 
     # Decrypt the file data
     decrypted_data = fernet.decrypt(encrypted_data)
+
+    # Remove the .encrypted extension if it exists
+    if file_path.endswith('.encrypted'):
+        file_path = file_path[:-10]  # Remove the last 10 characters ('.encrypted')
 
     # Write the decrypted data back to the file
     with open(file_path, 'wb') as file:

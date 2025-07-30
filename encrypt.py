@@ -45,5 +45,3 @@ def encrypt_data():
     for archivo in ARCHIVOS:
         encrypt_file(archivo, key)
         print(f"Archivo {archivo} encriptado.")
-
-encrypt_data()

@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 import os
 import time
 import streamlit as st
@@ -20,7 +22,7 @@ VENTAS_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/Ventas
 
 def setup_driver():
     options = Options()
-    #options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--headless")  # Run in headless mode
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
@@ -35,7 +37,7 @@ def setup_driver():
     "safebrowsing.enabled": True
     })
     
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
 def login_to_dispro(driver):

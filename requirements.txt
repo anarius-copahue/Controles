@@ -2,5 +2,7 @@ pandas
 streamlit
 cryptography
 numpy
-selenium
+streamlit
+seleniumbase
+webdriver-manager
 openpyxl

@@ -1,0 +1,6 @@
+pandas
+streamlit
+cryptography
+numpy
+selenium
+openpyxl

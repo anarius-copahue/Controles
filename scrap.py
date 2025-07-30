@@ -1,0 +1,116 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+import os
+import time
+import streamlit as st
+
+USER = st.secrets("DISPRO_USER")
+PASSWORD = st.secrets("DISPRO_PASSWORD")
+
+DOWNLOAD_DIR = os.path.join(os.getcwd(), "descargas")
+PREVENTA_REPORT_FILE_NAME = "preventa_por_cliente.csv"
+VENTA_REPORT_FILE_NAME = "ventas_netas_por_periodo_cliente.csv"
+
+LOGIN_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Login.aspx"
+PREVENTA_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorCliente.aspx"
+VENTAS_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/VentasNetasPeriodoCliente.aspx"
+
+def setup_driver():
+    options = Options()
+    #options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    # Set the path to the ChromeDriver executable
+    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+
+    # Set Chrome options for downloading files
+    options.add_experimental_option("prefs", {
+    "download.default_directory": DOWNLOAD_DIR,
+    "download.prompt_for_download": False,
+    "directory_upgrade": True,
+    "safebrowsing.enabled": True
+    })
+    
+    driver = webdriver.Chrome(options=options)
+    return driver
+
+def login_to_dispro(driver):
+    driver.get(LOGIN_URL)
+    driver.wait = WebDriverWait(driver, 10)
+
+    # Wait for the login form to be present and fill in the credentials
+    driver.wait.until(EC.presence_of_element_located((By.ID, "txtLogin"))).send_keys(USER)
+    driver.wait.until(EC.presence_of_element_located((By.ID, "txtPassword"))).send_keys(PASSWORD)
+    driver.find_element(By.XPATH, '//button[contains(text(), "Ingresar")]').click()
+
+    # Wait for the login to complete and the page to load
+    current_url = driver.current_url
+    driver.wait.until(EC.url_changes(current_url))
+
+def download_preventa_report(driver):
+    delete_previous_file(PREVENTA_REPORT_FILE_NAME)
+
+    driver.get(PREVENTA_URL)
+    driver.wait = WebDriverWait(driver, 10)
+
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="cmb_ventas"]/option[4]')))
+    Select(driver.wait.until(EC.presence_of_element_located((By.ID, "cmb_ventas")))).select_by_visible_text("Ambos")
+    time.sleep(0.5) # Wait for the dropdown to update before clicking
+    driver.wait.until(EC.presence_of_element_located((By.ID, "btnFiltrar"))).click()
+
+    # Download report as a csv file
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbPreventaPorCliente_wrapper"]/div[1]/div/a[2]'))).click()
+
+    wait_for_report_download(PREVENTA_REPORT_FILE_NAME)
+
+def download_venta_report(driver):
+    delete_previous_file(VENTA_REPORT_FILE_NAME)
+
+    driver.get(VENTAS_URL)
+    driver.wait = WebDriverWait(driver, 10)
+
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="cmb_ventas"]/option[4]')))
+    Select(driver.wait.until(EC.presence_of_element_located((By.ID, "cmb_fecha")))).select_by_visible_text("Procesado")
+    Select(driver.wait.until(EC.presence_of_element_located((By.ID, "cmb_ventas")))).select_by_visible_text("Ambas")
+    time.sleep(0.5) # Wait for the dropdown to update before clicking
+    driver.wait.until(EC.presence_of_element_located((By.ID, "btnFiltrar"))).click()
+
+    # Download report as a csv file
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbVentasNetasPeriodoCliente_wrapper"]/div[1]/div/a[2]'))).click()
+
+    wait_for_report_download(VENTA_REPORT_FILE_NAME)
+
+def delete_previous_file(file_name):
+    file_path = os.path.join(DOWNLOAD_DIR, file_name)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+def wait_for_report_download(file_name):
+    # Wait for the download to complete
+    file_path = os.path.join(DOWNLOAD_DIR, file_name)
+    timeout_seconds = 60
+    start_time = time.time()
+
+    while not os.path.exists(file_path) and (time.time() - start_time) < timeout_seconds:
+        time.sleep(1)
+
+def scrape_data():
+
+    driver = setup_driver()
+
+    try:
+        login_to_dispro(driver)
+        download_preventa_report(driver)
+        download_venta_report(driver)
+    except Exception as e:
+        print(f"Error accessing the page: {e}")
+    finally:
+        driver.quit()
+    return
+
+if __name__ == "__main__":
+    scrape_data()

@@ -9,7 +9,7 @@ import os
 st.set_page_config(page_title="Panel SELL", layout="wide")
 
 def decrypt_files():
-    ARCHIVOS = ["data/diccionario.xlsx", "data/representante.xlsx", "data/SELL_IN_OUT.csv"]
+    ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted"]
     key = st.secrets["ENCRYPTION_KEY"]
 
     for archivo in ARCHIVOS:

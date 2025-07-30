@@ -10,11 +10,10 @@ st.set_page_config(page_title="Panel SELL", layout="wide")
 
 def decrypt_files():
     ARCHIVOS = ["data/diccionario.xlsx", "data/representante.xlsx", "data/SELL_IN_OUT.csv"]
-    key = st.secrets["encryption_key"]
-    key = key.encode()
+    key = st.secrets["ENCRYPTION_KEY"]
 
     for archivo in ARCHIVOS:
-        decrypt_file(archivo, key)
+        decrypt_file(archivo, key.encode())
         st.success(f"Archivo {archivo} desencriptado.")
 
 # Desencriptar archivos al iniciar la aplicación

@@ -163,9 +163,12 @@ def main():
     }
 
     # --- MOSTRAR ---
-    st.dataframe(
-        resultado.style
-            .format(formato_columnas)
-            .applymap(highlight_variacion, subset=["Variación vs año anterior"]),
-        use_container_width=True
-    )
+   st.dataframe(
+    resultado.reset_index(drop=True)
+             .style
+             .format(formato_columnas)
+             .applymap(highlight_variacion, subset=["Variación vs año anterior"]),
+    use_container_width=True
+)
+
+

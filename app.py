@@ -5,8 +5,8 @@ from scrap import scrape_data
 from encrypt import decrypt_file
 from datetime import datetime, timedelta
 import os
-logo = Image.open("logo.png")  # Ruta local de tu logo
-st.image(logo, width=200)
+
+st.image("logo.png", width=200)
 st.set_page_config(page_title="Panel SELL", layout="wide")
 
 def decrypt_files():

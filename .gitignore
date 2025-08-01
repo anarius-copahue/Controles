@@ -207,3 +207,7 @@ descargas/
 
 # myenv
 myenv/
+
+# Data files
+.csv
+.xlsx

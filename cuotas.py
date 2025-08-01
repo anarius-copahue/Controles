@@ -176,7 +176,7 @@ def main():
 
     st.set_page_config(page_title="Control Cuota", layout="wide")
     st.title("Reporte de Representantes")
-    st.write("Resumen de cuotas y totales por representante:")
+    
 
 
     resumen = pd.DataFrame({
@@ -209,6 +209,7 @@ def main():
             (resumen["Total Caviahue"] / resumen["Cuota Caviahue"]) * 100
         ).fillna(0)
 
+
     resumen["% Mizu"] = (
             (resumen["Total Mizu"] / resumen["Cuota Mizu"]) * 100
         ).fillna(0)
@@ -217,7 +218,7 @@ def main():
     total_general_caviahue = resumen["Total Caviahue"].sum(skipna=True)
     st.markdown(f"<h2 style='color: #3A7CA5;'>Total Caviahue General: {int(total_general_caviahue)}</h2>", unsafe_allow_html=True)
 
-
+    st.write("Resumen de cuotas y totales por representante:")
     header_cols = st.columns([2, 3, 3, 3, 3, 3, 2, 2])
     header_cols[0].write("")
     header_cols[1].markdown("### Representante")

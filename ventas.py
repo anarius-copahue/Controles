@@ -157,7 +157,7 @@ def main():
         f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "Variación vs año anterior: lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
+        "Variación vs año anterior": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
         "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }

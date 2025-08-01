@@ -57,7 +57,7 @@ def main():
         ]
         return agg
 
-    actual = agg_periodo(df_actual, f"{meses} últimos meses")
+    actual = agg_periodo(df_actual, f"{meses} meses")
     anterior = agg_periodo(df_anterior, "mismo período año anterior")
     siguiente_sell_in = df_siguiente_anio_anterior.groupby("CADENA")["IN"].sum().rename("IN siguiente mes (año anterior)")
 

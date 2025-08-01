@@ -6,8 +6,13 @@ from encrypt import decrypt_file
 from datetime import datetime, timedelta
 import os
 
-st.image("logo.png", width=200)
-st.set_page_config(page_title="Panel SELL", layout="wide")
+col1, col2 = st.columns(2)
+with col1:
+        st.set_page_config(page_title="Panel SELL", layout="wide")
+with col2:
+        st.image("logo.png", width=200)
+
+
 
 def decrypt_files():
     ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted"]

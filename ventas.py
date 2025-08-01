@@ -63,7 +63,7 @@ def main():
 
     resultado = actual.join(anterior, how="outer").join(siguiente_sell_in, how="outer").fillna(0)
 
-    resultado["Variación vs año anterior (%)"] = np.where(
+    resultado["Variación vs año anterior"] = np.where(
         resultado["IN mismo período año anterior"] == 0,
         np.nan,
         ((resultado[f"IN {meses} meses"] / resultado["IN mismo período año anterior"]) - 1) * 100
@@ -97,10 +97,10 @@ def main():
     ], ignore_index=True)
 
     ventas_totales = ventas_y_preventas.groupby("CADENA")["valor"].sum().reset_index()
-    ventas_totales.rename(columns={"valor": "VENTA Y PREVENTA HASTA HOY"}, inplace=True)
+    ventas_totales.rename(columns={"valor": "VENTA Y PREVENTA A HOY"}, inplace=True)
 
     resultado = resultado.merge(ventas_totales, on="CADENA", how="left")
-    resultado["FALTA"] = resultado["IN estimado mes actual (crecimiento)"] - resultado["VENTA Y PREVENTA HASTA HOY"]
+    resultado["FALTA"] = resultado["IN estimado mes actual (crecimiento)"] - resultado["VENTA Y PREVENTA A HOY"]
 
 
 
@@ -108,12 +108,12 @@ def main():
 
     # --- OPORTUNIDADES Y ALERTAS ---
     oportunidades = resultado[
-        (resultado["Variación vs año anterior (%)"] > 40) &
+        (resultado["Variación vs año anterior"] > 40) &
         (resultado["FALTA"] > 50)
     ]
 
     alertas = resultado[
-        (resultado["OUT / IN"] > 100)  &  (resultado["Variación vs año anterior (%)"] > 20)
+        (resultado["OUT / IN"] > 100)  &  (resultado["Variación vs año anterior"] > 20)
     ]
 
     mensaje = ""
@@ -156,8 +156,8 @@ def main():
         f"IN promedio mismo período año anterior": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "VENTA Y PREVENTA HASTA HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "Variación vs año anterior (%)": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
+        "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        "Variación vs año anterior: lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
         "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
@@ -166,6 +166,6 @@ def main():
     st.dataframe(
         resultado.style
             .format(formato_columnas)
-            .applymap(highlight_variacion, subset=["Variación vs año anterior (%)"]),
+            .applymap(highlight_variacion, subset=["Variación vs año anterior"]),
         use_container_width=True
     )

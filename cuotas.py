@@ -1,30 +1,79 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 import numpy as np
 
+
 def main():
-# Cargar archivos
     archivo_excel = "data/representante.xlsx"
-    df_preventa = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
-    df_venta = pd.read_csv("descargas/ventas_netas_por_periodo_cliente.csv", sep="|")
 
-    # Calcular valor
 
-    # Normalizamos nombres de columnas y sumamos
-    ventas_pre = df_preventa.rename(columns={"Clie": "Cliente"})
-    ventas_pre["valor"] = ventas_pre["Unidades"]
-    df_venta["valor"] = df_venta["Venta Unid."] - df_venta["Unid. Bonif."]
+
+    df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
+    
+        # Calcular valor
+    df_venta["Caviahue"] = df_venta["Unidades"]
+    df_venta["Mizu"] = 0
+    df_venta = df_venta.rename(columns={"Clie": "Cliente"})
+
+    # Cargar archivo de preventa
+    df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
+
+    # Clasificar productos
+    df_preventa["Mizu"] = np.where(
+        df_preventa['Descripción'].isin([
+            'MIZU COLAGENO PLUS LIMON',
+            'F/L-COLAGENO HIDROLIZADO CLASICO - PIEL- MIZU',
+            "MIZU ARTRO FLEX"
+        ]),
+        df_preventa["Venta Unid."],
+        0
+    )
+
+    df_preventa["Caviahue"] = np.where(
+        ~df_preventa['Descripción'].isin([
+            'MIZU COLAGENO PLUS LIMON',
+            'F/L-COLAGENO HIDROLIZADO CLASICO - PIEL- MIZU',
+            "MIZU ARTRO FLEX"
+        ]),
+        df_preventa["Venta Unid."],
+        0
+    )
+
+    #Despaconar
+    df_preventa["Caviahue"] =  np.where(
+        df_preventa['PRODU.'].isin(['22005','21663','22251','21657','21655','21658'
+        ]),
+        df_preventa["Caviahue"] *3,
+        df_preventa["Caviahue"]
+    )
+
+    df_preventa["Caviahue"] =  np.where(
+        df_preventa['PRODU.'].isin(['21653','22285'    ]),    df_preventa["Caviahue"] *2,
+        df_preventa["Caviahue"]
+    )
+
+    df_preventa["Caviahue"] =  np.where(
+        df_preventa['PRODU.'].isin(['21656'   ]),    df_preventa["Caviahue"] *4,
+        df_preventa["Caviahue"]
+    )
 
     # Unificar ventas y calcular totales por cliente
-    ventas_combinadas = pd.concat([
-        ventas_pre[["Cliente", "valor"]],
-        df_venta[["Cliente", "valor"]]
-    ], ignore_index=True)
+    df_preventa = pd.concat([
+            df_preventa[["Cliente", "Caviahue", "Mizu"]],
+            df_venta[["Cliente", "Caviahue", "Mizu"]]
+        ], ignore_index=True)
 
-    ventas_totales_cliente = ventas_combinadas.groupby("Cliente")["valor"].sum().reset_index()
-    ventas_totales_cliente.rename(columns={"valor": "Total Caviahue"}, inplace=True)
+    # Agrupar totales por cliente
+    totales_caviahue = df_preventa.groupby("Cliente")["Caviahue"].sum().reset_index()
+    totales_caviahue.rename(columns={"Caviahue": "Total Caviahue"}, inplace=True)
 
-    # Lista de representantes esperados
+    totales_mizu = df_preventa.groupby("Cliente")["Mizu"].sum().reset_index()
+    totales_mizu.rename(columns={"Mizu": "Total Mizu"}, inplace=True)
+
+    # Unir los totales en un solo DataFrame
+    ventas_totales_cliente = pd.merge(totales_caviahue, totales_mizu, on="Cliente", how="outer")
+
+    # Lista de hojas esperadas
     lista_representantes = [
         'Karina Macías', 'Karina Perfu y Supermercados', 'Esteban Piegari',
         'Maria Laura Lavanchy', 'Patricia Zacca', 'Marcela Rosselot', 'Lucio Colombo',
@@ -32,73 +81,81 @@ def main():
         'Jessica Andermarch', 'Luciano Laguna'
     ]
 
-
-    # Cargar hojas del Excel en un diccionario
+    # Cargar hojas del Excel
     hojas_representantes = {
         nombre: pd.read_excel(archivo_excel, sheet_name=nombre)
         for nombre in lista_representantes
     }
 
+    # Incorporar los totales a cada hoja
     for nombre, df in hojas_representantes.items():
-        df_actualizado = df.drop(columns=["Total Caviahue"], errors="ignore").merge(
-            ventas_totales_cliente[["Cliente", "Total Caviahue"]],
+        df_actualizado = df.drop(columns=["Total Caviahue", "Total Mizu"], errors="ignore").merge(
+            ventas_totales_cliente[["Cliente", "Total Caviahue", "Total Mizu"]],
             left_on="N° CLIENTE",
             right_on="Cliente",
             how="left"
         ).drop(columns=["Cliente"], errors="ignore")
 
-        df_actualizado["Total Caviahue"] = df_actualizado["Total Caviahue"].fillna(0)
+        df_actualizado[["Total Caviahue", "Total Mizu"]] = df_actualizado[["Total Caviahue", "Total Mizu"]].fillna(0)
 
-        # Move "Total Caviahue" to second position
+        # Reordenar columnas si es necesario (ejemplo: mover total_caviahue detrás de 'N° CLIENTE')
         cols = df_actualizado.columns.tolist()
-        if "Total Caviahue" in cols:
-            cols.insert(3, cols.pop(cols.index("Total Caviahue")))
-            df_actualizado = df_actualizado[cols]
+        for col in ["Total Caviahue", "Total Mizu"]:
+            if col in cols:
+                cols.insert(3, cols.pop(cols.index(col)))
+        df_actualizado = df_actualizado[cols]
+    
 
         hojas_representantes[nombre] = df_actualizado
 
 
-    # Calcular cuota para totales dentro de cada hoja
+        # Calcular cuota para totales dentro de cada hoja
     for nombre, df in hojas_representantes.items():
         df = df.copy()
-    
-        # Search for clientes that have TOTAL in their name
+        
+            # Search for clientes that have TOTAL in their name
         total_rows = df["CLIENTE"].str.contains("TOTAL", case=False, na=False)
         group_id = total_rows.cumsum()
 
         for g in group_id[total_rows].unique():
-            # Get mask for this block
+                # Get mask for this block
             group_mask = group_id == g
             total_row_idx = df[group_mask & total_rows].index[0]
             children_mask = group_mask & (~total_rows)
 
-            # Sum numeric columns in children and assign to the total row
+                # Sum numeric columns in children and assign to the total row
             for col in ["Cuota Caviahue", "Total Caviahue", "Cuota Mizu", "Total Mizu"]:
                 if col in df.columns:
                     df.loc[total_row_idx, col] = df.loc[children_mask, col].sum(skipna=True)
 
-        # Save updated version
+        
+
+            # Save updated version
         hojas_representantes[nombre] = df
 
-    # Calcular porcentajes de Caviahue y Mizu
+        # Calcular porcentajes de Caviahue y Mizu
     for nombre, df in hojas_representantes.items():
         df = df.copy()
 
         df["% Caviahue"] = (
-            pd.to_numeric(df.get("Total Caviahue"), errors="coerce") /
-            pd.to_numeric(df.get("Cuota Caviahue"), errors="coerce") 
-        ) * 100
+                pd.to_numeric(df.get("Total Caviahue"), errors="coerce") /
+                pd.to_numeric(df.get("Cuota Caviahue"), errors="coerce") 
+            ) * 100
 
         df["% Mizu"] = (
-            pd.to_numeric(df.get("Total Mizu"), errors="coerce") /
-            pd.to_numeric(df.get("Cuota Mizu"), errors="coerce")
-        ) * 100
+                pd.to_numeric(df.get("Total Mizu"), errors="coerce") /
+                pd.to_numeric(df.get("Cuota Mizu"), errors="coerce")
+            ) * 100
 
-        # Limpiar y redondear
+            # Limpiar y redondear
         df["% Caviahue"] = df["% Caviahue"].replace([np.inf, -np.inf], 0).fillna(0).round(2)
         df["% Mizu"] = df["% Mizu"].replace([np.inf, -np.inf], 0).fillna(0).round(2)
 
+        nuevo_orden = ["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Total Caviahue","% Caviahue","Cuota Mizu", "Total Mizu", "% Mizu"]
+        df = df[nuevo_orden]
+
         hojas_representantes[nombre] = df
+
 
     def calcular_totales_por_bloques(df, columna_total="Total Caviahue"):
         df = df.copy()
@@ -121,41 +178,44 @@ def main():
     st.title("Reporte de Representantes")
     st.write("Resumen de cuotas y totales por representante:")
 
+
     resumen = pd.DataFrame({
-        "Representante": list(hojas_representantes.keys()),
+            "Representante": list(hojas_representantes.keys()),
 
-        "Cuota Caviahue": [
-            df[df["N° CLIENTE"].notna()]["Cuota Caviahue"].sum(skipna=True)
-            for df in hojas_representantes.values()
-        ],
+            "Cuota Caviahue": [
+                df[df["N° CLIENTE"].notna()]["Cuota Caviahue"].sum(skipna=True)
+                for df in hojas_representantes.values()
+            ],
 
-        "Total Caviahue": [
-            df[df["N° CLIENTE"].notna()]["Total Caviahue"].sum(skipna=True)
-            if "Total Caviahue" in df.columns else 0
-            for df in hojas_representantes.values()
-        ],
+            "Total Caviahue": [
+                df[df["N° CLIENTE"].notna()]["Total Caviahue"].sum(skipna=True)
+                if "Total Caviahue" in df.columns else 0
+                for df in hojas_representantes.values()
+            ],
 
-        "Cuota Mizu": [
-            df[df["N° CLIENTE"].notna()]["Cuota Mizu"].sum(skipna=True)
-            for df in hojas_representantes.values()
-        ],
+            "Cuota Mizu": [
+                df[df["N° CLIENTE"].notna()]["Cuota Mizu"].sum(skipna=True)
+                for df in hojas_representantes.values()
+            ],
 
-        "Total Mizu": [
-            df[df["N° CLIENTE"].notna()]["Total Mizu"].sum(skipna=True)
-            for df in hojas_representantes.values()
-        ],
-    })
+            "Total Mizu": [
+                df[df["N° CLIENTE"].notna()]["Total Mizu"].sum(skipna=True)
+                for df in hojas_representantes.values()
+            ],
+        })
 
-    # Calculate percentages manually from the two columns
+        # Calculate percentages manually from the two columns
     resumen["% Caviahue"] = (
-        (resumen["Total Caviahue"] / resumen["Cuota Caviahue"]) * 100
-    ).fillna(0)
+            (resumen["Total Caviahue"] / resumen["Cuota Caviahue"]) * 100
+        ).fillna(0)
 
     resumen["% Mizu"] = (
-        (resumen["Total Mizu"] / resumen["Cuota Mizu"]) * 100
-    ).fillna(0)
+            (resumen["Total Mizu"] / resumen["Cuota Mizu"]) * 100
+        ).fillna(0)
 
-    # Actualizar valores de totales por cada representante
+        # Actualizar valores de totales por cada representante
+    total_general_caviahue = resumen["Total Caviahue"].sum(skipna=True)
+    st.markdown(f"<h2 style='color: #3A7CA5;'>Total Caviahue General: {int(total_general_caviahue)}</h2>", unsafe_allow_html=True)
 
 
     header_cols = st.columns([2, 3, 3, 3, 3, 3, 2, 2])
@@ -179,7 +239,7 @@ def main():
             if st.button("➖" if st.session_state[key_expand] else "➕", key=f"boton_{i}"):
                 st.session_state[key_expand] = not st.session_state[key_expand]
 
-        # Asegurate que TODAS las celdas usen el mismo fondo condicional
+            # Asegurate que TODAS las celdas usen el mismo fondo condicional
         cols[1].markdown(f"{fila['Representante']}</div>", unsafe_allow_html=True)
         cols[2].markdown(f"{int(fila['Cuota Caviahue'])}</div>", unsafe_allow_html=True)
         cols[3].markdown(f"{int(fila['Total Caviahue'])}</div>", unsafe_allow_html=True)
@@ -191,16 +251,15 @@ def main():
         if st.session_state[key_expand]:
             st.markdown(f"#### Detalle de {fila['Representante']}")
             df = hojas_representantes[fila["Representante"]].copy()
-            
+                
             def resaltar_total(row):
                 if str(row["CLIENTE"]).strip().upper().startswith("TOTAL"):
                     return ["background-color: #f0f0f0"] * len(row)
                 else:
                     return [""] * len(row)
-    
+        
             st.dataframe(df.style.apply(resaltar_total, axis=1).format(precision=0), use_container_width=True)
-            
+                
         st.markdown("---")
 
-if __name__ == "__main__":
-    main()
+

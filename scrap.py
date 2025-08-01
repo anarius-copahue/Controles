@@ -13,6 +13,8 @@ import streamlit as st
 USER = st.secrets["DISPRO_USER"]
 PASSWORD = st.secrets["DISPRO_PASSWORD"]
 
+
+
 DOWNLOAD_DIR = os.path.join(os.getcwd(), "descargas")
 PREVENTA_REPORT_FILE_NAME = "preventa_por_cliente.csv"
 VENTA_REPORT_FILE_NAME = "ventas_netas_por_periodo_cliente.csv"
@@ -41,8 +43,9 @@ def setup_driver():
     })
     
     driver = webdriver.Chrome(service=Service(
-                ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-            ), options=options)
+                 ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+             ), options=options)
+    
     return driver
 
 def login_to_dispro(driver):
@@ -130,9 +133,7 @@ def scrape_data():
         login_to_dispro(driver)
         download_preventa_report(driver)
         download_venta_report(driver)
-        download_procucto_report(driver)
-    except Exception as e:
-        print(f"Error accessing the page: {e}")
+        download_producto_report(driver)
     finally:
         driver.quit()
     return

@@ -5,7 +5,8 @@ from scrap import scrape_data
 from encrypt import decrypt_file
 from datetime import datetime, timedelta
 import os
-
+logo = Image.open("logo.png")  # Ruta local de tu logo
+st.image(logo, width=200)
 st.set_page_config(page_title="Panel SELL", layout="wide")
 
 def decrypt_files():
@@ -47,6 +48,15 @@ run_scraping_if_needed()
 
 # Desencriptar archivos al iniciar la aplicación
 decrypt_files()
+
+# Show all files in the "data" and "descargas" directories
+data_files = os.listdir("data")
+descargas_files = os.listdir("descargas")
+st.subheader("Archivos en 'data':")
+st.write(data_files)
+st.subheader("Archivos en 'descargas':")
+st.write(descargas_files)
+# Password protection
 
 # Define la contraseña correcta
 PASSWORD = st.secrets["PASSWORD"]

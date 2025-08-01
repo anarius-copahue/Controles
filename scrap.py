@@ -16,10 +16,12 @@ PASSWORD = st.secrets["DISPRO_PASSWORD"]
 DOWNLOAD_DIR = os.path.join(os.getcwd(), "descargas")
 PREVENTA_REPORT_FILE_NAME = "preventa_por_cliente.csv"
 VENTA_REPORT_FILE_NAME = "ventas_netas_por_periodo_cliente.csv"
+VENTAS_PRODUCTO_REPORT_FILE_NAME = "venta_neta_por_periodo_producto_cliente.csv"
 
 LOGIN_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Login.aspx"
 PREVENTA_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorCliente.aspx"
 VENTAS_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/VentasNetasPeriodoCliente.aspx"
+VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/ConsultaDinamica.aspx?param=Y29kaWdvTWVudSUzRDExMDk%3D"
 
 def setup_driver():
     options = Options()
@@ -89,6 +91,23 @@ def download_venta_report(driver):
 
     wait_for_report_download(VENTA_REPORT_FILE_NAME)
 
+def download_producto_report(driver):
+    delete_previous_file(VENTAS_PRODUCTO_REPORT_FILE_NAME)
+
+    driver.get(VENTAS_PRODUCTO_URL)
+    driver.wait = WebDriverWait(driver, 10)
+
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbinVtaporPeriodoProduClie_codigoVenta"]/option[3]')))
+    Select(driver.wait.until(EC.presence_of_element_located((By.ID, "tbinVtaporPeriodoProduClie_codigoVenta")))).select_by_visible_text("Ambas")
+    time.sleep(0.5) # Wait for the dropdown to update before clicking
+    driver.wait.until(EC.presence_of_element_located((By.ID, "btnFiltrar"))).click()
+
+    # Download report as a csv file
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbinVtaporPeriodoProduClie_wrapper"]/div[1]/div/a[2]'))).click()
+
+    wait_for_report_download(VENTAS_PRODUCTO_REPORT_FILE_NAME)
+
+
 def delete_previous_file(file_name):
     file_path = os.path.join(DOWNLOAD_DIR, file_name)
     if os.path.exists(file_path):
@@ -111,6 +130,7 @@ def scrape_data():
         login_to_dispro(driver)
         download_preventa_report(driver)
         download_venta_report(driver)
+        download_procucto_report(driver)
     except Exception as e:
         print(f"Error accessing the page: {e}")
     finally:

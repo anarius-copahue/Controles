@@ -66,13 +66,13 @@ def main():
     resultado["Variación vs año anterior (%)"] = np.where(
         resultado["IN mismo período año anterior"] == 0,
         np.nan,
-        ((resultado[f"IN {meses} últimos meses"] / resultado["IN mismo período año anterior"]) - 1) * 100
+        ((resultado[f"IN {meses} meses"] / resultado["IN mismo período año anterior"]) - 1) * 100
     )
 
     resultado["OUT / IN"] = np.where(
-        resultado[f"IN {meses} últimos meses"] == 0,
+        resultado[f"IN {meses} meses"] == 0,
         np.nan,
-        (resultado[f"OUT {meses} últimos meses"] / resultado[f"IN {meses} últimos meses"])*100
+        (resultado[f"OUT {meses} meses"] / resultado[f"IN {meses} meses"])*100
     )
 
 
@@ -104,7 +104,7 @@ def main():
 
 
 
-    st.subheader(f"Último mes disponible: {fecha_ultima.strftime('%B %Y')} | Período comparado: {fechas_actuales[0].strftime('%Y-%m')} a {fechas_actuales[-1].strftime('%Y-%m')}")
+    st.subheader(f"mes disponible: {fecha_ultima.strftime('%B %Y')} | Período comparado: {fechas_actuales[0].strftime('%Y-%m')} a {fechas_actuales[-1].strftime('%Y-%m')}")
 
     # --- OPORTUNIDADES Y ALERTAS ---
     oportunidades = resultado[
@@ -141,7 +141,7 @@ def main():
 
     # --- LIMPIEZA ---
     columnas_a_eliminar = [
-        f"IN {meses} últimos meses", f"OUT {meses} últimos meses",
+        f"IN {meses} meses", f"OUT {meses} meses",
         'IN mismo período año anterior', 'OUT mismo período año anterior',
         "IN siguiente mes (año anterior)","OUT promedio mismo período año anterior",
     ]
@@ -149,12 +149,12 @@ def main():
 
     # --- FORMATEO FINAL ---
     formato_columnas = {
-        f"IN {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"OUT {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"IN promedio {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"IN {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"OUT {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"IN promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
 
         f"IN promedio mismo período año anterior": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"OUT promedio {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "VENTA Y PREVENTA HASTA HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "Variación vs año anterior (%)": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",

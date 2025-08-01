@@ -10,7 +10,7 @@ st.set_page_config(page_title="Panel SELL", layout="wide")
 
 cols = st.columns([2, 3, 3, 3, 3, 3, 2, 2])
 with cols[7]:
-        st.image("logo.png", width=200)
+        st.image("logo.png")
 
 def decrypt_files():
     ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted"]

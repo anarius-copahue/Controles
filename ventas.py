@@ -163,7 +163,7 @@ def main():
     }
 
     # --- MOSTRAR ---
-   st.dataframe(
+    st.dataframe(
     resultado.reset_index(drop=True)
              .style
              .format(formato_columnas)

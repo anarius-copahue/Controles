@@ -163,12 +163,14 @@ def main():
     }
 
     # --- MOSTRAR ---
-    st.dataframe(
-    resultado.index_hide(drop=True)
-             .style
-             .format(formato_columnas)
-             .applymap(highlight_variacion, subset=["Variación vs año anterior"]),
-    use_container_width=True
+    styled_df = (
+    resultado.style
+        .format(formato_columnas)
+        .applymap(highlight_variacion, subset=["Variación vs año anterior"])
+        .hide(axis="index")  # This hides the index in the HTML output
 )
+
+# Display styled DataFrame as HTML
+    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
 
 

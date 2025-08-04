@@ -162,28 +162,15 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
-    # Aplica estilo personalizado con HTML y CSS
-# CSS para achicar headers y evitar saltos de línea
-custom_css = """
-    <style>
-    thead th {
-        white-space: nowrap;
-        font-size: 11px;
-    }
-    tbody td {
-        font-size: 13px;
-    }
-    </style>
-    """
-
-# Aplicar estilo
+    # --- MOSTRAR ---
     styled_df = (
-        resultado.style
+    resultado.style
         .format(formato_columnas)
         .applymap(highlight_variacion, subset=["Variación vs AA"])
-    )
+        .hide(axis="index")  # This hides the index in the HTML output
+)
 
-# Mostrar en Streamlit
-    st.markdown(custom_css, unsafe_allow_html=True)
-    st.markdown("<div style='overflow-x:auto'>" + styled_df.to_html(index=False) + "</div>", unsafe_allow_html=True)
+# Display styled DataFrame as HTML
+    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+
 

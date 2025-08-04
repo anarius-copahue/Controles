@@ -48,7 +48,7 @@ def main():
     )
 
     df_preventa["Caviahue"] =  np.where(
-        df_preventa['PRODU.'].isin(['21653','22285'    ]),    df_preventa["Caviahue"] *2,
+        df_preventa['PRODU.'].isin(['21653'    ]),    df_preventa["Caviahue"] *2,
         df_preventa["Caviahue"]
     )
 

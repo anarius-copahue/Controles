@@ -172,13 +172,8 @@ def main():
             .format(formato_columnas)
             .applymap(highlight_variacion, subset=["Variación vs AA"])
             .hide(axis="index") # Opcional: este método también funciona para ocultar el índice
-    )
+    ).to_html(index=False)
 
-    # 2. Generar el HTML sin el índice
-    # El método .to_html() es donde pasas el parámetro 'index=False'
-    styled_df_html = styled_df.to_html(index=False)
-
-    # 3. Mostrar el HTML en tu aplicación (por ejemplo, con Streamlit)
-    import streamlit as st
+    
 
     st.markdown(styled_df_html, unsafe_allow_html=True)

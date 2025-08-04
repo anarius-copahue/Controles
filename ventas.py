@@ -169,8 +169,7 @@ def main():
         .format(formato_columnas)
         .applymap(highlight_variacion, subset=["Variación vs AA"])
         .hide(axis="index")  # This hides the index in the HTML output
-        .style = "display: flex; justify-content: center; overflow-x: auto; max-width: 100%;"
-
+        
 )
 
 # Display styled DataFrame as HTML

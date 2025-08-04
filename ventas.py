@@ -162,16 +162,19 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
-    # Estilo del DataFrame
+    
+    # --- MOSTRAR ---
     styled_df = (
     resultado.style
         .format(formato_columnas)
         .applymap(highlight_variacion, subset=["Variación vs AA"])
-    )
+        .hide(axis="index")  # This hides the index in the HTML output
+        .style = "display: flex; justify-content: center; overflow-x: auto; max-width: 100%;"
 
-# Mostrar como HTML ocultando el índice
-    st.markdown(
-    styled_df.to_html(index=False),  # 👈 Esto elimina la columna de índice
-    unsafe_allow_html=True
-    )
+)
+
+# Display styled DataFrame as HTML
+    st.markdown(f"<div style='display: flex; justify-content: center;'>{resultado.style.format(formato_columnas).applymap(highlight_variacion, subset=['Variación vs AA']).to_html(index=False)}</div>", unsafe_allow_html=True)
+
+
 

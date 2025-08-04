@@ -163,27 +163,27 @@ def main():
     }
 
     # Aplica estilo personalizado con HTML y CSS
+# CSS para achicar headers y evitar saltos de línea
 custom_css = """
-<style>
+    <style>
     thead th {
         white-space: nowrap;
-        font-size: 12px;
+        font-size: 11px;
     }
     tbody td {
         font-size: 13px;
     }
-</style>
-"""
+    </style>
+    """
 
-# Genera el HTML con estilos
-styled_html = (
-    resultado.style
-    .format(formato_columnas)
-    .applymap(highlight_variacion, subset=["Variación vs AA"])
-    .to_html(index=False)
-)
+# Aplicar estilo
+    styled_df = (
+        resultado.style
+        .format(formato_columnas)
+        .applymap(highlight_variacion, subset=["Variación vs AA"])
+    )
 
-# Muestra todo con st.markdown
-st.markdown(custom_css, unsafe_allow_html=True)
-st.markdown(f"<div style='overflow-x:auto'>{styled_html}</div>", unsafe_allow_html=True)
+# Mostrar en Streamlit
+    st.markdown(custom_css, unsafe_allow_html=True)
+    st.markdown("<div style='overflow-x:auto'>" + styled_df.to_html(index=False) + "</div>", unsafe_allow_html=True)
 

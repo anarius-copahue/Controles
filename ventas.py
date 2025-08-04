@@ -58,15 +58,15 @@ def main():
         return agg
 
     actual = agg_periodo(df_actual, f"{meses} meses")
-    anterior = agg_periodo(df_anterior, "mismo período año anterior")
-    siguiente_sell_in = df_siguiente_anio_anterior.groupby("CADENA")["IN"].sum().rename("IN siguiente mes (año anterior)")
+    anterior = agg_periodo(df_anterior, "MP AA")
+    siguiente_sell_in = df_siguiente_anio_anterior.groupby("CADENA")["IN"].sum().rename("IN siguiente mes (AA)")
 
     resultado = actual.join(anterior, how="outer").join(siguiente_sell_in, how="outer").fillna(0)
 
-    resultado["Variación vs año anterior"] = np.where(
-        resultado["IN mismo período año anterior"] == 0,
+    resultado["Variación vs AA"] = np.where(
+        resultado["IN MP AA"] == 0,
         np.nan,
-        ((resultado[f"IN {meses} meses"] / resultado["IN mismo período año anterior"]) - 1) * 100
+        ((resultado[f"IN {meses} meses"] / resultado["IN MP AA"]) - 1) * 100
     )
 
     resultado["OUT / IN"] = np.where(
@@ -77,7 +77,7 @@ def main():
 
 
 
-    resultado["IN estimado mes actual (crecimiento)"] = resultado[f"IN promedio mismo período año anterior"] * (tasa_crecimiento)
+    resultado["IN estimado mes actual (crecimiento)"] = resultado[f"IN promedio MP AA"] * (tasa_crecimiento)
 
     # --- UNIFICAR PREVENTAS Y VENTAS ---
     df_preventa = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
@@ -108,12 +108,12 @@ def main():
 
     # --- OPORTUNIDADES Y ALERTAS ---
     oportunidades = resultado[
-        (resultado["Variación vs año anterior"] > 40) &
+        (resultado["Variación vs AA"] > 40) &
         (resultado["FALTA"] > 50)
     ]
 
     alertas = resultado[
-        (resultado["OUT / IN"] > 100)  &  (resultado["Variación vs año anterior"] > 20)
+        (resultado["OUT / IN"] > 100)  &  (resultado["Variación vs AA"] > 20)
     ]
 
     mensaje = ""
@@ -142,8 +142,8 @@ def main():
     # --- LIMPIEZA ---
     columnas_a_eliminar = [
         f"IN {meses} meses", f"OUT {meses} meses",
-        'IN mismo período año anterior', 'OUT mismo período año anterior',
-        "IN siguiente mes (año anterior)","OUT promedio mismo período año anterior",
+        'IN MP AA', 'OUT MP AA',
+        "IN siguiente mes (AA)","OUT promedio MP AA",
     ]
     resultado.drop(columns=[col for col in columnas_a_eliminar if col in resultado.columns], inplace=True)
 
@@ -153,11 +153,11 @@ def main():
         f"OUT {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         f"IN promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
 
-        f"IN promedio mismo período año anterior": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"IN promedio MP AA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
         "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "Variación vs año anterior": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
+        "Variación vs AA": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
         "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
@@ -166,7 +166,7 @@ def main():
     styled_df = (
     resultado.style
         .format(formato_columnas)
-        .applymap(highlight_variacion, subset=["Variación vs año anterior"])
+        .applymap(highlight_variacion, subset=["Variación vs AA"])
         .hide(axis="index")  # This hides the index in the HTML output
 )
 

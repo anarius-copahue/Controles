@@ -162,22 +162,28 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
-    custom_style = """
+    # Aplica estilo personalizado con HTML y CSS
+custom_css = """
 <style>
     thead th {
         white-space: nowrap;
         font-size: 12px;
     }
-    td {
+    tbody td {
         font-size: 13px;
     }
 </style>
 """
 
-    styled_html = resultado.style\
-    .format(formato_columnas)\
-    .applymap(highlight_variacion, subset=["Variación vs AA"])\
+# Genera el HTML con estilos
+styled_html = (
+    resultado.style
+    .format(formato_columnas)
+    .applymap(highlight_variacion, subset=["Variación vs AA"])
     .to_html(index=False)
+)
 
-    |st.markdown(custom_style + f"<div style='overflow-x:auto'>{styled_html}</div>", unsafe_allow_html=True)
+# Muestra todo con st.markdown
+st.markdown(custom_css, unsafe_allow_html=True)
+st.markdown(f"<div style='overflow-x:auto'>{styled_html}</div>", unsafe_allow_html=True)
 

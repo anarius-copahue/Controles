@@ -162,38 +162,23 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
+    # Suponiendo que 'resultado' es tu DataFrame de pandas final
+    # ... (código previo para generar el DataFrame 'resultado') ...
+
     # --- MOSTRAR ---
-    # 1. Definir un CSS que evite el salto de línea y ajuste el texto
-    #    - white-space: nowrap; evita que el texto se parta en varias líneas.
-    #    - overflow: hidden; oculta el texto que exceda el ancho.
-    #    - text-overflow: ellipsis; añade puntos suspensivos (...) al final del texto cortado.
-    #    - max-width: 100px; (o el ancho que prefieras) para limitar el ancho de la columna si es necesario.
-    #      (Ajusta este valor según tus necesidades, o puedes omitirlo para que el ancho sea automático).
-    #
-    #    Vamos a añadir este CSS directamente en un <style> en el HTML.
-    #    También podemos aplicar un ancho fijo a las columnas para que el contenido se ajuste a ese ancho.
+    # 1. Aplicar los estilos al DataFrame
+    styled_df = (
+        resultado.style
+            .format(formato_columnas)
+            .applymap(highlight_variacion, subset=["Variación vs AA"])
+            .hide(axis="index") # Opcional: este método también funciona para ocultar el índice
+    )
 
-    html_css = """
-    <style>
-        table th {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 150px; /* Ajusta este valor al ancho máximo deseado */
-        }
-    </style>
-    """
+    # 2. Generar el HTML sin el índice
+    # El método .to_html() es donde pasas el parámetro 'index=False'
+    styled_df_html = styled_df.to_html(index=False)
 
-    # 2. Convertir el DataFrame estilizado a HTML
-    #    No se pueden inyectar estilos directamente en `.style`, así que generamos el HTML y le añadimos nuestro CSS.
+    # 3. Mostrar el HTML en tu aplicación (por ejemplo, con Streamlit)
+    import streamlit as st
 
-    styled_df_html = resultado.to_html()
-
-    # 3. Combinar el CSS con el HTML del DataFrame
-    #    Para que el CSS funcione, debe estar dentro del mismo documento HTML.
-    final_html = html_css + styled_df_html
-
-    # 4. Mostrar el HTML
-    st.markdown(final_html, unsafe_allow_html=True)
-
-
+    st.markdown(styled_df_html, unsafe_allow_html=True)

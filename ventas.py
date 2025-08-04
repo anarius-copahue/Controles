@@ -162,15 +162,14 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
-    # --- MOSTRAR ---
-    styled_df = (
-    resultado.style
-        .format(formato_columnas)
-        .applymap(highlight_variacion, subset=["Variación vs AA"])
-        .hide(axis="index")  # This hides the index in the HTML output
+    st.dataframe(
+    resultado.reset_index(drop=True)
+             .style
+             .format(formato_columnas)
+             .applymap(highlight_variacion, subset=["Variación vs año anterior"]),
+    use_container_width=True
 )
 
-# Display styled DataFrame as HTML
-    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+ 
 
 

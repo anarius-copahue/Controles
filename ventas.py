@@ -162,25 +162,12 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
-    # --- Crear estilo personalizado que mantiene altura uniforme ---
-cell_style = {
-    'selector': 'td',
-    'props': [('padding', '4px'), ('text-align', 'center'), ('vertical-align', 'middle')]
-}
-
-header_style = {
-    'selector': 'th',
-    'props': [('padding', '6px'), ('text-align', 'center'), ('vertical-align', 'middle')]
-}
-
-# --- Estilo del DataFrame ---
-styled_df = (
+    st.dataframe(
     resultado.style
-        .format(formato_columnas)
-        .applymap(highlight_variacion, subset=["Variación vs AA"])
-        .set_table_styles([cell_style, header_style])
-        .hide(axis="index")
+             .format(formato_columnas)
+             .applymap(highlight_variacion, subset=["Variación vs año anterior"]),
+    use_container_width=True
 )
 
-# --- Mostrar en Streamlit sin cambiar altura del renglón ---
-st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+
+

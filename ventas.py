@@ -162,15 +162,22 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
-    # --- MOSTRAR ---
-    styled_df = (
-    resultado.style
-        .format(formato_columnas)
-        .applymap(highlight_variacion, subset=["Variación vs AA"])
-        .hide(axis="index")  # This hides the index in the HTML output
-)
+    custom_style = """
+<style>
+    thead th {
+        white-space: nowrap;
+        font-size: 12px;
+    }
+    td {
+        font-size: 13px;
+    }
+</style>
+"""
 
-# Display styled DataFrame as HTML
-    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+    styled_html = resultado.style\
+    .format(formato_columnas)\
+    .applymap(highlight_variacion, subset=["Variación vs AA"])\
+    .to_html(index=False)
 
+    |st.markdown(custom_style + f"<div style='overflow-x:auto'>{styled_html}</div>", unsafe_allow_html=True)
 

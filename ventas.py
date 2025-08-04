@@ -170,6 +170,25 @@ def main():
     else:
         resultado_filtrado = resultado
 
+    st.markdown("""
+        <style>
+            table {
+                width: 100%;
+                table-layout: auto;
+            }
+            th {
+                white-space: nowrap;
+                text-align: center;
+                font-size: 14px;
+            }
+            td {
+                white-space: nowrap;
+                font-size: 13px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+
     # --- MOSTRAR ---
     styled_df = (
         resultado_filtrado.style
@@ -179,6 +198,4 @@ def main():
     )
 
     st.markdown(styled_df.to_html(), unsafe_allow_html=True)
-
-
 

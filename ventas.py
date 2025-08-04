@@ -11,7 +11,7 @@ def main():
     # --- FILTROS EN LA PARTE SUPERIOR ---
     col1, col2 = st.columns(2)
     with col1:
-        meses = st.radio("Seleccionar período móvil:", [3, 4, 6, 12], index=0, horizontal=True)
+        meses = st.radio("Seleccionar período móvil:", [1, 3, 4, 6, 12], index=0, horizontal=True)
     with col2:
         tasa_crecimiento = (st.number_input("Tasa de crecimiento (%)", value=40) / 100)+1
 
@@ -162,15 +162,23 @@ def main():
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
+        # --- BUSCADOR DE CADENAS ---
+    busqueda = st.text_input("🔍 Buscar cadena de farmacia:", "")
+
+    if busqueda:
+        resultado_filtrado = resultado[resultado["CADENA"].str.contains(busqueda, case=False, na=False)]
+    else:
+        resultado_filtrado = resultado
+
     # --- MOSTRAR ---
     styled_df = (
-    resultado.style
-        .format(formato_columnas)
-        .applymap(highlight_variacion, subset=["Variación vs AA"])
-        .hide(axis="index")  # This hides the index in the HTML output
-)
+        resultado_filtrado.style
+            .format(formato_columnas)
+            .applymap(highlight_variacion, subset=["Variación vs AA"])
+            .hide(axis="index")
+    )
 
-# Display styled DataFrame as HTML
     st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+
 
 

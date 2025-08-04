@@ -187,7 +187,7 @@ def main():
     # 2. Convertir el DataFrame estilizado a HTML
     #    No se pueden inyectar estilos directamente en `.style`, así que generamos el HTML y le añadimos nuestro CSS.
 
-    styled_df_html = styled_df.to_html()
+    styled_df_html = resultado.to_html()
 
     # 3. Combinar el CSS con el HTML del DataFrame
     #    Para que el CSS funcione, debe estar dentro del mismo documento HTML.

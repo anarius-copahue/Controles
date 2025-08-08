@@ -6,8 +6,6 @@ import numpy as np
 def main():
     archivo_excel = "data/representante.xlsx"
 
-
-
     df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
     
         # Calcular valor
@@ -127,8 +125,6 @@ def main():
             for col in ["Cuota Caviahue", "Total Caviahue", "Cuota Mizu", "Total Mizu"]:
                 if col in df.columns:
                     df.loc[total_row_idx, col] = df.loc[children_mask, col].sum(skipna=True)
-
-        
 
             # Save updated version
         hojas_representantes[nombre] = df

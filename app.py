@@ -1,6 +1,7 @@
 import streamlit as st
-from cuotas import main as main_cuota
-from ventas import main as main_ventas
+from cuotas_admin import main as admin_cuota
+from ventas_admin import main as admin_ventas
+from cuotas_ventas_representante import main as cuotas_ventas_representante
 from scrap import scrape_data
 from encrypt import decrypt_file
 from datetime import datetime, timedelta
@@ -18,6 +19,12 @@ def decrypt_files():
 
     for archivo in ARCHIVOS:
         decrypt_file(archivo, key.encode())
+a_representantes = [
+        'Karina Macías', 'Karina Perfu y Supermercados', 'Esteban Piegari',
+        'Maria Laura Lavanchy', 'Patricia Zacca', 'Marcela Rosselot', 'Lucio Colombo',
+        'Yanina Cuezzo', 'Leonardo Paredes', 'Yamila Arreche', 'Emiliano Veiga',
+        'Jessica Andermarch', 'Luciano Laguna'
+    ]
 
 def get_last_scrape_time():
     if os.path.exists("last_scrape.txt"):
@@ -53,27 +60,35 @@ run_scraping_if_needed()
 decrypt_files()
 
 # Password protection
+def page_login():
+    # Campo para ingresar contraseña
+    st.title("Acceso restringido")
 
-# Define la contraseña correcta
-PASSWORD = st.secrets["PASSWORD"]
+    user_input = st.text_input("Ingresá tu usuario:")
+    password_input = st.text_input("Ingresá la contraseña:", type="password")
 
-# Campo para ingresar contraseña
-st.title("Acceso restringido")
-password_input = st.text_input("Ingresá la contraseña:", type="password")
+    # Define la contraseña correcta
+    password = st.secrets[user_input.upper()]
 
-# Verificación
-if password_input != PASSWORD:
-    st.warning("Acceso denegado. Ingresá la contraseña para continuar.")
-    st.stop()
+    # Verificación
+    if password_input != password:
+        st.warning("Acceso denegado. Ingresá la contraseña para continuar.")
+        st.stop()
+
+    return user_input
+
+user_logged = page_login()
 
 # Si la contraseña es correcta, muestra el contenido
 st.success("Acceso concedido")
 
-# Tabs
-tab1, tab2 = st.tabs(["Ventas", "Cuota"])
+if user_logged.upper() == "ADMIN":
+    # Tabs
+    tab1, tab2 = st.tabs(["Ventas", "Cuota"])
+    with tab1:
+        admin_ventas()
+    with tab2:
+        admin_cuota()
 
-with tab1:
-    main_ventas()
-
-with tab2:
-    main_cuota()
+else:
+    cuotas_ventas_representante(user_logged.upper())

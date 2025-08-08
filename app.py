@@ -67,6 +67,11 @@ def page_login():
     user_input = st.text_input("Ingresá tu usuario:")
     password_input = st.text_input("Ingresá la contraseña:", type="password")
 
+    # Esperar a que el usuario ingrese ambos campos
+    if not user_input or not password_input:
+        st.warning("Por favor, ingresá tu usuario y contraseña.")
+        st.stop()
+
     # Define la contraseña correcta
     password = st.secrets[user_input.upper()]
 

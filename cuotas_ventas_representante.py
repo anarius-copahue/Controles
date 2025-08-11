@@ -30,6 +30,20 @@ REPRESENTANTE_POR_USUARIO = {
         "LLAGUNA": ["Luciano Laguna"]
 }
 
+REPRESENTANTE_mapa= {
+        "KMACIAS": "mapa_ventas_KARINA.html",
+        "EPIEGARI": "mapa_ventas_ESTEBAN.html",
+        "PZACCA": "mapa_ventas_PATRICA.html",
+        "MROSSELOT": "mapa_ventas_MARCELA.html",
+        "LCOLOMBO": "mapa_ventas_LUCIO.html",
+        "YCUEZZO": "mapa_ventas_YANINA.html",
+        "YARRECHE": "mapa_ventas_YAMILA.html",
+        "EVEIGA": "mapa_ventas_EMILIANO.html",
+        "JANDERMARCH": "mapa_ventas_JESSICA.html",
+        "LLAGUNA": "mapa_ventas_LUCIANO.html"
+}
+
+
 def ventas(representante):
     st.set_page_config(page_title="Control SELL OUT/IN", layout="wide")
     st.title("Control SELL OUT/IN")
@@ -453,6 +467,17 @@ def cuotas(representante):
             st.dataframe(df.style.apply(resaltar_total, axis=1).format(precision=0), use_container_width=True)
                 
         st.markdown("---")
+
+        import streamlit as st
+
+    # Cargar el archivo HTML
+    mapa_html = REPRESENTANTE_mapa.get(representante)
+    with open(f"mapa por representante/{mapa_html}", "r", encoding="utf-8") as f:
+        mapa_html = f.read()
+
+    # Mostrar el mapa en Streamlit
+    st.components.v1.html(mapa_html, height=600, scrolling=True)
+
 
 def main(representante):
     ventas(representante)

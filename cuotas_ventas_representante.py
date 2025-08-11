@@ -474,14 +474,13 @@ def cuotas(representante):
 
     if mapa_file:  # Solo si existe en el diccionario
         ruta_mapa = f"mapa por representante/{mapa_file}"
-    with open(ruta_mapa, "r", encoding="utf-8") as f:
-        mapa_html = f.read()
+        with open(ruta_mapa, "r", encoding="utf-8") as f:
+            mapa_html = f.read()
 
     # Mostrar el mapa en Streamlit
         st.components.v1.html(mapa_html, height=600, scrolling=True)
-    
     else:
-        st.warning(f"No se encontró un mapa para {representante}")
+        st.warning("No hay mapa disponible para este representante.")
 
 def main(representante):
     ventas(representante)

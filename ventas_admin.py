@@ -11,7 +11,7 @@ def main():
     # --- FILTROS EN LA PARTE SUPERIOR ---
     col1, col2 = st.columns(2)
     with col1:
-        meses = st.radio("Seleccionar período móvil:", [3, 4, 6, 12], index=0, horizontal=True)
+        meses = st.radio("Seleccionar período móvil:", [1, 3, 4, 6, 12], index=0, horizontal=True)
     with col2:
         tasa_crecimiento = (st.number_input("Tasa de crecimiento (%)", value=40) / 100)+1
 
@@ -22,7 +22,10 @@ def main():
     df.dropna(subset=["FECHA", "CADENA"], inplace=True)
     df = df[df['CADENA'] != "PERFUMERÍAS PIGMENTO"]  # Excluir "PIGMENTO" de las cadenas
     df = df[df['CADENA'] != "FARMACIA DEL SIGLO"]  # Excluir "PIGMENTO" de las cadenas
-
+    df = df.rename(columns={
+        "SELL IN": "IN",
+        "SELL OUT": "OUT"
+    })
     # --- DETERMINAR PERÍODOS ---
     fecha_ultima = df["FECHA"].max()
     fechas_actuales = pd.date_range(end=fecha_ultima, periods=meses, freq="MS")
@@ -43,38 +46,38 @@ def main():
     # --- AGREGAR ---
     def agg_periodo(df_, label):
         agg = df_.groupby("CADENA").agg({
-            "SELL IN": ["sum", lambda x: x[x != 0].mean()],
-            "SELL OUT": ["sum", lambda x: x[x != 0].mean()]
+            "IN": ["sum", lambda x: x[x != 0].mean()],
+            "OUT": ["sum", lambda x: x[x != 0].mean()]
         })
         agg.columns = [
-            f"SELL IN {label}",
-            f"SELL IN promedio {label}",
-            f"SELL OUT {label}",
-            f"SELL OUT promedio {label}"
+            f"IN {label}",
+            f"IN promedio {label}",
+            f"OUT {label}",
+            f"OUT promedio {label}"
         ]
         return agg
 
-    actual = agg_periodo(df_actual, f"{meses} últimos meses")
-    anterior = agg_periodo(df_anterior, "mismo período año anterior")
-    siguiente_sell_in = df_siguiente_anio_anterior.groupby("CADENA")["SELL IN"].sum().rename("SELL IN siguiente mes (año anterior)")
+    actual = agg_periodo(df_actual, f"{meses} meses")
+    anterior = agg_periodo(df_anterior, "MP AA")
+    siguiente_sell_in = df_siguiente_anio_anterior.groupby("CADENA")["IN"].sum().rename("IN siguiente mes (AA)")
 
     resultado = actual.join(anterior, how="outer").join(siguiente_sell_in, how="outer").fillna(0)
 
-    resultado["Variación vs año anterior (%)"] = np.where(
-        resultado["SELL IN mismo período año anterior"] == 0,
+    resultado["Variación vs AA"] = np.where(
+        resultado["IN MP AA"] == 0,
         np.nan,
-        ((resultado[f"SELL IN {meses} últimos meses"] / resultado["SELL IN mismo período año anterior"]) - 1) * 100
+        ((resultado[f"IN {meses} meses"] / resultado["IN MP AA"]) - 1) * 100
     )
 
-    resultado["SELL OUT / SELL IN"] = np.where(
-        resultado[f"SELL IN {meses} últimos meses"] == 0,
+    resultado["OUT / IN"] = np.where(
+        resultado[f"IN {meses} meses"] == 0,
         np.nan,
-        (resultado[f"SELL OUT {meses} últimos meses"] / resultado[f"SELL IN {meses} últimos meses"])*100
+        (resultado[f"OUT {meses} meses"] / resultado[f"IN {meses} meses"])*100
     )
 
 
 
-    resultado["SELL IN estimado mes actual (crecimiento)"] = resultado[f"SELL IN promedio mismo período año anterior"] * (tasa_crecimiento)
+    resultado["IN estimado mes actual (crecimiento)"] = resultado[f"IN promedio MP AA"] * (tasa_crecimiento)
 
     # --- UNIFICAR PREVENTAS Y VENTAS ---
     df_preventa = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
@@ -94,23 +97,23 @@ def main():
     ], ignore_index=True)
 
     ventas_totales = ventas_y_preventas.groupby("CADENA")["valor"].sum().reset_index()
-    ventas_totales.rename(columns={"valor": "VENTA Y PREVENTA HASTA HOY"}, inplace=True)
+    ventas_totales.rename(columns={"valor": "VENTA Y PREVENTA A HOY"}, inplace=True)
 
     resultado = resultado.merge(ventas_totales, on="CADENA", how="left")
-    resultado["FALTA"] = resultado["SELL IN estimado mes actual (crecimiento)"] - resultado["VENTA Y PREVENTA HASTA HOY"]
+    resultado["FALTA"] = resultado["IN estimado mes actual (crecimiento)"] - resultado["VENTA Y PREVENTA A HOY"]
 
 
 
-    st.subheader(f"Último mes disponible: {fecha_ultima.strftime('%B %Y')} | Período comparado: {fechas_actuales[0].strftime('%Y-%m')} a {fechas_actuales[-1].strftime('%Y-%m')}")
+    st.subheader(f"mes disponible: {fecha_ultima.strftime('%B %Y')} | Período comparado: {fechas_actuales[0].strftime('%Y-%m')} a {fechas_actuales[-1].strftime('%Y-%m')}")
 
     # --- OPORTUNIDADES Y ALERTAS ---
     oportunidades = resultado[
-        (resultado["Variación vs año anterior (%)"] > 40) &
+        (resultado["Variación vs AA"] > 40) &
         (resultado["FALTA"] > 50)
     ]
 
     alertas = resultado[
-        (resultado["SELL OUT / SELL IN"] > 100)  &  (resultado["Variación vs año anterior (%)"] > 20)
+        (resultado["OUT / IN"] > 100)  &  (resultado["Variación vs AA"] > 20)
     ]
 
     mensaje = ""
@@ -138,31 +141,61 @@ def main():
 
     # --- LIMPIEZA ---
     columnas_a_eliminar = [
-        f"SELL IN {meses} últimos meses", f"SELL OUT {meses} últimos meses",
-        'SELL IN mismo período año anterior', 'SELL OUT mismo período año anterior',
-        "SELL IN siguiente mes (año anterior)","SELL OUT promedio mismo período año anterior",
+        f"IN {meses} meses", f"OUT {meses} meses",
+        'IN MP AA', 'OUT MP AA',
+        "IN siguiente mes (AA)","OUT promedio MP AA",
     ]
     resultado.drop(columns=[col for col in columnas_a_eliminar if col in resultado.columns], inplace=True)
 
     # --- FORMATEO FINAL ---
     formato_columnas = {
-        f"SELL IN {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"SELL OUT {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"SELL IN promedio {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"IN {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"OUT {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"IN promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
 
-        f"SELL IN promedio mismo período año anterior": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"SELL OUT promedio {meses} últimos meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "SELL IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "VENTA Y PREVENTA HASTA HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "Variación vs año anterior (%)": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
-        "SELL OUT / SELL IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
+        f"IN promedio MP AA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+        "Variación vs AA": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
+        "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
         "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
+        # --- BUSCADOR DE CADENAS ---
+    busqueda = st.text_input("🔍 Buscar cadena de farmacia:", "")
+
+    if busqueda:
+        resultado_filtrado = resultado[resultado["CADENA"].str.contains(busqueda, case=False, na=False)]
+    else:
+        resultado_filtrado = resultado
+
+    st.markdown("""
+        <style>
+            table {
+                width: 100%;
+                table-layout: auto;
+            }
+            th {
+                white-space: nowrap;
+                text-align: center;
+                font-size: 14px;
+            }
+            td {
+                white-space: nowrap;
+                font-size: 13px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+
     # --- MOSTRAR ---
-    st.dataframe(
-        resultado.style
+    styled_df = (
+        resultado_filtrado.style
             .format(formato_columnas)
-            .applymap(highlight_variacion, subset=["Variación vs año anterior (%)"]),
-        use_container_width=True
+            .applymap(highlight_variacion, subset=["Variación vs AA"])
+            .hide(axis="index")
     )
+
+    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+

@@ -478,7 +478,7 @@ def cuotas(representante):
             mapa_html = f.read()
 
     # Mostrar el mapa en Streamlit
-        st.components.v1.html(mapa_html, height=600, scrolling=True)
+        st.components.v1.html(mapa_html, height=600, width=800, scrolling=True)
     else:
         st.warning("No hay mapa disponible para este representante.")
 

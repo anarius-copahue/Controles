@@ -1,4 +1,5 @@
 from cryptography.fernet import Fernet
+import os
 
 def encrypt_file(file_path, key=None):
     # Read the file content

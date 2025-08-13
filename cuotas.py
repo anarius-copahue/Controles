@@ -15,7 +15,7 @@ REPRESENTANTE_POR_USUARIO = {
         "LLAGUNA": ["Luciano Laguna"]
 }
 
-def cuotas(representantes=None):
+def cuotas(representantes=[]):
     """
     args:
         representantes: Lista de representantes a incluir en el reporte. Si es None, se incluyen todos los representantes.

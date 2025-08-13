@@ -15,7 +15,7 @@ FARMACIA_POR_USUARIO = {
 "LLAGUNA" : [],
 }
 
-def ventas(representantes):
+def ventas(representantes=None):
     st.set_page_config(page_title="Control SELL OUT/IN", layout="wide")
     st.title("Control SELL OUT/IN")
 

@@ -15,7 +15,7 @@ REPRESENTANTE_mapa= {
         "LLAGUNA": "mapa_ventas_LUCIANO.html"
 }
 
-def mapa(representante):
+def mapa(representante=None):
     mapa_file = REPRESENTANTE_mapa.get(representante)
 
     if mapa_file:  # Solo si existe en el diccionario

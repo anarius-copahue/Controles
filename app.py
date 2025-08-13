@@ -1,7 +1,7 @@
 import streamlit as st
-from cuotas_admin import main as admin_cuota
-from ventas_admin import main as admin_ventas
-from cuotas_ventas_representante import main as cuotas_ventas_representante
+from cuotas import cuotas
+from ventas import ventas
+from mapa import mapa
 from scrap import scrape_data
 from encrypt import decrypt_file
 from datetime import datetime, timedelta
@@ -91,9 +91,11 @@ if user_logged.upper() == "ADMIN":
     # Tabs
     tab1, tab2 = st.tabs(["Ventas", "Cuota"])
     with tab1:
-        admin_ventas()
+        ventas()
     with tab2:
-        admin_cuota()
+        cuotas()
 
 else:
-    cuotas_ventas_representante(user_logged.upper())
+    ventas([user_logged.upper()])
+    cuotas([user_logged.upper()])
+    mapa(user_logged.upper())

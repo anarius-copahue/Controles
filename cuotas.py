@@ -89,13 +89,14 @@ def cuotas(representantes=[]):
 
     # Lista de hojas esperadas
     lista_representantes = []
-    for usuario, representantes in REPRESENTANTE_POR_USUARIO.items():
-        if usuario in representantes:
-            lista_representantes.extend(representantes)
     if not representantes:
-        for usuario, representantes in REPRESENTANTE_POR_USUARIO.items():
-            lista_representantes.extend(representantes)
+        representantes = REPRESENTANTE_POR_USUARIO.keys()
 
+    # Lista de representantes según el usuario
+    for usuario, nombres in REPRESENTANTE_POR_USUARIO.items():
+        if usuario in representantes:
+            lista_representantes.extend(nombres)
+            
     # Cargar hojas del Excel
     hojas_representantes = {
         nombre: pd.read_excel(archivo_excel, sheet_name=nombre)

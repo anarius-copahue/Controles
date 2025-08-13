@@ -34,13 +34,12 @@ def ventas(representantes=[]):
 
     # Lista de farmacias según el representante
     lista = []
+    if not representantes:
+        representantes = FARMACIA_POR_USUARIO.keys()
+
     for usuario, farmacias in FARMACIA_POR_USUARIO.items():
         if usuario in representantes:
             lista.extend(farmacias)
-    if not representantes:
-        for usuario, farmacias in FARMACIA_POR_USUARIO.items():
-            lista.extend(farmacias)
-
 
     df = df[df['CADENA'].isin(lista)]  # Filtrar por representante
     df = df.rename(columns={

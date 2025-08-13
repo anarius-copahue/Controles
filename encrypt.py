@@ -1,10 +1,15 @@
 from cryptography.fernet import Fernet
-import os
+import sys
 
 def encrypt_file(file_path, key=None):
     # Read the file content
     with open(file_path, 'rb') as file:
         file_data = file.read()
+
+    # Generate a key if not provided
+    if key is None:
+        key = Fernet.generate_key()
+        print(f"Generated Key: {key.decode()} (store this key to decrypt the file later)")
 
     # Create a Fernet object with the provided key
     fernet = Fernet(key)
@@ -39,18 +44,21 @@ def decrypt_file(file_path, key):
     with open(file_path, 'wb') as file:
         file.write(decrypted_data)
 
-def encrypt_data():
-    import sys
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python encrypt.py <file_path> <key>")
+        sys.exit(1)
 
-    ARCHIVOS = ["data/diccionario.xlsx", "data/representante.xlsx", "data/SELL_IN_OUT.csv"]
+    file_path = sys.argv[1]
+    key = sys.argv[2] if len(sys.argv) > 2 else None
 
-    key = sys.argv[1] if len(sys.argv) > 1 else None
+    if file_path.endswith('.encrypted'):
+        if key is None:
+            print("Key is required for decryption.")
+            sys.exit(1)
+        decrypt_file(file_path, key.encode())
+        print(f"Archivo {file_path} desencriptado.")
 
-    if key is None:
-        # Generate a key if not provided
-        key = Fernet.generate_key()
-        print(f"Generated key: {key.decode()}")
-
-    for archivo in ARCHIVOS:
-        encrypt_file(archivo, key)
-        print(f"Archivo {archivo} encriptado.")
+    else:
+        encrypt_file(file_path, key.encode() if key else None)
+        print(f"Archivo {file_path} encriptado.")

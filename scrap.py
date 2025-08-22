@@ -102,6 +102,16 @@ def download_producto_report(driver):
 
     driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbinVtaporPeriodoProduClie_codigoVenta"]/option[3]')))
     Select(driver.wait.until(EC.presence_of_element_located((By.ID, "tbinVtaporPeriodoProduClie_codigoVenta")))).select_by_visible_text("Ambas")
+    # Obtain current date from the element by id tbinVtaporPeriodoProduClie_fechaDesde
+    current_date = driver.wait.until(EC.presence_of_element_located((By.ID, "tbinVtaporPeriodoProduClie_fechaDesde"))).get_attribute("value")
+    new_date = current_date.split("/")
+    new_date[0] = "01"  # Change the day to the first of the month
+    current_date = "/".join(new_date)
+    # Change the date to the first day of the month
+    driver.find_element(By.ID, "tbinVtaporPeriodoProduClie_fechaDesde").clear()
+    driver.find_element(By.ID, "tbinVtaporPeriodoProduClie_fechaDesde").send_keys(new_date)
+
+    
     time.sleep(0.5) # Wait for the dropdown to update before clicking
     driver.wait.until(EC.presence_of_element_located((By.ID, "btnFiltrar"))).click()
 

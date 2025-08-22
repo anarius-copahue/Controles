@@ -209,5 +209,8 @@ descargas/
 myenv/
 
 # Data files
-.csv
-.xlsx
+*.csv
+*.xlsx
+
+# Scrape
+last_scrape.txt

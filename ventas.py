@@ -101,6 +101,7 @@ def ventas(representantes=[]):
     df_preventa = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
     df_venta = pd.read_csv("descargas/ventas_netas_por_periodo_cliente.csv", sep="|")
     diccionario = pd.read_excel("data/diccionario.xlsx")
+    diccionario = diccionario.drop_duplicates(subset=["N° CLIENTE"])
     mapa_cadenas = diccionario.set_index("N° CLIENTE")["CADENA"]
 
     df_preventa["CADENA"] = df_preventa["Clie"].map(mapa_cadenas)

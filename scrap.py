@@ -4,16 +4,12 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
 import os
 import time
 import streamlit as st
 
 USER = st.secrets["DISPRO_USER"]
 PASSWORD = st.secrets["DISPRO_PASSWORD"]
-
-
 
 DOWNLOAD_DIR = os.path.join(os.getcwd(), "descargas")
 PREVENTA_REPORT_FILE_NAME = "preventa_por_cliente.csv"
@@ -27,7 +23,8 @@ VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Con
 
 def setup_driver():
     options = Options()
-    options.add_argument("--headless")  # Run in headless mode
+    if st.secrets["LOCAL"] == "FALSE":
+        options.add_argument("--headless")  # Run in headless mode
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
@@ -41,10 +38,15 @@ def setup_driver():
     "directory_upgrade": True,
     "safebrowsing.enabled": True
     })
-    
-    driver = webdriver.Chrome(service=Service(
-                 ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-             ), options=options)
+
+    if st.secrets["LOCAL"] == "FALSE":
+        from webdriver_manager.chrome import ChromeDriverManager
+        from webdriver_manager.core.os_manager import ChromeType
+        driver = webdriver.Chrome(service=Service(
+                    ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+                ), options=options)
+    else:
+        driver = webdriver.Chrome(options=options)
     
     return driver
 
@@ -69,7 +71,7 @@ def download_preventa_report(driver):
 
     driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="cmb_ventas"]/option[4]')))
     Select(driver.wait.until(EC.presence_of_element_located((By.ID, "cmb_ventas")))).select_by_visible_text("Ambos")
-    time.sleep(0.5) # Wait for the dropdown to update before clicking
+    time.sleep(1) # Wait for the dropdown to update before clicking
     driver.wait.until(EC.presence_of_element_located((By.ID, "btnFiltrar"))).click()
 
     # Download report as a csv file

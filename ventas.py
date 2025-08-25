@@ -168,52 +168,61 @@ def ventas(representantes=[]):
 
     # --- FORMATEO FINAL ---
     formato_columnas = {
-        f"IN {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"OUT {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"IN promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-
-        f"IN promedio MP AA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-        "Variación vs AA": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
-        "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
-        "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
+    f"IN {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+    f"OUT {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+    f"IN promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+    f"IN promedio MP AA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+    f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+    "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+    "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
+    "Variación vs AA": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
+    "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
+    "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
     }
 
-        # --- BUSCADOR DE CADENAS ---
+# --- BUSCADOR DE CADENAS ---
     busqueda = st.text_input("🔍 Buscar cadena de farmacia:", "")
 
     if busqueda:
-        resultado_filtrado = resultado[resultado["CADENA"].str.contains(busqueda, case=False, na=False)]
+     resultado_filtrado = resultado[resultado["CADENA"].str.contains(busqueda, case=False, na=False)]
     else:
         resultado_filtrado = resultado
 
+# --- AGREGAR FILA DE TOTALES ---
+    totales = resultado_filtrado.drop(columns=["CADENA"], errors="ignore").sum(numeric_only=True)
+    totales["CADENA"] = "TOTAL"
+
+    resultado_con_totales = pd.concat([resultado_filtrado, pd.DataFrame([totales])], ignore_index=True)
+
+# --- ESTILOS CSS ---
     st.markdown("""
-        <style>
-            table {
-                width: 100%;
-                table-layout: auto;
-            }
-            th {
-                white-space: nowrap;
-                text-align: center;
-                font-size: 14px;
-            }
-            td {
-                white-space: nowrap;
-                font-size: 13px;
-            }
-        </style>
+    <style>
+        table {
+            width: 100%;
+            table-layout: auto;
+        }
+        th {
+            white-space: nowrap;
+            text-align: center;
+            font-size: 14px;
+        }
+        td {
+            white-space: nowrap;
+            font-size: 13px;
+        }
+    </style>
     """, unsafe_allow_html=True)
 
-
-    # --- MOSTRAR ---
+# --- MOSTRAR ---
     styled_df = (
-        resultado_filtrado.style
-            .format(formato_columnas)
-            .applymap(highlight_variacion, subset=["Variación vs AA"])
-            .hide(axis="index")
+        resultado_con_totales.style
+        .format(formato_columnas)
+        .applymap(highlight_variacion, subset=["Variación vs AA"])
+        .hide(axis="index")
+        .apply(
+            lambda row: ["font-weight: bold;" if row["CADENA"] == "TOTAL" else "" for _ in row],
+            axis=1
+        )
     )
 
     st.markdown(styled_df.to_html(), unsafe_allow_html=True)

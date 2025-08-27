@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import io
 
 FARMACIA_POR_USUARIO = {
 "KMACIAS" : ["BELEN","DUTY PAID","CENTRAL OESTE","LA FRANCO","FARMACITY"],
@@ -225,4 +226,34 @@ def ventas(representantes=[]):
         )
     )
 
+    def to_excel(df: pd.DataFrame):
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="Reporte")
+            workbook = writer.book
+            worksheet = writer.sheets["Reporte"]
+
+        # Ajustar ancho de columnas
+            for col in worksheet.columns:
+                max_length = 0
+                col_letter = col[0].column_letter
+                for cell in col:
+                    try:
+                        if cell.value:
+                          max_length = max(max_length, len(str(cell.value)))
+                    except:
+                        pass
+                worksheet.column_dimensions[col_letter].width = max_length + 2
+
+        output.seek(0)
+        return output
+
     st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+    excel_file = to_excel(resultado_con_totales)
+
+    st.download_button(
+        label="📥 Descargar Excel",
+        data=excel_file,
+        file_name="reporte.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )

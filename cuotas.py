@@ -12,7 +12,8 @@ REPRESENTANTE_POR_USUARIO = {
         "YARRECHE": ["Yamila Arreche"],
         "EVEIGA": ["Emiliano Veiga"],
         "JANDERMARCH": ["Jessica Andermarch"],
-        "LLAGUNA": ["Luciano Laguna"]
+        "LLAGUNA": ["Luciano Laguna"],
+        "OTROS" : ["Leonardo Paredes", "Maria Laura Lavanchy"]
 }
 
 def cuotas(representantes=[]):
@@ -32,42 +33,45 @@ def cuotas(representantes=[]):
     # Cargar archivo de preventa
     df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
 
+    #Que las unidades bonificadas resten. Si venta bruta es igual a dtos. en farmacia mas menos 2, es una venta bonificada
+    def limpiar_valor(valor):
+        if pd.isna(valor):
+            return 0
+        valor = str(valor).replace('$', '').replace(' ', '')  # quitar $ y espacios
+        valor = valor.replace('.', '')  # quitar puntos de miles
+        valor = valor.replace(',', '.')  # reemplazar coma decimal por punto
+        return float(valor)
+    
+    df_preventa["Venta Bruta"] = df_preventa["Venta Bruta"].apply(limpiar_valor)
+    df_preventa["Dtos. en Factura"] = df_preventa["Dtos. en Factura"].apply(limpiar_valor)
+
+
+    df_preventa["venta_bonificada"] = np.isclose(    df_preventa["Venta Bruta"],    df_preventa["Dtos. en Factura"],   atol=2    )
+    #si la venta es bonificada, las unidades se toman como negativas
+    df_preventa["Venta Unid."] = np.where(    df_preventa["venta_bonificada"],   0,   df_preventa["Venta Unid."]    )
+
+
     # Clasificar productos
     df_preventa["Mizu"] = np.where(
-        df_preventa['Descripción'].isin([
-            'MIZU COLAGENO PLUS LIMON',
-            'F/L-COLAGENO HIDROLIZADO CLASICO - PIEL- MIZU',
-            "MIZU ARTRO FLEX"
-        ]),
-        df_preventa["Venta Unid."],
-        0
-    )
+        df_preventa['PRODU.'].isin([ 21304 , 21302 ]),df_preventa["Venta Unid."], 0 )
 
     df_preventa["Caviahue"] = np.where(
-        ~df_preventa['Descripción'].isin([
-            'MIZU COLAGENO PLUS LIMON',
-            'F/L-COLAGENO HIDROLIZADO CLASICO - PIEL- MIZU',
-            "MIZU ARTRO FLEX"
-        ]),
-        df_preventa["Venta Unid."],
-        0
-    )
+        ~df_preventa['PRODU.'].isin([ 21304 , 21302 ]),  df_preventa["Venta Unid."],   0  )
 
     #Despaconar
     df_preventa["Caviahue"] =  np.where(
-        df_preventa['PRODU.'].isin(['22005','21663','22251','21657','21655','21658'
-        ]),
+        df_preventa['PRODU.'].isin([22005,21663,22251,21657,21655,21658]),
         df_preventa["Caviahue"] *3,
         df_preventa["Caviahue"]
     )
 
     df_preventa["Caviahue"] =  np.where(
-        df_preventa['PRODU.'].isin(['21653'    ]),    df_preventa["Caviahue"] *2,
+        df_preventa['PRODU.'].isin([21653    ]),    df_preventa["Caviahue"] *2,
         df_preventa["Caviahue"]
     )
 
     df_preventa["Caviahue"] =  np.where(
-        df_preventa['PRODU.'].isin(['21656'   ]),    df_preventa["Caviahue"] *4,
+        df_preventa['PRODU.'].isin([21656   ]),    df_preventa["Caviahue"] *4,
         df_preventa["Caviahue"]
     )
 
@@ -177,7 +181,7 @@ def cuotas(representantes=[]):
             "Representante": list(hojas_representantes.keys()),
 
             "Cuota Caviahue": [
-                df[df["N° CLIENTE"].notna()]["Cuota Caviahue"].sum(skipna=True)
+                df[~df["CLIENTE"].str.contains("TOTAL", case=False, na=False)]["Cuota Caviahue"].sum(skipna=True)
                 for df in hojas_representantes.values()
             ],
 

@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_e190c93e2ac82014e008736e123647e8 {
+                #map_48d2a5be3026c1453c57ac6b9a7f225f {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -55,37 +55,38 @@
     
     
     <div style="
-        position: fixed;
-        bottom: 40px; left: 30px; width: 220px;
-        background-color: white;
-        border: 2px solid grey;
-        z-index:9999;
-        font-size: 14px;
-        padding: 10px;
-        box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+         position: fixed;
+         bottom: 40px; left: 30px; width: 220px;
+         background-color: white;
+         border: 2px solid grey;
+         z-index:9999;
+         font-size: 14px;
+         padding: 10px;
+         box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
     ">
     <b>🗺️ Leyenda</b><br>
-    <span style="font-size:18px; color: green;">●</span> Caviahue ↑<br>
-    <span style="font-size:18px; color: red;">●</span> Caviahue ↓<br>
-    <span style="font-size:18px; color: yellow;">●</span> Caviahue sin cambio<br>
+    <span style="font-size:18px; color: green;">●</span>
+    <span style="font-size:18px; color: red;">●</span>
+    <span style="font-size:18px; color: yellow;">●</span>
+    ; Caviahue <br>
     <span style="font-size:18px; color: #337AFF;">●</span> Competencia<br>
     <small>Tamaño = Volumen Total</small>
     </div>
     
     
-            <div class="folium-map" id="map_e190c93e2ac82014e008736e123647e8" ></div>
+            <div class="folium-map" id="map_48d2a5be3026c1453c57ac6b9a7f225f" ></div>
         
 </body>
 <script>
     
     
-            var map_e190c93e2ac82014e008736e123647e8 = L.map(
-                "map_e190c93e2ac82014e008736e123647e8",
+            var map_48d2a5be3026c1453c57ac6b9a7f225f = L.map(
+                "map_48d2a5be3026c1453c57ac6b9a7f225f",
                 {
-                    center: [-13.517995652173914, -30.286082608695654],
+                    center: [-27.489, -64.8282],
                     crs: L.CRS.EPSG3857,
                     ...{
-  "zoom": 11,
+  "zoom": 12,
   "zoomControl": true,
   "preferCanvas": false,
 }
@@ -97,7 +98,7 @@
 
         
     
-            var tile_layer_0c308edf1ed29e6a4645d70b1f03d679 = L.tileLayer(
+            var tile_layer_cd3d4a4cb470c14968db0123da9a2027 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
@@ -114,45 +115,39 @@
             );
         
     
-            tile_layer_0c308edf1ed29e6a4645d70b1f03d679.addTo(map_e190c93e2ac82014e008736e123647e8);
+            tile_layer_cd3d4a4cb470c14968db0123da9a2027.addTo(map_48d2a5be3026c1453c57ac6b9a7f225f);
         
     
-            map_e190c93e2ac82014e008736e123647e8.fitBounds(
-                [[-29.4902, -64.8282], [0.0, 0.0]],
-                {}
-            );
-        
-    
-            var feature_group_e3c3ce34ec1fe1d53869b570ce32de16 = L.featureGroup(
+            var feature_group_4d07a8f800e25734a3301caf5be2cc8d = L.featureGroup(
                 {
 }
             );
         
     
-            var circle_marker_7a8c1f00e078cabb5beae8b27789af23 = L.circleMarker(
+            var circle_marker_885e302fcf4b72288a4daa5751e1a97b = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_354c1a33d24d7143536e02ffecb8207b = L.popup({
+        var popup_ddfc44e36e7bc5e27e449c5a92ecc54b = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_fd1e1a7af2de8f93cff0764bf6dc3fb1 = $(`<div id="html_fd1e1a7af2de8f93cff0764bf6dc3fb1" style="width: 100.0%; height: 100.0%;"><b>ARRUFO<b>CP:</b> 2344<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 3.0</div>`)[0];
-                popup_354c1a33d24d7143536e02ffecb8207b.setContent(html_fd1e1a7af2de8f93cff0764bf6dc3fb1);
+                var html_b83094cb40ed3c6e2de607d535d6765a = $(`<div id="html_b83094cb40ed3c6e2de607d535d6765a" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 2344<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 3.0</div>`)[0];
+                popup_ddfc44e36e7bc5e27e449c5a92ecc54b.setContent(html_b83094cb40ed3c6e2de607d535d6765a);
             
         
 
-        circle_marker_7a8c1f00e078cabb5beae8b27789af23.bindPopup(popup_354c1a33d24d7143536e02ffecb8207b)
+        circle_marker_885e302fcf4b72288a4daa5751e1a97b.bindPopup(popup_ddfc44e36e7bc5e27e449c5a92ecc54b)
         ;
 
         
     
     
-            circle_marker_7a8c1f00e078cabb5beae8b27789af23.bindTooltip(
+            circle_marker_885e302fcf4b72288a4daa5751e1a97b.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -162,30 +157,30 @@
             );
         
     
-            var circle_marker_1f3760884495138e86bfcc4646d83a8a = L.circleMarker(
+            var circle_marker_00c806e0bc84786511e02b69b9cc305b = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_f481f45ccfdf2b8d3828fbdee6eff555 = L.popup({
+        var popup_c8b5aef02b474bc79ddac56ab375add7 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_d4e4b5fe0fefa1d6181bf673d581517c = $(`<div id="html_d4e4b5fe0fefa1d6181bf673d581517c" style="width: 100.0%; height: 100.0%;"><b>PINTO<b>CP:</b> 2356<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 3.0</div>`)[0];
-                popup_f481f45ccfdf2b8d3828fbdee6eff555.setContent(html_d4e4b5fe0fefa1d6181bf673d581517c);
+                var html_a3da36b6032e008ec72227dd4d62031a = $(`<div id="html_a3da36b6032e008ec72227dd4d62031a" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 2356<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 3.0</div>`)[0];
+                popup_c8b5aef02b474bc79ddac56ab375add7.setContent(html_a3da36b6032e008ec72227dd4d62031a);
             
         
 
-        circle_marker_1f3760884495138e86bfcc4646d83a8a.bindPopup(popup_f481f45ccfdf2b8d3828fbdee6eff555)
+        circle_marker_00c806e0bc84786511e02b69b9cc305b.bindPopup(popup_c8b5aef02b474bc79ddac56ab375add7)
         ;
 
         
     
     
-            circle_marker_1f3760884495138e86bfcc4646d83a8a.bindTooltip(
+            circle_marker_00c806e0bc84786511e02b69b9cc305b.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -195,30 +190,30 @@
             );
         
     
-            var circle_marker_f2615569a3706fd7dde41a722b23eee8 = L.circleMarker(
+            var circle_marker_13a95ffb48b3a861ef28cdb220791477 = L.circleMarker(
                 [-28.8876, -62.2454],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6.809483127522302, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_04d08c70f9da89e636b51179a926b4fe = L.popup({
+        var popup_9f856c6c819f48801336d24ce93fb990 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_5110525ee61b0191aed4e1e760e3675e = $(`<div id="html_5110525ee61b0191aed4e1e760e3675e" style="width: 100.0%; height: 100.0%;"><b>BANDERA<b>CP:</b> 3064<br><b>Caviahue Q2:</b> 15.0<br><b>Share Caviahue Q2:</b> 12.4%<br><b>Share Caviahue Q1:</b> 6.6%<br><b>Total Q2:</b> 121.0</div>`)[0];
-                popup_04d08c70f9da89e636b51179a926b4fe.setContent(html_5110525ee61b0191aed4e1e760e3675e);
+                var html_84987d57109e7184b0f2006837c48764 = $(`<div id="html_84987d57109e7184b0f2006837c48764" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 3064<br>                     <b>Caviahue Q2:</b> 15.0<br>                     <b>Share Caviahue Q2:</b> 12.4%<br>                     <b>Share Caviahue Q1:</b> 6.6%<br>                     <b>Total Q2:</b> 121.0</div>`)[0];
+                popup_9f856c6c819f48801336d24ce93fb990.setContent(html_84987d57109e7184b0f2006837c48764);
             
         
 
-        circle_marker_f2615569a3706fd7dde41a722b23eee8.bindPopup(popup_04d08c70f9da89e636b51179a926b4fe)
+        circle_marker_13a95ffb48b3a861ef28cdb220791477.bindPopup(popup_9f856c6c819f48801336d24ce93fb990)
         ;
 
         
     
     
-            circle_marker_f2615569a3706fd7dde41a722b23eee8.bindTooltip(
+            circle_marker_13a95ffb48b3a861ef28cdb220791477.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -228,30 +223,30 @@
             );
         
     
-            var circle_marker_3f416ab8e3a4d0ca2691cbbbce8045ff = L.circleMarker(
+            var circle_marker_4343929f0ce4b49fbf20312368cd55db = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.4432540924015447, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_84bee668aa1a4af8e6ede491c844d94e = L.popup({
+        var popup_5c5e17352f78699680dc01b579ee7e29 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_c41c6e85d40ce8ed388f061c2b756093 = $(`<div id="html_c41c6e85d40ce8ed388f061c2b756093" style="width: 100.0%; height: 100.0%;"><b>URUTAU<b>CP:</b> 3714<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 22.0</div>`)[0];
-                popup_84bee668aa1a4af8e6ede491c844d94e.setContent(html_c41c6e85d40ce8ed388f061c2b756093);
+                var html_dc15e467820beda105fc7affcfabb08d = $(`<div id="html_dc15e467820beda105fc7affcfabb08d" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 3714<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 22.0</div>`)[0];
+                popup_5c5e17352f78699680dc01b579ee7e29.setContent(html_dc15e467820beda105fc7affcfabb08d);
             
         
 
-        circle_marker_3f416ab8e3a4d0ca2691cbbbce8045ff.bindPopup(popup_84bee668aa1a4af8e6ede491c844d94e)
+        circle_marker_4343929f0ce4b49fbf20312368cd55db.bindPopup(popup_5c5e17352f78699680dc01b579ee7e29)
         ;
 
         
     
     
-            circle_marker_3f416ab8e3a4d0ca2691cbbbce8045ff.bindTooltip(
+            circle_marker_4343929f0ce4b49fbf20312368cd55db.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -261,30 +256,30 @@
             );
         
     
-            var circle_marker_5a4d95ee0bc63e47c395bb5e24c32c0b = L.circleMarker(
+            var circle_marker_9480087ea4de8b60d29493e8cc81d2ae = L.circleMarker(
                 [-27.6444, -62.4151],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6.3846175870322135, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_4694e6f345154053e1014be7ab14c9da = L.popup({
+        var popup_263db5e8a8929f75b3fd38ebccb956d3 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_3759bcea65021cacb4498c142c1507d9 = $(`<div id="html_3759bcea65021cacb4498c142c1507d9" style="width: 100.0%; height: 100.0%;"><b>QUIMILI<b>CP:</b> 3740<br><b>Caviahue Q2:</b> 8.0<br><b>Share Caviahue Q2:</b> 7.8%<br><b>Share Caviahue Q1:</b> 17.4%<br><b>Total Q2:</b> 103.0</div>`)[0];
-                popup_4694e6f345154053e1014be7ab14c9da.setContent(html_3759bcea65021cacb4498c142c1507d9);
+                var html_084c4e36a759256d95723a3e838be894 = $(`<div id="html_084c4e36a759256d95723a3e838be894" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 3740<br>                     <b>Caviahue Q2:</b> 8.0<br>                     <b>Share Caviahue Q2:</b> 7.8%<br>                     <b>Share Caviahue Q1:</b> 17.4%<br>                     <b>Total Q2:</b> 103.0</div>`)[0];
+                popup_263db5e8a8929f75b3fd38ebccb956d3.setContent(html_084c4e36a759256d95723a3e838be894);
             
         
 
-        circle_marker_5a4d95ee0bc63e47c395bb5e24c32c0b.bindPopup(popup_4694e6f345154053e1014be7ab14c9da)
+        circle_marker_9480087ea4de8b60d29493e8cc81d2ae.bindPopup(popup_263db5e8a8929f75b3fd38ebccb956d3)
         ;
 
         
     
     
-            circle_marker_5a4d95ee0bc63e47c395bb5e24c32c0b.bindTooltip(
+            circle_marker_9480087ea4de8b60d29493e8cc81d2ae.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -294,30 +289,30 @@
             );
         
     
-            var circle_marker_0dc8753971c55d10d4f1296f78562d8b = L.circleMarker(
+            var circle_marker_57867e76e7d296226ee42da3f79dbd6a = L.circleMarker(
                 [-27.0264, -62.7057],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_fe9a5307a81880ec9b4e2774f4fa7fd4 = L.popup({
+        var popup_64c42c31a9292139737fd552d544f62d = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_4d9e0c000881ae713920f4878c298058 = $(`<div id="html_4d9e0c000881ae713920f4878c298058" style="width: 100.0%; height: 100.0%;"><b>TINTINA<b>CP:</b> 3743<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 1.0</div>`)[0];
-                popup_fe9a5307a81880ec9b4e2774f4fa7fd4.setContent(html_4d9e0c000881ae713920f4878c298058);
+                var html_0f06f4a30bef9d7179ea2c257a2b5040 = $(`<div id="html_0f06f4a30bef9d7179ea2c257a2b5040" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 3743<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 1.0</div>`)[0];
+                popup_64c42c31a9292139737fd552d544f62d.setContent(html_0f06f4a30bef9d7179ea2c257a2b5040);
             
         
 
-        circle_marker_0dc8753971c55d10d4f1296f78562d8b.bindPopup(popup_fe9a5307a81880ec9b4e2774f4fa7fd4)
+        circle_marker_57867e76e7d296226ee42da3f79dbd6a.bindPopup(popup_64c42c31a9292139737fd552d544f62d)
         ;
 
         
     
     
-            circle_marker_0dc8753971c55d10d4f1296f78562d8b.bindTooltip(
+            circle_marker_57867e76e7d296226ee42da3f79dbd6a.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -327,30 +322,30 @@
             );
         
     
-            var circle_marker_3de9465a762bcf3a83ee4f52a7562aea = L.circleMarker(
+            var circle_marker_d46d53ed484c3b0202f9a0f91a55e5a8 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_cef97f293c1d8508977314eaf058e454 = L.popup({
+        var popup_3d04a40ec7f867c3c3af4ada326e566a = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_80750875ad9dea34026432cbbee4d641 = $(`<div id="html_80750875ad9dea34026432cbbee4d641" style="width: 100.0%; height: 100.0%;"><b>CAMPO GALLO<b>CP:</b> 3747<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 1.0</div>`)[0];
-                popup_cef97f293c1d8508977314eaf058e454.setContent(html_80750875ad9dea34026432cbbee4d641);
+                var html_4fcea1181eb79e5734d7adebe515d3c8 = $(`<div id="html_4fcea1181eb79e5734d7adebe515d3c8" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 3747<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 1.0</div>`)[0];
+                popup_3d04a40ec7f867c3c3af4ada326e566a.setContent(html_4fcea1181eb79e5734d7adebe515d3c8);
             
         
 
-        circle_marker_3de9465a762bcf3a83ee4f52a7562aea.bindPopup(popup_cef97f293c1d8508977314eaf058e454)
+        circle_marker_d46d53ed484c3b0202f9a0f91a55e5a8.bindPopup(popup_3d04a40ec7f867c3c3af4ada326e566a)
         ;
 
         
     
     
-            circle_marker_3de9465a762bcf3a83ee4f52a7562aea.bindTooltip(
+            circle_marker_d46d53ed484c3b0202f9a0f91a55e5a8.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -360,30 +355,30 @@
             );
         
     
-            var circle_marker_734d6a6db01d7562bfd8fad9cec53811 = L.circleMarker(
+            var circle_marker_43c9fe4f26ac05b457a3108700c1a73e = L.circleMarker(
                 [-28.4645, -62.8164],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.9541769390627777, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_2fdcb4c1f73bb02e13067eebfc2e7621 = L.popup({
+        var popup_9e863696b09a8a44737c12e9d467ee91 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_a46fe26a3a8f8ee9bd0870a12b0c9482 = $(`<div id="html_a46fe26a3a8f8ee9bd0870a12b0c9482" style="width: 100.0%; height: 100.0%;"><b>ANATUYA<b>CP:</b> 3760<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 8.0%<br><b>Total Q2:</b> 15.0</div>`)[0];
-                popup_2fdcb4c1f73bb02e13067eebfc2e7621.setContent(html_a46fe26a3a8f8ee9bd0870a12b0c9482);
+                var html_41bdb54956c2352e6fb4c1bb842877f2 = $(`<div id="html_41bdb54956c2352e6fb4c1bb842877f2" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 3760<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 8.0%<br>                     <b>Total Q2:</b> 15.0</div>`)[0];
+                popup_9e863696b09a8a44737c12e9d467ee91.setContent(html_41bdb54956c2352e6fb4c1bb842877f2);
             
         
 
-        circle_marker_734d6a6db01d7562bfd8fad9cec53811.bindPopup(popup_2fdcb4c1f73bb02e13067eebfc2e7621)
+        circle_marker_43c9fe4f26ac05b457a3108700c1a73e.bindPopup(popup_9e863696b09a8a44737c12e9d467ee91)
         ;
 
         
     
     
-            circle_marker_734d6a6db01d7562bfd8fad9cec53811.bindTooltip(
+            circle_marker_43c9fe4f26ac05b457a3108700c1a73e.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -393,30 +388,30 @@
             );
         
     
-            var circle_marker_0e0bacc71fc887f2d463954ccbaf2adf = L.circleMarker(
+            var circle_marker_d5b5370efd3406552b6c91b5c27d23de = L.circleMarker(
                 [-28.4424, -62.0574],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_2798dfdc62ed8964669bf39efcead9a3 = L.popup({
+        var popup_2d4779fca29e8e5fc869c418c94b3704 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_185f339e2a99d692930b29fda21ac0b8 = $(`<div id="html_185f339e2a99d692930b29fda21ac0b8" style="width: 100.0%; height: 100.0%;"><b>LOS JURIES<b>CP:</b> 3763<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 50.0%<br><b>Total Q2:</b> 3.0</div>`)[0];
-                popup_2798dfdc62ed8964669bf39efcead9a3.setContent(html_185f339e2a99d692930b29fda21ac0b8);
+                var html_129194d44001808a0611d0b718aac256 = $(`<div id="html_129194d44001808a0611d0b718aac256" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 3763<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 50.0%<br>                     <b>Total Q2:</b> 3.0</div>`)[0];
+                popup_2d4779fca29e8e5fc869c418c94b3704.setContent(html_129194d44001808a0611d0b718aac256);
             
         
 
-        circle_marker_0e0bacc71fc887f2d463954ccbaf2adf.bindPopup(popup_2798dfdc62ed8964669bf39efcead9a3)
+        circle_marker_d5b5370efd3406552b6c91b5c27d23de.bindPopup(popup_2d4779fca29e8e5fc869c418c94b3704)
         ;
 
         
     
     
-            circle_marker_0e0bacc71fc887f2d463954ccbaf2adf.bindTooltip(
+            circle_marker_d5b5370efd3406552b6c91b5c27d23de.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -426,30 +421,30 @@
             );
         
     
-            var circle_marker_dce90a888de28810bd979d8a0e157509 = L.circleMarker(
+            var circle_marker_a05b482fa58d2e8c51c9ce5c4f74ea14 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.197901845829199, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_e8b38987f57f0e788677f5e4e51608b2 = L.popup({
+        var popup_e84b3b33d345bbd8b2b3016423b36e20 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_4862948cce902f6077ba4125c0246982 = $(`<div id="html_4862948cce902f6077ba4125c0246982" style="width: 100.0%; height: 100.0%;"><b>ABRITA<b>CP:</b> 4206<br><b>Caviahue Q2:</b> 13.0<br><b>Share Caviahue Q2:</b> 9.4%<br><b>Share Caviahue Q1:</b> 0%<br><b>Total Q2:</b> 139.0</div>`)[0];
-                popup_e8b38987f57f0e788677f5e4e51608b2.setContent(html_4862948cce902f6077ba4125c0246982);
+                var html_7f554aab7445c9b13696876a43643275 = $(`<div id="html_7f554aab7445c9b13696876a43643275" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4206<br>                     <b>Caviahue Q2:</b> 13.0<br>                     <b>Share Caviahue Q2:</b> 9.4%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 139.0</div>`)[0];
+                popup_e84b3b33d345bbd8b2b3016423b36e20.setContent(html_7f554aab7445c9b13696876a43643275);
             
         
 
-        circle_marker_dce90a888de28810bd979d8a0e157509.bindPopup(popup_e8b38987f57f0e788677f5e4e51608b2)
+        circle_marker_a05b482fa58d2e8c51c9ce5c4f74ea14.bindPopup(popup_e84b3b33d345bbd8b2b3016423b36e20)
         ;
 
         
     
     
-            circle_marker_dce90a888de28810bd979d8a0e157509.bindTooltip(
+            circle_marker_a05b482fa58d2e8c51c9ce5c4f74ea14.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -459,30 +454,30 @@
             );
         
     
-            var circle_marker_95374ff6ebf2ffd12e082a0cf7848bbf = L.circleMarker(
+            var circle_marker_69a58a55e4e5aca64dedb549619763f4 = L.circleMarker(
                 [-28.4123, -64.1989],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.29739670999407, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_d0ce4a8ed9759cfdbadb422c5e673351 = L.popup({
+        var popup_1b0ceb416e5787909ecc288637dccec9 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_198a3324f6200c0713c5c80e19b85e5d = $(`<div id="html_198a3324f6200c0713c5c80e19b85e5d" style="width: 100.0%; height: 100.0%;"><b>LORETO/ALBARDON<b>CP:</b> 4208<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 9.1%<br><b>Total Q2:</b> 8.0</div>`)[0];
-                popup_d0ce4a8ed9759cfdbadb422c5e673351.setContent(html_198a3324f6200c0713c5c80e19b85e5d);
+                var html_00276668017a01ef9ec8d49a4384192b = $(`<div id="html_00276668017a01ef9ec8d49a4384192b" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4208<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 9.1%<br>                     <b>Total Q2:</b> 8.0</div>`)[0];
+                popup_1b0ceb416e5787909ecc288637dccec9.setContent(html_00276668017a01ef9ec8d49a4384192b);
             
         
 
-        circle_marker_95374ff6ebf2ffd12e082a0cf7848bbf.bindPopup(popup_d0ce4a8ed9759cfdbadb422c5e673351)
+        circle_marker_69a58a55e4e5aca64dedb549619763f4.bindPopup(popup_1b0ceb416e5787909ecc288637dccec9)
         ;
 
         
     
     
-            circle_marker_95374ff6ebf2ffd12e082a0cf7848bbf.bindTooltip(
+            circle_marker_69a58a55e4e5aca64dedb549619763f4.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -492,30 +487,30 @@
             );
         
     
-            var circle_marker_6b26141643527653a7721e34ecbd677a = L.circleMarker(
+            var circle_marker_809e7804553d92562f88b803390e5b4c = L.circleMarker(
                 [-27.489, -64.8282],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12.340748817388523, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_6c79e5d8d693b30f72026f01b79d0f64 = L.popup({
+        var popup_3b8a6fc3f1747847383aeca0aec5d09d = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_5998bd326c87c653abd2ba559492e052 = $(`<div id="html_5998bd326c87c653abd2ba559492e052" style="width: 100.0%; height: 100.0%;"><b>TERMAS DE RIO HONDO<b>CP:</b> 4220<br><b>Caviahue Q2:</b> 26.0<br><b>Share Caviahue Q2:</b> 4.9%<br><b>Share Caviahue Q1:</b> 9.4%<br><b>Total Q2:</b> 535.0</div>`)[0];
-                popup_6c79e5d8d693b30f72026f01b79d0f64.setContent(html_5998bd326c87c653abd2ba559492e052);
+                var html_8c1e172359fd437bc1b94a81cb06fce1 = $(`<div id="html_8c1e172359fd437bc1b94a81cb06fce1" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4220<br>                     <b>Caviahue Q2:</b> 26.0<br>                     <b>Share Caviahue Q2:</b> 4.9%<br>                     <b>Share Caviahue Q1:</b> 9.4%<br>                     <b>Total Q2:</b> 535.0</div>`)[0];
+                popup_3b8a6fc3f1747847383aeca0aec5d09d.setContent(html_8c1e172359fd437bc1b94a81cb06fce1);
             
         
 
-        circle_marker_6b26141643527653a7721e34ecbd677a.bindPopup(popup_6c79e5d8d693b30f72026f01b79d0f64)
+        circle_marker_809e7804553d92562f88b803390e5b4c.bindPopup(popup_3b8a6fc3f1747847383aeca0aec5d09d)
         ;
 
         
     
     
-            circle_marker_6b26141643527653a7721e34ecbd677a.bindTooltip(
+            circle_marker_809e7804553d92562f88b803390e5b4c.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -525,30 +520,30 @@
             );
         
     
-            var circle_marker_f092ba18a5ffc44fb911d053f4178d31 = L.circleMarker(
+            var circle_marker_4e809b0daa49ae9a54486372a3855ff1 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.623898318388478, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_ebccf62ceed08da26af980adea52bd2e = L.popup({
+        var popup_81faadd16fd1bbe159f429e682b8737a = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_32a8c57ef98fac1bd8b27e6b34db75d7 = $(`<div id="html_32a8c57ef98fac1bd8b27e6b34db75d7" style="width: 100.0%; height: 100.0%;"><b>FRIAS<b>CP:</b> 4230<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 25.0</div>`)[0];
-                popup_ebccf62ceed08da26af980adea52bd2e.setContent(html_32a8c57ef98fac1bd8b27e6b34db75d7);
+                var html_9a978fcec9141de802b33fbf702ec07e = $(`<div id="html_9a978fcec9141de802b33fbf702ec07e" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4230<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 25.0</div>`)[0];
+                popup_81faadd16fd1bbe159f429e682b8737a.setContent(html_9a978fcec9141de802b33fbf702ec07e);
             
         
 
-        circle_marker_f092ba18a5ffc44fb911d053f4178d31.bindPopup(popup_ebccf62ceed08da26af980adea52bd2e)
+        circle_marker_4e809b0daa49ae9a54486372a3855ff1.bindPopup(popup_81faadd16fd1bbe159f429e682b8737a)
         ;
 
         
     
     
-            circle_marker_f092ba18a5ffc44fb911d053f4178d31.bindTooltip(
+            circle_marker_4e809b0daa49ae9a54486372a3855ff1.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -558,30 +553,30 @@
             );
         
     
-            var circle_marker_ea5a727d11f5e61e635833292db80f1e = L.circleMarker(
+            var circle_marker_d4ace8cbcf59abac40f9c7df32dbdbed = L.circleMarker(
                 [-27.7608, -64.2566],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 11.717612805699602, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_8c17c1761d4df69aba2a58577b20ffe5 = L.popup({
+        var popup_305c1f8da85c9e753fffbbd4fff9b7ba = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_2924b209deac5e32c85572e89cfc4454 = $(`<div id="html_2924b209deac5e32c85572e89cfc4454" style="width: 100.0%; height: 100.0%;"><b>LA BANDA<b>CP:</b> 4300<br><b>Caviahue Q2:</b> 14.0<br><b>Share Caviahue Q2:</b> 3.0%<br><b>Share Caviahue Q1:</b> 2.6%<br><b>Total Q2:</b> 470.0</div>`)[0];
-                popup_8c17c1761d4df69aba2a58577b20ffe5.setContent(html_2924b209deac5e32c85572e89cfc4454);
+                var html_511bdfda6d8e9c9b9d7e2563cbed7111 = $(`<div id="html_511bdfda6d8e9c9b9d7e2563cbed7111" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4300<br>                     <b>Caviahue Q2:</b> 14.0<br>                     <b>Share Caviahue Q2:</b> 3.0%<br>                     <b>Share Caviahue Q1:</b> 2.6%<br>                     <b>Total Q2:</b> 470.0</div>`)[0];
+                popup_305c1f8da85c9e753fffbbd4fff9b7ba.setContent(html_511bdfda6d8e9c9b9d7e2563cbed7111);
             
         
 
-        circle_marker_ea5a727d11f5e61e635833292db80f1e.bindPopup(popup_8c17c1761d4df69aba2a58577b20ffe5)
+        circle_marker_d4ace8cbcf59abac40f9c7df32dbdbed.bindPopup(popup_305c1f8da85c9e753fffbbd4fff9b7ba)
         ;
 
         
     
     
-            circle_marker_ea5a727d11f5e61e635833292db80f1e.bindTooltip(
+            circle_marker_d4ace8cbcf59abac40f9c7df32dbdbed.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -591,30 +586,30 @@
             );
         
     
-            var circle_marker_0ca975e6b97fa484d6f3a557bb146508 = L.circleMarker(
+            var circle_marker_21363cac0972de4703d8a6edd842acf7 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_1cb916d4bd86e0fc8215a082c3e132f7 = L.popup({
+        var popup_469d5401ddda2dac5635850d123b4558 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_3fd773f00cef5fb7c5b550f33cf03d2f = $(`<div id="html_3fd773f00cef5fb7c5b550f33cf03d2f" style="width: 100.0%; height: 100.0%;"><b>BELTRAN<b>CP:</b> 4308<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 2.0</div>`)[0];
-                popup_1cb916d4bd86e0fc8215a082c3e132f7.setContent(html_3fd773f00cef5fb7c5b550f33cf03d2f);
+                var html_ff7b41f3c4567cfa563e2a0721c1476f = $(`<div id="html_ff7b41f3c4567cfa563e2a0721c1476f" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4308<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 2.0</div>`)[0];
+                popup_469d5401ddda2dac5635850d123b4558.setContent(html_ff7b41f3c4567cfa563e2a0721c1476f);
             
         
 
-        circle_marker_0ca975e6b97fa484d6f3a557bb146508.bindPopup(popup_1cb916d4bd86e0fc8215a082c3e132f7)
+        circle_marker_21363cac0972de4703d8a6edd842acf7.bindPopup(popup_469d5401ddda2dac5635850d123b4558)
         ;
 
         
     
     
-            circle_marker_0ca975e6b97fa484d6f3a557bb146508.bindTooltip(
+            circle_marker_21363cac0972de4703d8a6edd842acf7.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -624,30 +619,30 @@
             );
         
     
-            var circle_marker_eb28e077e6fa8e072b2c55c04eff0efc = L.circleMarker(
+            var circle_marker_1538167332beaff37ec66ec3ff6b4c90 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_3a619d026207f41b72b4c69285997ce3 = L.popup({
+        var popup_29d8130944d5cf09e3ff0609d15dfc78 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_32dbfd4b4f78b01c7d584b76c4288488 = $(`<div id="html_32dbfd4b4f78b01c7d584b76c4288488" style="width: 100.0%; height: 100.0%;"><b>TACO ISLA<b>CP:</b> 4321<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 5.0</div>`)[0];
-                popup_3a619d026207f41b72b4c69285997ce3.setContent(html_32dbfd4b4f78b01c7d584b76c4288488);
+                var html_f90d2d35b6a6db317f5c60911c6c9dca = $(`<div id="html_f90d2d35b6a6db317f5c60911c6c9dca" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4321<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 5.0</div>`)[0];
+                popup_29d8130944d5cf09e3ff0609d15dfc78.setContent(html_f90d2d35b6a6db317f5c60911c6c9dca);
             
         
 
-        circle_marker_eb28e077e6fa8e072b2c55c04eff0efc.bindPopup(popup_3a619d026207f41b72b4c69285997ce3)
+        circle_marker_1538167332beaff37ec66ec3ff6b4c90.bindPopup(popup_29d8130944d5cf09e3ff0609d15dfc78)
         ;
 
         
     
     
-            circle_marker_eb28e077e6fa8e072b2c55c04eff0efc.bindTooltip(
+            circle_marker_1538167332beaff37ec66ec3ff6b4c90.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -657,30 +652,30 @@
             );
         
     
-            var circle_marker_fb428d6b8a74c75ae1200ea7fe025b36 = L.circleMarker(
+            var circle_marker_8f959faaa5bff3b4c75c6e5cab1e7919 = L.circleMarker(
                 [-27.9249, -63.8929],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.4082246852806923, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_fc01f5088dd2afbb358e996dd2891f61 = L.popup({
+        var popup_d98defa0522642e0c99df20c8bfbc522 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_f2825ed3ba127e09f2931730f8007303 = $(`<div id="html_f2825ed3ba127e09f2931730f8007303" style="width: 100.0%; height: 100.0%;"><b>FERNANDEZ<b>CP:</b> 4322<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 9.0</div>`)[0];
-                popup_fc01f5088dd2afbb358e996dd2891f61.setContent(html_f2825ed3ba127e09f2931730f8007303);
+                var html_c06318c5b14bf440dd29d83b88366fcf = $(`<div id="html_c06318c5b14bf440dd29d83b88366fcf" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4322<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 9.0</div>`)[0];
+                popup_d98defa0522642e0c99df20c8bfbc522.setContent(html_c06318c5b14bf440dd29d83b88366fcf);
             
         
 
-        circle_marker_fb428d6b8a74c75ae1200ea7fe025b36.bindPopup(popup_fc01f5088dd2afbb358e996dd2891f61)
+        circle_marker_8f959faaa5bff3b4c75c6e5cab1e7919.bindPopup(popup_d98defa0522642e0c99df20c8bfbc522)
         ;
 
         
     
     
-            circle_marker_fb428d6b8a74c75ae1200ea7fe025b36.bindTooltip(
+            circle_marker_8f959faaa5bff3b4c75c6e5cab1e7919.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -690,30 +685,30 @@
             );
         
     
-            var circle_marker_bfadaf1e2ca74f139be167c6bec39d4f = L.circleMarker(
+            var circle_marker_dbfa6f861cc9f7e1302ea9093524173a = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_4cfc14301e8a43e8a5659812f14e185f = L.popup({
+        var popup_22507160559e01714590ed10e9c8555b = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_e8de50bd2017289d74fdb391b8f90769 = $(`<div id="html_e8de50bd2017289d74fdb391b8f90769" style="width: 100.0%; height: 100.0%;"><b>COL. DORA<b>CP:</b> 4332<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 2.0</div>`)[0];
-                popup_4cfc14301e8a43e8a5659812f14e185f.setContent(html_e8de50bd2017289d74fdb391b8f90769);
+                var html_295996b8e0dab1667bbf9baa087345b3 = $(`<div id="html_295996b8e0dab1667bbf9baa087345b3" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4332<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 2.0</div>`)[0];
+                popup_22507160559e01714590ed10e9c8555b.setContent(html_295996b8e0dab1667bbf9baa087345b3);
             
         
 
-        circle_marker_bfadaf1e2ca74f139be167c6bec39d4f.bindPopup(popup_4cfc14301e8a43e8a5659812f14e185f)
+        circle_marker_dbfa6f861cc9f7e1302ea9093524173a.bindPopup(popup_22507160559e01714590ed10e9c8555b)
         ;
 
         
     
     
-            circle_marker_bfadaf1e2ca74f139be167c6bec39d4f.bindTooltip(
+            circle_marker_dbfa6f861cc9f7e1302ea9093524173a.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -723,30 +718,30 @@
             );
         
     
-            var circle_marker_fae0d76a24e3c73021aac456afc765ad = L.circleMarker(
+            var circle_marker_290ba1b3d060b80e4642348c508e6795 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.29739670999407, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_389015b1e7dc42dcc997f9cde12b544f = L.popup({
+        var popup_e1b1c4f0d76404a5817ecfef58dc85e3 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_d28b2ab6803d08a7f06cd50904a6679e = $(`<div id="html_d28b2ab6803d08a7f06cd50904a6679e" style="width: 100.0%; height: 100.0%;"><b>ICANO<b>CP:</b> 4334<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 8.0</div>`)[0];
-                popup_389015b1e7dc42dcc997f9cde12b544f.setContent(html_d28b2ab6803d08a7f06cd50904a6679e);
+                var html_0f0a18e8995dce108e73f1455deb0547 = $(`<div id="html_0f0a18e8995dce108e73f1455deb0547" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4334<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 8.0</div>`)[0];
+                popup_e1b1c4f0d76404a5817ecfef58dc85e3.setContent(html_0f0a18e8995dce108e73f1455deb0547);
             
         
 
-        circle_marker_fae0d76a24e3c73021aac456afc765ad.bindPopup(popup_389015b1e7dc42dcc997f9cde12b544f)
+        circle_marker_290ba1b3d060b80e4642348c508e6795.bindPopup(popup_e1b1c4f0d76404a5817ecfef58dc85e3)
         ;
 
         
     
     
-            circle_marker_fae0d76a24e3c73021aac456afc765ad.bindTooltip(
+            circle_marker_290ba1b3d060b80e4642348c508e6795.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -756,30 +751,30 @@
             );
         
     
-            var circle_marker_4ca482767cee560caf4caf7e0b574e36 = L.circleMarker(
+            var circle_marker_180ba01494e30fa3b1722d625cd3e0e4 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_a6c09c1d15df15cba0b07c40f7a86be8 = L.popup({
+        var popup_954d3e39df12d312270a105cc6c0e3f4 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_68a21a3ab3c030b7d981fa253d518e99 = $(`<div id="html_68a21a3ab3c030b7d981fa253d518e99" style="width: 100.0%; height: 100.0%;"><b>CLODOMIRA<b>CP:</b> 4338<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 0.0</div>`)[0];
-                popup_a6c09c1d15df15cba0b07c40f7a86be8.setContent(html_68a21a3ab3c030b7d981fa253d518e99);
+                var html_6d3a5cc414550d6af3299d1f77a6c0a0 = $(`<div id="html_6d3a5cc414550d6af3299d1f77a6c0a0" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 4350<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 1.0</div>`)[0];
+                popup_954d3e39df12d312270a105cc6c0e3f4.setContent(html_6d3a5cc414550d6af3299d1f77a6c0a0);
             
         
 
-        circle_marker_4ca482767cee560caf4caf7e0b574e36.bindPopup(popup_a6c09c1d15df15cba0b07c40f7a86be8)
+        circle_marker_180ba01494e30fa3b1722d625cd3e0e4.bindPopup(popup_954d3e39df12d312270a105cc6c0e3f4)
         ;
 
         
     
     
-            circle_marker_4ca482767cee560caf4caf7e0b574e36.bindTooltip(
+            circle_marker_180ba01494e30fa3b1722d625cd3e0e4.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -789,63 +784,30 @@
             );
         
     
-            var circle_marker_3cdcbc06e3f7c76baf3c338a7cb82187 = L.circleMarker(
-                [0.0, 0.0],
-                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
-        
-    
-        var popup_0451c797b819ba61602125fc293bf55b = L.popup({
-  "maxWidth": 250,
-});
-
-        
-            
-                var html_6788390d167b275443ac9f23ef01573a = $(`<div id="html_6788390d167b275443ac9f23ef01573a" style="width: 100.0%; height: 100.0%;"><b>SUNCHO CORRAL<b>CP:</b> 4350<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 1.0</div>`)[0];
-                popup_0451c797b819ba61602125fc293bf55b.setContent(html_6788390d167b275443ac9f23ef01573a);
-            
-        
-
-        circle_marker_3cdcbc06e3f7c76baf3c338a7cb82187.bindPopup(popup_0451c797b819ba61602125fc293bf55b)
-        ;
-
-        
-    
-    
-            circle_marker_3cdcbc06e3f7c76baf3c338a7cb82187.bindTooltip(
-                `<div>
-                     Competencia
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var circle_marker_c8f428196aebaebf059b48031b18cb58 = L.circleMarker(
+            var circle_marker_1f0f40e69839de83d03c73587f90880a = L.circleMarker(
                 [-29.4902, -63.7124],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_53108f5bf482555a6562bec195162ef0 = L.popup({
+        var popup_c8ff56ef9ee49e2f0b70e0801797c75e = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_ec70bb8b6b5d60991c5b222a20cc9057 = $(`<div id="html_ec70bb8b6b5d60991c5b222a20cc9057" style="width: 100.0%; height: 100.0%;"><b>AGUA BLANCA<b>CP:</b> 5250<br><b>Caviahue Q2:</b> 0.0<br><b>Share Caviahue Q2:</b> 0.0%<br><b>Share Caviahue Q1:</b> 62.5%<br><b>Total Q2:</b> 3.0</div>`)[0];
-                popup_53108f5bf482555a6562bec195162ef0.setContent(html_ec70bb8b6b5d60991c5b222a20cc9057);
+                var html_f783935cac46263e1f11d660b4d43f44 = $(`<div id="html_f783935cac46263e1f11d660b4d43f44" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 5250<br>                     <b>Caviahue Q2:</b> 0.0<br>                     <b>Share Caviahue Q2:</b> 0.0%<br>                     <b>Share Caviahue Q1:</b> 62.5%<br>                     <b>Total Q2:</b> 3.0</div>`)[0];
+                popup_c8ff56ef9ee49e2f0b70e0801797c75e.setContent(html_f783935cac46263e1f11d660b4d43f44);
             
         
 
-        circle_marker_c8f428196aebaebf059b48031b18cb58.bindPopup(popup_53108f5bf482555a6562bec195162ef0)
+        circle_marker_1f0f40e69839de83d03c73587f90880a.bindPopup(popup_c8ff56ef9ee49e2f0b70e0801797c75e)
         ;
 
         
     
     
-            circle_marker_c8f428196aebaebf059b48031b18cb58.bindTooltip(
+            circle_marker_1f0f40e69839de83d03c73587f90880a.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -855,30 +817,30 @@
             );
         
     
-            var circle_marker_5507867c2ec988088d8159e1fe35a7ce = L.circleMarker(
+            var circle_marker_8d8a4d54cf22377952cbc99dfaf2fc46 = L.circleMarker(
                 [-29.3714, -63.4509],
                 {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.17790642448278, "stroke": true, "weight": 3}
-            ).addTo(feature_group_e3c3ce34ec1fe1d53869b570ce32de16);
+            ).addTo(feature_group_4d07a8f800e25734a3301caf5be2cc8d);
         
     
-        var popup_9685421a342a810d9c0c101558373ad9 = L.popup({
+        var popup_e384e65a88223fdcb760a6d6fa6b9a65 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_47508598861aef43d7039a2928c042e6 = $(`<div id="html_47508598861aef43d7039a2928c042e6" style="width: 100.0%; height: 100.0%;"><b>SUMAMPA<b>CP:</b> 5253<br><b>Caviahue Q2:</b> 1.0<br><b>Share Caviahue Q2:</b> 14.3%<br><b>Share Caviahue Q1:</b> 0.0%<br><b>Total Q2:</b> 7.0</div>`)[0];
-                popup_9685421a342a810d9c0c101558373ad9.setContent(html_47508598861aef43d7039a2928c042e6);
+                var html_a309049b3ad1e446f856e6af5bae8a50 = $(`<div id="html_a309049b3ad1e446f856e6af5bae8a50" style="width: 100.0%; height: 100.0%;"><b>row['Localidad']<br>                     <b>CP:</b> 5253<br>                     <b>Caviahue Q2:</b> 1.0<br>                     <b>Share Caviahue Q2:</b> 14.3%<br>                     <b>Share Caviahue Q1:</b> 0.0%<br>                     <b>Total Q2:</b> 7.0</div>`)[0];
+                popup_e384e65a88223fdcb760a6d6fa6b9a65.setContent(html_a309049b3ad1e446f856e6af5bae8a50);
             
         
 
-        circle_marker_5507867c2ec988088d8159e1fe35a7ce.bindPopup(popup_9685421a342a810d9c0c101558373ad9)
+        circle_marker_8d8a4d54cf22377952cbc99dfaf2fc46.bindPopup(popup_e384e65a88223fdcb760a6d6fa6b9a65)
         ;
 
         
     
     
-            circle_marker_5507867c2ec988088d8159e1fe35a7ce.bindTooltip(
+            circle_marker_8d8a4d54cf22377952cbc99dfaf2fc46.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -888,22 +850,22 @@
             );
         
     
-            feature_group_e3c3ce34ec1fe1d53869b570ce32de16.addTo(map_e190c93e2ac82014e008736e123647e8);
+            feature_group_4d07a8f800e25734a3301caf5be2cc8d.addTo(map_48d2a5be3026c1453c57ac6b9a7f225f);
         
     
-            var feature_group_399850bb6ae55bdfe36a007f77c4cb0d = L.featureGroup(
+            var feature_group_74648e9455bcd58fc3a965a4854f32eb = L.featureGroup(
                 {
 }
             );
         
     
-            var circle_marker_4dea1495a2a36e883bbc10127b15edaa = L.circleMarker(
+            var circle_marker_a6156a6d5a180560c2aefc291cdb5185 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_4dea1495a2a36e883bbc10127b15edaa.bindTooltip(
+            circle_marker_a6156a6d5a180560c2aefc291cdb5185.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -913,13 +875,13 @@
             );
         
     
-            var circle_marker_2b31127508a44bd3c5002f00665d7cf9 = L.circleMarker(
+            var circle_marker_392d387721ad167f30e48b3123d125a2 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_2b31127508a44bd3c5002f00665d7cf9.bindTooltip(
+            circle_marker_392d387721ad167f30e48b3123d125a2.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -929,13 +891,13 @@
             );
         
     
-            var circle_marker_630b213676a88ba70fc6e5c06591a117 = L.circleMarker(
+            var circle_marker_8d8a0be00647ec685f52f48786993d9f = L.circleMarker(
                 [-28.8876, -62.2454],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.9541769390627777, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_630b213676a88ba70fc6e5c06591a117.bindTooltip(
+            circle_marker_8d8a0be00647ec685f52f48786993d9f.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -945,13 +907,13 @@
             );
         
     
-            var circle_marker_d567f25b4de72984dc226d49a5a23f2e = L.circleMarker(
+            var circle_marker_8e36641903f81974bf4f31cd325405c8 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_d567f25b4de72984dc226d49a5a23f2e.bindTooltip(
+            circle_marker_8e36641903f81974bf4f31cd325405c8.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -961,13 +923,13 @@
             );
         
     
-            var circle_marker_c0f58e80c90dac4c4a37c0a56912c6ab = L.circleMarker(
+            var circle_marker_3f7aaedadc1d2d970a6b446798a321ec = L.circleMarker(
                 [-27.6444, -62.4151],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.29739670999407, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_c0f58e80c90dac4c4a37c0a56912c6ab.bindTooltip(
+            circle_marker_3f7aaedadc1d2d970a6b446798a321ec.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -977,13 +939,13 @@
             );
         
     
-            var circle_marker_6ed3c4dbe0330f31959c7086bd036986 = L.circleMarker(
+            var circle_marker_0fdea2996dd07b6873b94e29bb718182 = L.circleMarker(
                 [-27.0264, -62.7057],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_6ed3c4dbe0330f31959c7086bd036986.bindTooltip(
+            circle_marker_0fdea2996dd07b6873b94e29bb718182.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -993,13 +955,13 @@
             );
         
     
-            var circle_marker_b208aa1e06b3ac7816972a2104460238 = L.circleMarker(
+            var circle_marker_9683fd48e6ae480b250df02b112d7f7e = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_b208aa1e06b3ac7816972a2104460238.bindTooltip(
+            circle_marker_9683fd48e6ae480b250df02b112d7f7e.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1009,13 +971,13 @@
             );
         
     
-            var circle_marker_fb112c5cb270537911abca9fcb36bd18 = L.circleMarker(
+            var circle_marker_67eedb420000f56e146d672d95016c3d = L.circleMarker(
                 [-28.4645, -62.8164],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_fb112c5cb270537911abca9fcb36bd18.bindTooltip(
+            circle_marker_67eedb420000f56e146d672d95016c3d.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1025,13 +987,13 @@
             );
         
     
-            var circle_marker_75d969f3f4c64000a13be1be48f91d9c = L.circleMarker(
+            var circle_marker_d84dcde77268f9de7fc0d07d9cf991c8 = L.circleMarker(
                 [-28.4424, -62.0574],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_75d969f3f4c64000a13be1be48f91d9c.bindTooltip(
+            circle_marker_d84dcde77268f9de7fc0d07d9cf991c8.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1041,13 +1003,13 @@
             );
         
     
-            var circle_marker_458677f5a0abbee113234d4accf5d28e = L.circleMarker(
+            var circle_marker_7e6b57b1892482000a9f83a3768a5189 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.789827435889086, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_458677f5a0abbee113234d4accf5d28e.bindTooltip(
+            circle_marker_7e6b57b1892482000a9f83a3768a5189.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1057,13 +1019,13 @@
             );
         
     
-            var circle_marker_d882d5e9e869d4f5e670a50e541e90e4 = L.circleMarker(
+            var circle_marker_889bb04bf09245376119dbd0d4aad0e2 = L.circleMarker(
                 [-28.4123, -64.1989],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_d882d5e9e869d4f5e670a50e541e90e4.bindTooltip(
+            circle_marker_889bb04bf09245376119dbd0d4aad0e2.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1073,13 +1035,13 @@
             );
         
     
-            var circle_marker_09da4913899a1885338a8fd344e32127 = L.circleMarker(
+            var circle_marker_9d6f7d927fb34aa99f47d22c6d416760 = L.circleMarker(
                 [-27.489, -64.8282],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3.6811993713469082, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_09da4913899a1885338a8fd344e32127.bindTooltip(
+            circle_marker_9d6f7d927fb34aa99f47d22c6d416760.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1089,13 +1051,13 @@
             );
         
     
-            var circle_marker_a3145d1703d09366b9817ad60395b80c = L.circleMarker(
+            var circle_marker_88733bb1a9b9ec9f35968292833e8db0 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_a3145d1703d09366b9817ad60395b80c.bindTooltip(
+            circle_marker_88733bb1a9b9ec9f35968292833e8db0.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1105,13 +1067,13 @@
             );
         
     
-            var circle_marker_01da2032d90f8accb0704b01d59e55c4 = L.circleMarker(
+            var circle_marker_9afd22af92f64a8ceec8c87a67ddf70c = L.circleMarker(
                 [-27.7608, -64.2566],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.8737647560281374, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_01da2032d90f8accb0704b01d59e55c4.bindTooltip(
+            circle_marker_9afd22af92f64a8ceec8c87a67ddf70c.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1121,13 +1083,13 @@
             );
         
     
-            var circle_marker_b7cb9826949999e2f976a2f59c0ba8f8 = L.circleMarker(
+            var circle_marker_5d1d880bf540c2f9107315048bbb4db7 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_b7cb9826949999e2f976a2f59c0ba8f8.bindTooltip(
+            circle_marker_5d1d880bf540c2f9107315048bbb4db7.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1137,13 +1099,13 @@
             );
         
     
-            var circle_marker_bc16c8d219797be8949eec90847cde89 = L.circleMarker(
+            var circle_marker_9096f5ec64a56e6a8525a8bb03385794 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_bc16c8d219797be8949eec90847cde89.bindTooltip(
+            circle_marker_9096f5ec64a56e6a8525a8bb03385794.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1153,13 +1115,13 @@
             );
         
     
-            var circle_marker_4c4873a12d66148152cf38a08d835489 = L.circleMarker(
+            var circle_marker_6011ac0f72bb3cb2ca12296c6c85259c = L.circleMarker(
                 [-27.9249, -63.8929],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_4c4873a12d66148152cf38a08d835489.bindTooltip(
+            circle_marker_6011ac0f72bb3cb2ca12296c6c85259c.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1169,13 +1131,13 @@
             );
         
     
-            var circle_marker_54cd250011ba8c54c1c8b05e5cc1778d = L.circleMarker(
+            var circle_marker_a05d0ad10fee808f3a1bdbff1c06f988 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_54cd250011ba8c54c1c8b05e5cc1778d.bindTooltip(
+            circle_marker_a05d0ad10fee808f3a1bdbff1c06f988.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1185,13 +1147,13 @@
             );
         
     
-            var circle_marker_067353fa63cd706265c83e201ff1405c = L.circleMarker(
+            var circle_marker_73a3d6286d38591123b0712d85233918 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_067353fa63cd706265c83e201ff1405c.bindTooltip(
+            circle_marker_73a3d6286d38591123b0712d85233918.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1201,13 +1163,13 @@
             );
         
     
-            var circle_marker_e63efb17858c3994c3302be6fcedf45d = L.circleMarker(
+            var circle_marker_9fa1242fdbefd4dea331cbd7783afe60 = L.circleMarker(
                 [0.0, 0.0],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_e63efb17858c3994c3302be6fcedf45d.bindTooltip(
+            circle_marker_9fa1242fdbefd4dea331cbd7783afe60.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1217,29 +1179,13 @@
             );
         
     
-            var circle_marker_4085a767617555b289aeb8f159c9dd9d = L.circleMarker(
-                [0.0, 0.0],
-                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
-        
-    
-            circle_marker_4085a767617555b289aeb8f159c9dd9d.bindTooltip(
-                `<div>
-                     Caviahue
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-            var circle_marker_e848fb6cc86c44bca14111afcd1da5ba = L.circleMarker(
+            var circle_marker_e4aea2fc475c991f02698c30aacd7ec2 = L.circleMarker(
                 [-29.4902, -63.7124],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_e848fb6cc86c44bca14111afcd1da5ba.bindTooltip(
+            circle_marker_e4aea2fc475c991f02698c30aacd7ec2.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1249,13 +1195,13 @@
             );
         
     
-            var circle_marker_a2ec84f812a7e165a1c3c24db5321df2 = L.circleMarker(
+            var circle_marker_d58a7c75dbf5bff546f4cf5cc91e4ae5 = L.circleMarker(
                 [-29.3714, -63.4509],
                 {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 1, "stroke": true, "weight": 1}
-            ).addTo(feature_group_399850bb6ae55bdfe36a007f77c4cb0d);
+            ).addTo(feature_group_74648e9455bcd58fc3a965a4854f32eb);
         
     
-            circle_marker_a2ec84f812a7e165a1c3c24db5321df2.bindTooltip(
+            circle_marker_d58a7c75dbf5bff546f4cf5cc91e4ae5.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -1265,27 +1211,27 @@
             );
         
     
-            feature_group_399850bb6ae55bdfe36a007f77c4cb0d.addTo(map_e190c93e2ac82014e008736e123647e8);
+            feature_group_74648e9455bcd58fc3a965a4854f32eb.addTo(map_48d2a5be3026c1453c57ac6b9a7f225f);
         
     
-            var layer_control_d1dc880d84b5900b98188658400bc64e_layers = {
+            var layer_control_264d2951502786b9d9515d04a86049e9_layers = {
                 base_layers : {
-                    "cartodbpositron" : tile_layer_0c308edf1ed29e6a4645d70b1f03d679,
+                    "cartodbpositron" : tile_layer_cd3d4a4cb470c14968db0123da9a2027,
                 },
                 overlays :  {
-                    "Competencia" : feature_group_e3c3ce34ec1fe1d53869b570ce32de16,
-                    "Caviahue" : feature_group_399850bb6ae55bdfe36a007f77c4cb0d,
+                    "Competencia" : feature_group_4d07a8f800e25734a3301caf5be2cc8d,
+                    "Caviahue" : feature_group_74648e9455bcd58fc3a965a4854f32eb,
                 },
             };
-            let layer_control_d1dc880d84b5900b98188658400bc64e = L.control.layers(
-                layer_control_d1dc880d84b5900b98188658400bc64e_layers.base_layers,
-                layer_control_d1dc880d84b5900b98188658400bc64e_layers.overlays,
+            let layer_control_264d2951502786b9d9515d04a86049e9 = L.control.layers(
+                layer_control_264d2951502786b9d9515d04a86049e9_layers.base_layers,
+                layer_control_264d2951502786b9d9515d04a86049e9_layers.overlays,
                 {
   "position": "topright",
   "collapsed": false,
   "autoZIndex": true,
 }
-            ).addTo(map_e190c93e2ac82014e008736e123647e8);
+            ).addTo(map_48d2a5be3026c1453c57ac6b9a7f225f);
 
         
 </script>

@@ -14,6 +14,7 @@ FARMACIA_POR_USUARIO = {
 "EVEIGA" : ["RIADIGOS"],
 "JANDERMARCH" : [ ],
 "LLAGUNA" : [],
+"OTROS" : ['FARMAPLUS','FARMALIFE']
 }
 
 def ventas(representantes=[]):

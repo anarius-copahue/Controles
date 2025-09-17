@@ -62,7 +62,7 @@ decrypt_files()
 # Password protection
 def page_login():
     # Campo para ingresar contraseña
-    st.title("Acceso restringido")
+    st.title("Tablero de avance de ventas")
 
     user_input = st.text_input("Ingresá tu usuario:")
     password_input = st.text_input("Ingresá la contraseña:", type="password")

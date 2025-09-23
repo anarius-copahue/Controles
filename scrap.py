@@ -57,7 +57,7 @@ def login_to_dispro(driver):
     # Wait for the login form to be present and fill in the credentials
     driver.wait.until(EC.presence_of_element_located((By.ID, "txtLogin"))).send_keys(USER)
     driver.wait.until(EC.presence_of_element_located((By.ID, "txtPassword"))).send_keys(PASSWORD)
-    driver.find_element(By.XPATH, '//button[contains(text(), "Ingresar")]').click()
+    driver.find_element(By.XPATH, '//*[@id="formLogin"]/button').click()
 
     # Wait for the login to complete and the page to load
     current_url = driver.current_url

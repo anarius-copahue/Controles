@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import io
 
+
 REPRESENTANTE_POR_USUARIO = {
         "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
         "EPIEGARI": ["Esteban Piegari"],
@@ -264,7 +265,7 @@ def cuotas(representantes=[]):
 
         def to_excel(df: pd.DataFrame) -> bytes:
             output = io.BytesIO()
-            with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+            with pd.ExcelWriter(output, engine="openpyxl") as writer:
                 df.to_excel(writer, index=False, sheet_name="Reporte")
             return output.getvalue()
 

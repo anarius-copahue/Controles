@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import io
 
 REPRESENTANTE_POR_USUARIO = {
         "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
@@ -260,3 +261,21 @@ def cuotas(representantes=[]):
             st.dataframe(df.style.apply(resaltar_total, axis=1).format(precision=0), use_container_width=True)
                 
         st.markdown("---")
+
+        def to_excel(df: pd.DataFrame) -> bytes:
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+                df.to_excel(writer, index=False, sheet_name="Reporte")
+            return output.getvalue()
+
+    
+        # Generar el Excel del DataFrame actual
+        excel_file = to_excel(df)
+
+        st.download_button(
+        label="📥 Descargar Excel",
+        data=excel_file,
+        file_name=f"reporte_{fila['Representante']}.xlsx",  # nombre único
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        key=f"download_{i}"  # clave única para cada botón
+        )

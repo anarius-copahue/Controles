@@ -20,10 +20,10 @@ def decrypt_files():
     for archivo in ARCHIVOS:
         decrypt_file(archivo, key.encode())
 a_representantes = [
-        'Karina Macías', 'Karina Perfu y Supermercados', 'Esteban Piegari',
-        'Maria Laura Lavanchy', 'Patricia Zacca', 'Marcela Rosselot', 'Lucio Colombo',
-        'Yanina Cuezzo', 'Leonardo Paredes', 'Yamila Arreche', 'Emiliano Veiga',
-        'Jessica Andermarch', 'Luciano Laguna'
+        'Karina Macías', 'Karina Perfu y Supermercados', 'Zona Norte',
+        'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Lucio Colombo',
+        'Yanina Cuezzo',  'Yamila Arreche', 'Emiliano Veiga',
+        'Jessica Andermarch', 'Vacante'
     ]
 
 def get_last_scrape_time():

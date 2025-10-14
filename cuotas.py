@@ -6,7 +6,6 @@ import io
 
 REPRESENTANTE_POR_USUARIO = {
         "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
-        "EPIEGARI": ["Esteban Piegari"],
         "PZACCA": ["Patricia Zacca"],
         "MROSSELOT": ["Marcela Rosselot"],
         "LCOLOMBO": ["Lucio Colombo"],
@@ -14,8 +13,7 @@ REPRESENTANTE_POR_USUARIO = {
         "YARRECHE": ["Yamila Arreche"],
         "EVEIGA": ["Emiliano Veiga"],
         "JANDERMARCH": ["Jessica Andermarch"],
-        "LLAGUNA": ["Luciano Laguna"],
-        "OTROS" : ["Leonardo Paredes", "Maria Laura Lavanchy"]
+        "OTROS" : ["Vacante", "Zona Norte", "Gerencia" ],
 }
 
 def cuotas(representantes=[]):

@@ -4,7 +4,7 @@ import numpy as np
 
 REPRESENTANTE_mapa= {
         "KMACIAS": "mapa_ventas_KARINA.html",
-        "SROCHI": "mapa_ventas_ESTEBAN.html",
+        "SROCHI": "mapa_ventas_SANTIAGO.html",
         "PZACCA": "mapa_ventas_PATRICA.html",
         "MROSSELOT": "mapa_ventas_MARCELA.html",
         "LCOLOMBO": "mapa_ventas_LUCIO.html",

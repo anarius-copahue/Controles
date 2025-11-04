@@ -6,7 +6,7 @@ import io
 
 REPRESENTANTE_POR_USUARIO = {
         "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
-        "SROCHI": ["Zona Norte"],
+        "SROCCHI": ["Zona Norte"],
         "PZACCA": ["Patricia Zacca"],
         "MROSSELOT": ["Marcela Rosselot"],
         "LCOLOMBO": ["Lucio Colombo"],

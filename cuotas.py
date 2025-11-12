@@ -15,7 +15,7 @@ REPRESENTANTE_POR_USUARIO = {
         "EVEIGA": ["Emiliano Veiga"],
         "JANDERMARCH": ["Jessica Andermarch"],
         "NBRIDI":["Natalia Bridi"],
-        "OTROS" : ["Vacante", "Gerencia" ],
+        "OTROS" : [ "Gerencia" ],
 }
 
 def cuotas(representantes=[]):

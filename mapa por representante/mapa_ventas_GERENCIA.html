@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e8647378f7164728c64bf5249cdb956d {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+    <div style="
+         position: fixed;
+         bottom: 40px; left: 30px; width: 220px;
+         background-color: white;
+         border: 2px solid grey;
+         z-index:9999;
+         font-size: 14px;
+         padding: 10px;
+         box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    ">
+    <b>🗺️ Leyenda</b><br>
+    <span style="font-size:18px; color: green;">●</span> Aumento de Share (Q3 vs Q2)<br>
+    <span style="font-size:18px; color: red;">●</span> Disminución de Share (Q3 vs Q2)<br>
+    <span style="font-size:18px; color: yellow;">●</span> Sin cambio o sin share en Q2<br>
+    <span style="font-size:18px; color: #337AFF;">●</span> Competencia<br>
+    <small>Tamaño = Volumen Total (Q3)</small>
+    </div>
+    
+    
+            <div class="folium-map" id="map_e8647378f7164728c64bf5249cdb956d" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_e8647378f7164728c64bf5249cdb956d = L.map(
+                "map_e8647378f7164728c64bf5249cdb956d",
+                {
+                    center: [-27.79, -64.264],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_928fa55bf8c4860a83e0ce0e57e283cd = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_928fa55bf8c4860a83e0ce0e57e283cd.addTo(map_e8647378f7164728c64bf5249cdb956d);
+        
+    
+            var feature_group_20a2db00de5cbd9de892bdfd4c557529 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_c9b1c4b054a97d4964490e932bf6b898 = L.circleMarker(
+                [-27.79, -64.264],
+                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 38.45958178989638, "stroke": true, "weight": 3}
+            ).addTo(feature_group_20a2db00de5cbd9de892bdfd4c557529);
+        
+    
+        var popup_320a080ebf76d5566ff9099aee09e9c2 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_79dda7206bffc6bc1d2885c14619131e = $(`<div id="html_79dda7206bffc6bc1d2885c14619131e" style="width: 100.0%; height: 100.0%;"><b>SANTIAGO DEL ESTERO<br>                     <b>CP:</b> 4200<br>                     <b>Caviahue Q3:</b> 1196.0<br>                     <b>Share Caviahue Q3:</b> 13.0%<br>                     <b>Share Caviahue f'Q2:</b> 9.3%<br>                     <b>Total Q3:</b> 9173.0</div>`)[0];
+                popup_320a080ebf76d5566ff9099aee09e9c2.setContent(html_79dda7206bffc6bc1d2885c14619131e);
+            
+        
+
+        circle_marker_c9b1c4b054a97d4964490e932bf6b898.bindPopup(popup_320a080ebf76d5566ff9099aee09e9c2)
+        ;
+
+        
+    
+    
+            circle_marker_c9b1c4b054a97d4964490e932bf6b898.bindTooltip(
+                `<div>
+                     Competencia
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_35b1ce6e638403db303b628f60f1a8b1 = L.circleMarker(
+                [-27.49, -64.83],
+                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.979565641633144, "stroke": true, "weight": 3}
+            ).addTo(feature_group_20a2db00de5cbd9de892bdfd4c557529);
+        
+    
+        var popup_1096dd6e57f347d07c99efe6c7ea5d45 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_eaaf229a70d1116b2b9bfd5aedfeb35a = $(`<div id="html_eaaf229a70d1116b2b9bfd5aedfeb35a" style="width: 100.0%; height: 100.0%;"><b>TERMAS DE RIO HONDO<br>                     <b>CP:</b> 4220<br>                     <b>Caviahue Q3:</b> 174.0<br>                     <b>Share Caviahue Q3:</b> 14.6%<br>                     <b>Share Caviahue f'Q2:</b> 4.9%<br>                     <b>Total Q3:</b> 1188.0</div>`)[0];
+                popup_1096dd6e57f347d07c99efe6c7ea5d45.setContent(html_eaaf229a70d1116b2b9bfd5aedfeb35a);
+            
+        
+
+        circle_marker_35b1ce6e638403db303b628f60f1a8b1.bindPopup(popup_1096dd6e57f347d07c99efe6c7ea5d45)
+        ;
+
+        
+    
+    
+            circle_marker_35b1ce6e638403db303b628f60f1a8b1.bindTooltip(
+                `<div>
+                     Competencia
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c1c3dff01ab1a9f5c43e2abd931e9493 = L.circleMarker(
+                [-27.76, -64.26],
+                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 14.767181320693757, "stroke": true, "weight": 3}
+            ).addTo(feature_group_20a2db00de5cbd9de892bdfd4c557529);
+        
+    
+        var popup_345276f6685ba937cf4c2665ebefd80c = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_393ff62f9fca50e6638aecdf8fb860b3 = $(`<div id="html_393ff62f9fca50e6638aecdf8fb860b3" style="width: 100.0%; height: 100.0%;"><b>LA BANDA<br>                     <b>CP:</b> 4300<br>                     <b>Caviahue Q3:</b> 14.0<br>                     <b>Share Caviahue Q3:</b> 1.7%<br>                     <b>Share Caviahue f'Q2:</b> 3.0%<br>                     <b>Total Q3:</b> 838.0</div>`)[0];
+                popup_345276f6685ba937cf4c2665ebefd80c.setContent(html_393ff62f9fca50e6638aecdf8fb860b3);
+            
+        
+
+        circle_marker_c1c3dff01ab1a9f5c43e2abd931e9493.bindPopup(popup_345276f6685ba937cf4c2665ebefd80c)
+        ;
+
+        
+    
+    
+            circle_marker_c1c3dff01ab1a9f5c43e2abd931e9493.bindTooltip(
+                `<div>
+                     Competencia
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_20a2db00de5cbd9de892bdfd4c557529.addTo(map_e8647378f7164728c64bf5249cdb956d);
+        
+    
+            var feature_group_afcbd8f08818f58fda9f8295ea53ccc9 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_cc996be95ac50f90ea6ae5dc0b2c418b = L.circleMarker(
+                [-27.79, -64.264],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 17.025209779403774, "stroke": true, "weight": 1}
+            ).addTo(feature_group_afcbd8f08818f58fda9f8295ea53ccc9);
+        
+    
+            circle_marker_cc996be95ac50f90ea6ae5dc0b2c418b.bindTooltip(
+                `<div>
+                     Caviahue
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0a2c3d726c46543a5a3deaba5581c4a5 = L.circleMarker(
+                [-27.49, -64.83],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.874440382805996, "stroke": true, "weight": 1}
+            ).addTo(feature_group_afcbd8f08818f58fda9f8295ea53ccc9);
+        
+    
+            circle_marker_0a2c3d726c46543a5a3deaba5581c4a5.bindTooltip(
+                `<div>
+                     Caviahue
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2ad37d40547ce2df70e19888f2bc09a6 = L.circleMarker(
+                [-27.76, -64.26],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.8737647560281374, "stroke": true, "weight": 1}
+            ).addTo(feature_group_afcbd8f08818f58fda9f8295ea53ccc9);
+        
+    
+            circle_marker_2ad37d40547ce2df70e19888f2bc09a6.bindTooltip(
+                `<div>
+                     Caviahue
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_afcbd8f08818f58fda9f8295ea53ccc9.addTo(map_e8647378f7164728c64bf5249cdb956d);
+        
+    
+            var layer_control_3233da2ff175719cd28e35f51bbbd993_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_928fa55bf8c4860a83e0ce0e57e283cd,
+                },
+                overlays :  {
+                    "Competencia" : feature_group_20a2db00de5cbd9de892bdfd4c557529,
+                    "Caviahue" : feature_group_afcbd8f08818f58fda9f8295ea53ccc9,
+                },
+            };
+            let layer_control_3233da2ff175719cd28e35f51bbbd993 = L.control.layers(
+                layer_control_3233da2ff175719cd28e35f51bbbd993_layers.base_layers,
+                layer_control_3233da2ff175719cd28e35f51bbbd993_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_e8647378f7164728c64bf5249cdb956d);
+
+        
+</script>
+</html>

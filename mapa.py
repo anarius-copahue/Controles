@@ -3,16 +3,16 @@ import pandas as pd
 import numpy as np
 
 REPRESENTANTE_mapa= {
-        "KMACIAS": "mapa_ventas_KARINA.html",
-        "SROCCHI": "mapa_ventas_SANTIAGO.html",
-        "PZACCA": "mapa_ventas_PATRICA.html",
-        "MROSSELOT": "mapa_ventas_MARCELA.html",
-        "LCOLOMBO": "mapa_ventas_LUCIO.html",
-        "YCUEZZO": "mapa_ventas_YANINA.html",
-        "YARRECHE": "mapa_ventas_YAMILA.html",
-        "EVEIGA": "mapa_ventas_EMILIANO.html",
-        "JANDERMARCH": "mapa_ventas_JESSICA.html",
-        "LLAGUNA": "mapa_ventas_LUCIANO.html"
+        "NBRIDI" : "mapa_ventas_ZONA_CABA_1425.html",
+        "SROCCHI": "mapa_ventas_ZONA_NORTE.html",
+        "PZACCA": "mapa_ventas_PATAGONIA.html",
+        "MROSSELOT": "mapa_ventas_CORDOBA_+_NORESTE.html",
+        "LCOLOMBO": "mapa_ventas_LITORAL.html",
+        "YCUEZZO": "mapa_ventas_NORTE.html",
+        "YARRECHE": "mapa_ventas_ZONA_SUR.html",
+        "EVEIGA": "mapa_ventas_COSTA_ATLANTICA.html",
+        "JANDERMARCH": "mapa_ventas_CUYO.html",
+        
 }
 
 def mapa(representante):

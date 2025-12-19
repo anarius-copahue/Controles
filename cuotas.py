@@ -5,7 +5,7 @@ import io
 
 
 REPRESENTANTE_POR_USUARIO = {
-        
+        "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
         "SROCCHI": ["Zona Norte"],
         "PZACCA": ["Patricia Zacca"],
         "MROSSELOT": ["Marcela Rosselot"],
@@ -92,52 +92,52 @@ def cuotas(representantes=[]):
     # ==========================================================
     # =====================   TANGO   ==========================
     # ==========================================================
-    #SI EXISTE ARCHIVO TANGO CARGARLO Y PROCESARLO, SINO IGNORAR
-try:
-    df_tango = pd.read_excel("data/TANGO.xls", sheet_name="Datos")
 
-    df_tango = df_tango.rename(columns={
-        "COD_CLI": "Cliente",
-        "COD_ARTICU": "PRODU.",
-        "CANTIDAD": "Venta Unid."
-    })
+    try:
+        df_tango = pd.read_excel("data/TANGO.xls", sheet_name="Datos")
 
-    df_tango["Mizu"] = np.where(
-        df_tango["PRODU."].isin([21304, 21302]),
-        df_tango["Venta Unid."],
-        0
-    )
+        df_tango = df_tango.rename(columns={
+            "COD_CLI": "Cliente",
+            "COD_ARTICU": "PRODU.",
+            "CANTIDAD": "Venta Unid."
+        })
 
-    df_tango["Caviahue"] = np.where(
-        ~df_tango["PRODU."].isin([21304, 21302]),
-        df_tango["Venta Unid."],
-        0
-    )
+        df_tango["Mizu"] = np.where(
+            df_tango["PRODU."].isin([21304, 21302]),
+            df_tango["Venta Unid."],
+            0
+        )
 
-    # Despaconar TANGO
-    df_tango["Caviahue"] = np.where(
-        df_tango['PRODU.'].isin([22005,21663,22251,21657,21655,21658]),
-        df_tango["Caviahue"] * 3,
-        df_tango["Caviahue"]
-    )
+        df_tango["Caviahue"] = np.where(
+            ~df_tango["PRODU."].isin([21304, 21302]),
+            df_tango["Venta Unid."],
+            0
+        )
 
-    df_tango["Caviahue"] = np.where(
-        df_tango['PRODU.'].isin([21653]),
-        df_tango["Caviahue"] * 2,
-        df_tango["Caviahue"]
-    )
+        # Despaconar TANGO
+        df_tango["Caviahue"] = np.where(
+            df_tango['PRODU.'].isin([22005,21663,22251,21657,21655,21658]),
+            df_tango["Caviahue"] * 3,
+            df_tango["Caviahue"]
+        )
 
-    df_tango["Caviahue"] = np.where(
-        df_tango['PRODU.'].isin([21656]),
-        df_tango["Caviahue"] * 4,
-        df_tango["Caviahue"]
-    )
+        df_tango["Caviahue"] = np.where(
+            df_tango['PRODU.'].isin([21653]),
+            df_tango["Caviahue"] * 2,
+            df_tango["Caviahue"]
+        )
 
-    df_tango = df_tango[["Cliente", "Caviahue", "Mizu"]]
+        df_tango["Caviahue"] = np.where(
+            df_tango['PRODU.'].isin([21656]),
+            df_tango["Caviahue"] * 4,
+            df_tango["Caviahue"]
+        )
 
-except FileNotFoundError:
+        df_tango = df_tango[["Cliente", "Caviahue", "Mizu"]]
+
+    except FileNotFoundError:
     # DataFrame vacío PERO con columnas correctas
-    df_tango = pd.DataFrame(columns=["Cliente", "Caviahue", "Mizu"])
+        df_tango = pd.DataFrame(columns=["Cliente", "Caviahue", "Mizu"])
 
 
     # ==========================================================

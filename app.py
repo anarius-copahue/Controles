@@ -1,6 +1,7 @@
 import streamlit as st
 from cuotas import cuotas
 from ventas import ventas
+from update_data import update_data
 from mapa import mapa
 from scrap import scrape_data
 from encrypt import decrypt_file
@@ -19,6 +20,11 @@ def decrypt_files():
 
     for archivo in ARCHIVOS:
         decrypt_file(archivo, key.encode())
+    #si existe desencriptar tambien el archivo TANGO si existe
+    tango_path = "data/TANGO.csv.encrypted"
+    if os.path.exists(tango_path):
+        decrypt_file(tango_path, key.encode())
+        
 a_representantes = [
         'Karina Macías', 'Karina Perfu y Supermercados', 'Zona Norte',
         'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Lucio Colombo',
@@ -94,6 +100,16 @@ if user_logged.upper() == "ADMIN":
         ventas()
     with tab2:
         cuotas()
+
+if user_logged.upper() == "ADMIN_DATA":
+    # Tabs
+    tab1, tab2, tab3 = st.tabs(["Ventas", "Cuota", "Actualizar Datos"])
+    with tab1:
+        ventas()
+    with tab2:
+        cuotas()
+    with tab3:
+        update_data()
 
 else:
     ventas([user_logged.upper()])

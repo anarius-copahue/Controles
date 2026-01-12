@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import io
 
-
 REPRESENTANTE_POR_USUARIO = {
         "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
         "SROCCHI": ["Zona Norte"],
@@ -94,7 +93,8 @@ def cuotas(representantes=[]):
     # ==========================================================
 
     try:
-        df_tango = pd.read_excel("data/TANGO.xls", sheet_name="Datos")
+        #hoja Datos del archivo TANGO.csv
+        df_tango = pd.read_csv("data/TANGO.csv")
 
         df_tango = df_tango.rename(columns={
             "COD_CLI": "Cliente",

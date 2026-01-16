@@ -6,3 +6,4 @@ streamlit
 seleniumbase
 webdriver-manager
 openpyxl
+xlrd

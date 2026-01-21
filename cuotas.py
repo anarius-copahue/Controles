@@ -43,7 +43,6 @@ def cuotas(representantes=[], usuario_id="default"):
         ahora = datetime.datetime.now()
         mes_actual, anio_actual, anio_anterior = ahora.month, ahora.year, ahora.year - 1
 
-        # Mapeo de fechas para cálculos AA y YTD
         cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
         
         df_hist["Venta Año Anterior"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_anterior]].sum(axis=1)
@@ -56,7 +55,6 @@ def cuotas(representantes=[], usuario_id="default"):
 
     # --- 1. CARGA VENTAS ACTUALES ---
     try:
-        # Preventa y Venta Neta
         df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|").rename(columns={"Clie": "Cliente"})
         df_venta["Caviahue"] = df_venta["Unidades"]
         
@@ -97,7 +95,6 @@ def cuotas(representantes=[], usuario_id="default"):
             df_rep = df_rep.merge(df_hist_resumen, left_on="N° CLIENTE_INT", right_on="N° CLIENTE", how="left", suffixes=('', '_hist')).fillna(0)
             df_rep["Acumulado año"] = df_rep["Hist_Act"] + df_rep["Venta Mes Actual"]
             
-            # Totales internos
             t_mask = df_rep["CLIENTE"].str.contains("TOTAL", case=False, na=False)
             gid = t_mask.cumsum()
             for g in gid[t_mask].unique():
@@ -110,7 +107,7 @@ def cuotas(representantes=[], usuario_id="default"):
             hojas_rep[nombre] = df_rep[["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta Año Anterior", "Acumulado año", "Crecimiento MMAA", "Venta AA YTD"]]
         except: pass
 
-    # --- 3. UI STREAMLIT ---
+    # --- 3. UI ---
     st.title("Reporte de avance de cuota Caviahue")
     
     res_list = []
@@ -151,11 +148,12 @@ def cuotas(representantes=[], usuario_id="default"):
                 df_disp = hojas_rep[r["Rep"]].drop(columns=["Venta AA YTD"])
                 
                 # --- PARCHE PARA ERROR LargeUtf8 ---
+                # Convertimos todas las columnas de texto a string estándar
                 for col in df_disp.columns:
                     if df_disp[col].dtype == 'object' or pd.api.types.is_string_dtype(df_disp[col]):
                         df_disp[col] = df_disp[col].astype(str)
                 
-                # --- PARCHE PARA ERROR hide_index ---
+                # --- RENDERIZADO CORREGIDO ---
                 st.dataframe(
                     df_disp.style.apply(resaltar_totales, axis=1).format({
                         "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",

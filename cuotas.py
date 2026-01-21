@@ -2,332 +2,199 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import io
+import datetime
+import os
 
+# Importamos tu función de encriptación
+from encrypt import encrypt_file
+
+# --- CONFIGURACIÓN DE REPRESENTANTES ---
 REPRESENTANTE_POR_USUARIO = {
-        "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
-        "SROCCHI": ["Zona Norte"],
-        "PZACCA": ["Patricia Zacca"],
-        "MROSSELOT": ["Marcela Rosselot"],
-        "LCOLOMBO": ["Lucio Colombo"],
-        "YCUEZZO": ["Yanina Cuezzo"],
-        "YARRECHE": ["Yamila Arreche"],
-        "EVEIGA": ["Emiliano Veiga"],
-        "JANDERMARCH": ["Jessica Andermarch"],
-        "NBRIDI":["Natalia Bridi"],
-        "OTROS" : [ "Gerencia" ],
+    "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
+    "SROCCHI": ["Zona Norte"],
+    "PZACCA": ["Patricia Zacca"],
+    "MROSSELOT": ["Marcela Rosselot"],
+    "LCOLOMBO": ["Lucio Colombo"],
+    "YCUEZZO": ["Yanina Cuezzo"],
+    "YARRECHE": ["Yamila Arreche"],
+    "EVEIGA": ["Emiliano Veiga"],
+    "JANDERMARCH": ["Jessica Andermarch"],
+    "NBRIDI":["Natalia Bridi"],
+    "OTROS" : [ "Gerencia" ],
 }
 
-def cuotas(representantes=[]):
+def resaltar_totales(row):
+    """Aplica color gris clarito a las filas que contienen 'TOTAL' en la columna CLIENTE"""
+    # Usamos .get para evitar errores si la columna no existe en ese momento
+    cliente_val = str(row.get('CLIENTE', '')).upper()
+    if 'TOTAL' in cliente_val:
+        return ['background-color: #f0f0f0'] * len(row)
+    return [''] * len(row)
 
+def cuotas(representantes=[], usuario_id="default"):
     archivo_excel = "data/representante.xlsx"
-
-    df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
+    archivo_historico = "data/Historico.xlsx"
     
-    # Calcular valor
-    df_venta["Caviahue"] = df_venta["Unidades"]
-    df_venta["Mizu"] = 0
-    df_venta = df_venta.rename(columns={"Clie": "Cliente"})
+    key_enc = st.secrets["ENCRYPTION_KEY"].encode() if "ENCRYPTION_KEY" in st.secrets else None
 
-    # Cargar archivo de preventa
-    df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
-
-    # Limpieza de valores
-    def limpiar_valor(valor):
-        if pd.isna(valor):
-            return 0
-        valor = str(valor).replace('$', '').replace(' ', '')
-        valor = valor.replace('.', '')
-        valor = valor.replace(',', '.')
-        return float(valor)
-    
-    df_preventa["Venta Bruta"] = df_preventa["Venta Bruta"].apply(limpiar_valor)
-    df_preventa["Dtos. en Factura"] = df_preventa["Dtos. en Factura"].apply(limpiar_valor)
-
-    # Bonificación
-    df_preventa["venta_bonificada"] = np.isclose(
-        df_preventa["Venta Bruta"],
-        df_preventa["Dtos. en Factura"],
-        atol=2
-    )
-
-    df_preventa["Venta Unid."] = np.where(
-        df_preventa["venta_bonificada"],
-        0,
-        df_preventa["Venta Unid."]
-    )
-
-    # Clasificar productos PREVENTA
-    df_preventa["Mizu"] = np.where(
-        df_preventa['PRODU.'].isin([21304, 21302]),
-        df_preventa["Venta Unid."],
-        0
-    )
-
-    df_preventa["Caviahue"] = np.where(
-        ~df_preventa['PRODU.'].isin([21304, 21302]),
-        df_preventa["Venta Unid."],
-        0
-    )
-
-    # Despaconar PREVENTA
-    df_preventa["Caviahue"] = np.where(
-        df_preventa['PRODU.'].isin([22005,21663,22251,21657,21655,21658]),
-        df_preventa["Caviahue"] * 3,
-        df_preventa["Caviahue"]
-    )
-
-    df_preventa["Caviahue"] = np.where(
-        df_preventa['PRODU.'].isin([21653]),
-        df_preventa["Caviahue"] * 2,
-        df_preventa["Caviahue"]
-    )
-
-    df_preventa["Caviahue"] = np.where(
-        df_preventa['PRODU.'].isin([21656]),
-        df_preventa["Caviahue"] * 4,
-        df_preventa["Caviahue"]
-    )
-
-    # ==========================================================
-    # =====================   TANGO   ==========================
-    # ==========================================================
-
+    # --- 0. PROCESAR HISTÓRICO ---
     try:
-        #hoja Datos del archivo TANGO.csv
-        df_tango = pd.read_csv("data/TANGO.csv")
+        df_hist = pd.read_excel(archivo_historico)
+        df_hist = df_hist.dropna(subset=["N° CLIENTE"])
+        df_hist["N° CLIENTE"] = df_hist["N° CLIENTE"].astype(int)
+        
+        ahora = datetime.datetime.now()
+        mes_actual = ahora.month
+        anio_actual = ahora.year
+        anio_anterior = ahora.year - 1
 
-        df_tango = df_tango.rename(columns={
-            "COD_CLI": "Cliente",
-            "COD_ARTICU": "PRODU.",
-            "CANTIDAD": "Venta Unid."
-        })
+        cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
 
-        df_tango["Mizu"] = np.where(
-            df_tango["PRODU."].isin([21304, 21302]),
-            df_tango["Venta Unid."],
-            0
-        )
+        cols_aa = [c for c, dt in cols_fechas.items() if dt.year == anio_anterior]
+        df_hist["Venta Año Anterior"] = df_hist[cols_aa].sum(axis=1)
 
-        df_tango["Caviahue"] = np.where(
-            ~df_tango["PRODU."].isin([21304, 21302]),
-            df_tango["Venta Unid."],
-            0
-        )
+        cols_aa_ytd = [c for c, dt in cols_fechas.items() if dt.year == anio_anterior and dt.month <= mes_actual]
+        df_hist["Venta AA YTD"] = df_hist[cols_aa_ytd].sum(axis=1)
 
-        # Despaconar TANGO
-        df_tango["Caviahue"] = np.where(
-            df_tango['PRODU.'].isin([22005,21663,22251,21657,21655,21658]),
-            df_tango["Caviahue"] * 3,
-            df_tango["Caviahue"]
-        )
+        cols_act = [c for c, dt in cols_fechas.items() if dt.year == anio_actual]
+        df_hist["Hist_Act"] = df_hist[cols_act].sum(axis=1)
+        
+        df_hist_resumen = df_hist[["N° CLIENTE", "Venta Año Anterior", "Venta AA YTD", "Hist_Act"]].groupby("N° CLIENTE").sum().reset_index()
+    except Exception as e:
+        df_hist_resumen = pd.DataFrame(columns=["N° CLIENTE", "Venta Año Anterior", "Venta AA YTD", "Hist_Act"])
 
-        df_tango["Caviahue"] = np.where(
-            df_tango['PRODU.'].isin([21653]),
-            df_tango["Caviahue"] * 2,
-            df_tango["Caviahue"]
-        )
+    # --- 1. CARGA VENTAS ACTUALES ---
+    try:
+        df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|").rename(columns={"Clie": "Cliente"})
+        df_venta["Caviahue"] = df_venta["Unidades"]
+        
+        df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
+        def limpiar_v(v): return float(str(v).replace('$', '').replace(' ', '').replace('.', '').replace(',', '.')) if pd.notnull(v) else 0
+        df_preventa["Venta Unid."] = np.where(np.isclose(df_preventa["Venta Bruta"].apply(limpiar_v), df_preventa["Dtos. en Factura"].apply(limpiar_v), atol=2), 0, df_preventa["Venta Unid."])
+        df_preventa["Caviahue"] = np.where(~df_preventa['PRODU.'].isin([21304, 21302]), df_preventa["Venta Unid."], 0)
 
-        df_tango["Caviahue"] = np.where(
-            df_tango['PRODU.'].isin([21656]),
-            df_tango["Caviahue"] * 4,
-            df_tango["Caviahue"]
-        )
+        def mult(df):
+            for ids, m in [([22005,21663,22251,21657,21655,21658], 3), ([21653], 2), ([21656], 4)]:
+                target = 'PRODU.' if 'PRODU.' in df.columns else 'COD_ARTICU'
+                if target in df.columns: df["Caviahue"] = np.where(df[target].isin(ids), df["Caviahue"] * m, df["Caviahue"])
+            return df
+        df_preventa = mult(df_preventa)
 
-        df_tango = df_tango[["Cliente", "Caviahue", "Mizu"]]
+        try:
+            df_tango = pd.read_csv("data/TANGO.csv").rename(columns={"COD_CLI": "Cliente", "CANTIDAD": "Venta Unid."})
+            df_tango["Caviahue"] = np.where(~df_tango["COD_ARTICU"].isin([21304, 21302]), df_tango["Venta Unid."], 0)
+            df_tango = mult(df_tango)
+        except: df_tango = pd.DataFrame(columns=["Cliente", "Caviahue"])
 
-    except FileNotFoundError:
-    # DataFrame vacío PERO con columnas correctas
-        df_tango = pd.DataFrame(columns=["Cliente", "Caviahue", "Mizu"])
+        ventas_mes = pd.concat([df_preventa[["Cliente", "Caviahue"]], df_venta[["Cliente", "Caviahue"]], df_tango[["Cliente", "Caviahue"]]])
+        ventas_mes = ventas_mes.groupby("Cliente")["Caviahue"].sum().reset_index()
+        ventas_mes.rename(columns={"Caviahue": "Venta Mes Actual"}, inplace=True)
+        ventas_mes = ventas_mes.dropna(subset=["Cliente"])
+        ventas_mes["Cliente"] = ventas_mes["Cliente"].astype(int)
+    except:
+        ventas_mes = pd.DataFrame(columns=["Cliente", "Venta Mes Actual"])
 
+    # --- CIERRE DÍA 30 ---
+    ahora = datetime.datetime.now()
+    if ahora.day == 30:
+        nueva_col = f"1/{ahora.month}/{ahora.year}"
+        try:
+            df_c = pd.read_excel(archivo_historico)
+            if nueva_col not in df_c.columns:
+                df_c = df_c.dropna(subset=["N° CLIENTE"])
+                df_c["N° CLIENTE"] = df_c["N° CLIENTE"].astype(int)
+                df_c[nueva_col] = df_c["N° CLIENTE"].map(ventas_mes.set_index("Cliente")["Venta Mes Actual"]).fillna(0).astype(int)
+                df_c.to_excel(archivo_historico, index=False)
+                if key_enc: encrypt_file(archivo_historico, key_enc)
+        except: pass
 
-    # ==========================================================
-    # =============== UNIFICAR TODAS LAS FUENTES ===============
-    # ==========================================================
-
-    df_preventa = pd.concat([
-        df_preventa[["Cliente", "Caviahue", "Mizu"]],
-        df_venta[["Cliente", "Caviahue", "Mizu"]],
-        df_tango[["Cliente", "Caviahue", "Mizu"]]
-    ], ignore_index=True)
-
-    # Agrupar totales por cliente
-    totales_caviahue = df_preventa.groupby("Cliente")["Caviahue"].sum().reset_index()
-    totales_caviahue.rename(columns={"Caviahue": "Total Caviahue"}, inplace=True)
-
-    totales_mizu = df_preventa.groupby("Cliente")["Mizu"].sum().reset_index()
-    totales_mizu.rename(columns={"Mizu": "Total Mizu"}, inplace=True)
-
-    ventas_totales_cliente = pd.merge(totales_caviahue, totales_mizu, on="Cliente", how="outer")
-
-    # ==========================================================
-    # ============ EL RESTO DEL CÓDIGO ES IGUAL ===============
-    # ==========================================================
-
-    # Lista de hojas esperadas
-    lista_representantes = []
-    if not representantes:
-        representantes = REPRESENTANTE_POR_USUARIO.keys()
-
-    for usuario, nombres in REPRESENTANTE_POR_USUARIO.items():
-        if usuario in representantes:
-            lista_representantes.extend(nombres)
+    # --- 2. INTEGRACIÓN FINAL ---
+    if not representantes: representantes = list(REPRESENTANTE_POR_USUARIO.keys())
+    nombres_planillas = []
+    for u in representantes:
+        if u in REPRESENTANTE_POR_USUARIO: nombres_planillas.extend(REPRESENTANTE_POR_USUARIO[u])
             
-    hojas_representantes = {
-        nombre: pd.read_excel(archivo_excel, sheet_name=nombre)
-        for nombre in lista_representantes
-    }
+    hojas_rep = {}
+    for nombre in nombres_planillas:
+        try:
+            df_rep = pd.read_excel(archivo_excel, sheet_name=nombre)
+            # Para los cálculos de merge, necesitamos N° CLIENTE temporal como int
+            df_rep["N° CLIENTE_INT"] = pd.to_numeric(df_rep["N° CLIENTE"], errors='coerce')
+            
+            df_rep = df_rep.drop(columns=["Total Caviahue"], errors="ignore").merge(ventas_mes, left_on="N° CLIENTE_INT", right_on="Cliente", how="left").drop(columns=["Cliente"], errors="ignore")
+            df_rep = df_rep.merge(df_hist_resumen, left_on="N° CLIENTE_INT", right_on="N° CLIENTE", how="left", suffixes=('', '_hist')).fillna(0)
+            
+            # Limpieza de columnas tras el merge
+            if 'N° CLIENTE_hist' in df_rep.columns: df_rep = df_rep.drop(columns=['N° CLIENTE_hist'])
+            
+            df_rep["Acumulado año"] = df_rep["Hist_Act"] + df_rep["Venta Mes Actual"]
+            
+            # Lógica de Totales (sin filtrar las filas TOTAL)
+            t_mask = df_rep["CLIENTE"].str.contains("TOTAL", case=False, na=False)
+            gid = t_mask.cumsum()
+            for g in gid[t_mask].unique():
+                m = (gid == g); idx = df_rep[m & t_mask].index[0]; h = m & (~t_mask)
+                for c in ["Cuota Caviahue", "Venta Mes Actual", "Venta Año Anterior", "Acumulado año", "Venta AA YTD"]:
+                    df_rep.loc[idx, c] = df_rep.loc[h, c].sum()
 
-    # Incorporar totales en cada hoja
-    for nombre, df in hojas_representantes.items():
-        df_actualizado = df.drop(columns=["Total Caviahue", "Total Mizu"], errors="ignore").merge(
-            ventas_totales_cliente[["Cliente", "Total Caviahue", "Total Mizu"]],
-            left_on="N° CLIENTE",
-            right_on="Cliente",
-            how="left"
-        ).drop(columns=["Cliente"], errors="ignore")
+            df_rep["Avance %"] = (df_rep["Venta Mes Actual"] / df_rep["Cuota Caviahue"] * 100).replace([np.inf, -np.inf], 0).fillna(0)
+            df_rep["Crecimiento MMAA"] = np.where(df_rep["Venta AA YTD"] > 0, ((df_rep["Acumulado año"] / df_rep["Venta AA YTD"]) - 1) * 100, 0)
+            
+            orden = ["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta Año Anterior", "Acumulado año", "Crecimiento MMAA", "Venta AA YTD"]
+            hojas_rep[nombre] = df_rep[orden]
+        except: pass
 
-        df_actualizado[["Total Caviahue", "Total Mizu"]] = df_actualizado[["Total Caviahue", "Total Mizu"]].fillna(0)
-
-        cols = df_actualizado.columns.tolist()
-        for col in ["Total Caviahue", "Total Mizu"]:
-            if col in cols:
-                cols.insert(3, cols.pop(cols.index(col)))
-
-        df_actualizado = df_actualizado[cols]
-        hojas_representantes[nombre] = df_actualizado
-
-    # Totales dentro de cada hoja
-    for nombre, df in hojas_representantes.items():
-        df = df.copy()
-        
-        total_rows = df["CLIENTE"].str.contains("TOTAL", case=False, na=False)
-        group_id = total_rows.cumsum()
-
-        for g in group_id[total_rows].unique():
-            group_mask = group_id == g
-            total_row_idx = df[group_mask & total_rows].index[0]
-            children_mask = group_mask & (~total_rows)
-
-            for col in ["Cuota Caviahue", "Total Caviahue", "Cuota Mizu", "Total Mizu"]:
-                if col in df.columns:
-                    df.loc[total_row_idx, col] = df.loc[children_mask, col].sum(skipna=True)
-
-        hojas_representantes[nombre] = df
-
-    # Porcentajes
-    for nombre, df in hojas_representantes.items():
-        df = df.copy()
-
-        df["% Caviahue"] = (
-            pd.to_numeric(df.get("Total Caviahue"), errors="coerce") /
-            pd.to_numeric(df.get("Cuota Caviahue"), errors="coerce")
-        ) * 100
-
-        df["% Mizu"] = (
-            pd.to_numeric(df.get("Total Mizu"), errors="coerce") /
-            pd.to_numeric(df.get("Cuota Mizu"), errors="coerce")
-        ) * 100
-
-        df["% Caviahue"] = df["% Caviahue"].replace([np.inf, -np.inf], 0).fillna(0).round(2)
-        df["% Mizu"] = df["% Mizu"].replace([np.inf, -np.inf], 0).fillna(0).round(2)
-
-        nuevo_orden = ["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Total Caviahue","% Caviahue",
-                       "Cuota Mizu", "Total Mizu", "% Mizu"]
-
-        df = df[nuevo_orden]
-
-        hojas_representantes[nombre] = df
-
-    st.set_page_config(page_title="Control Cuota", layout="wide")
-    st.title("Reporte de Representantes")
+    # --- 3. UI ---
+    st.title("Reporte Caviahue 2026")
     
-    resumen = pd.DataFrame({
-        "Representante": list(hojas_representantes.keys()),
+    res_list = []
+    for n, df in hojas_rep.items():
+        # Para el resumen general, solo sumamos clientes reales (N° CLIENTE > 0)
+        sc = df[pd.to_numeric(df["N° CLIENTE"], errors='coerce') > 0].copy()
+        res_list.append({"Rep": n, "Cuota": sc["Cuota Caviahue"].sum(), "Venta": sc["Venta Mes Actual"].sum(), "VAA": sc["Venta Año Anterior"].sum(), "Acumulado año": sc["Acumulado año"].sum(), "VAA_YTD": sc["Venta AA YTD"].sum()})
+    
+    resumen = pd.DataFrame(res_list)
+    if not resumen.empty:
+        resumen["Avance"] = (resumen["Venta"] / resumen["Cuota"] * 100).fillna(0)
+        resumen["Crecimiento MMAA"] = np.where(resumen["VAA_YTD"] > 0, ((resumen["Acumulado año"] / resumen["VAA_YTD"]) - 1) * 100, 0)
 
-        "Cuota Caviahue": [
-            df[~df["CLIENTE"].str.contains("TOTAL", case=False, na=False)]["Cuota Caviahue"].sum(skipna=True)
-            for df in hojas_representantes.values()
-        ],
+        # Renderizado de filas de representantes
+        for i, r in resumen.iterrows():
+            key = f"exp_{usuario_id}_{i}"
+            if key not in st.session_state: st.session_state[key] = False
+            
+            cols = st.columns([0.5, 2, 1, 1, 1, 1, 1, 1])
+            if cols[0].button("➕" if not st.session_state[key] else "➖", key=f"b_{usuario_id}_{i}"):
+                st.session_state[key] = not st.session_state[key]
+            
+            cols[1].write(r["Rep"])
+            cols[2].write(f"{int(r['Cuota']):,}".replace(",", "."))
+            cols[3].write(f"{int(r['Venta']):,}".replace(",", "."))
+            cols[4].write(f"{int(r['Avance'])}%")
+            cols[5].write(f"{int(r['VAA']):,}".replace(",", "."))
+            cols[6].write(f"{int(r['Acumulado año']):,}".replace(",", "."))
+            color = "green" if r["Crecimiento MMAA"] >= 0 else "red"
+            cols[7].markdown(f":{color}[{int(r['Crecimiento MMAA'])}%]")
 
-        "Total Caviahue": [
-            df[df["N° CLIENTE"].notna()]["Total Caviahue"].sum(skipna=True)
-            for df in hojas_representantes.values()
-        ],
-
-        "Cuota Mizu": [
-            df[df["N° CLIENTE"].notna()]["Cuota Mizu"].sum(skipna=True)
-            for df in hojas_representantes.values()
-        ],
-
-        "Total Mizu": [
-            df[df["N° CLIENTE"].notna()]["Total Mizu"].sum(skipna=True)
-            for df in hojas_representantes.values()
-        ],
-    })
-
-    resumen["% Caviahue"] = ((resumen["Total Caviahue"] / resumen["Cuota Caviahue"]) * 100).fillna(0)
-    resumen["% Mizu"] = ((resumen["Total Mizu"] / resumen["Cuota Mizu"]) * 100).fillna(0)
-
-    total_general_caviahue = resumen["Total Caviahue"].sum(skipna=True)
-    st.markdown(f"<h2 style='color: #3A7CA5;'>Total Caviahue General: {int(total_general_caviahue)}</h2>", unsafe_allow_html=True)
-
-    st.write("Resumen de cuotas y totales por representante:")
-
-    header_cols = st.columns([2, 3, 3, 3, 3, 3, 2, 2])
-    header_cols[0].write("")
-    header_cols[1].markdown("### Representante")
-    header_cols[2].markdown("### Cuota Caviahue")
-    header_cols[3].markdown("### Total Caviahue")
-    header_cols[4].markdown("### % Caviahue")
-    header_cols[5].markdown("### Cuota Mizu")
-    header_cols[6].markdown("### Total Mizu")
-    header_cols[7].markdown("### % Mizu")
-
-    for i, fila in resumen.iterrows():
-        key_expand = f"expandir_{i}"
-        if key_expand not in st.session_state:
-            st.session_state[key_expand] = False
-
-        cols = st.columns([2, 3, 3, 3, 3, 3, 2, 2])
-
-        with cols[0]:
-            if st.button("➖" if st.session_state[key_expand] else "➕", key=f"boton_{i}"):
-                st.session_state[key_expand] = not st.session_state[key_expand]
-
-        cols[1].markdown(f"{fila['Representante']}")
-        cols[2].markdown(f"{int(fila['Cuota Caviahue'])}")
-        cols[3].markdown(f"{int(fila['Total Caviahue'])}")
-        cols[4].markdown(f"{fila['% Caviahue']:.2f}%")
-        cols[5].markdown(f"{int(fila['Cuota Mizu'])}")
-        cols[6].markdown(f"{int(fila['Total Mizu'])}")
-        cols[7].markdown(f"{fila['% Mizu']:.2f}%")
-
-        if st.session_state[key_expand]:
-            st.markdown(f"#### Detalle de {fila['Representante']}")
-            df = hojas_representantes[fila["Representante"]].copy()
+            if st.session_state[key]:
+                df_disp = hojas_rep[r["Rep"]].drop(columns=["Venta AA YTD"])
                 
-            def resaltar_total(row):
-                if str(row["CLIENTE"]).strip().upper().startswith("TOTAL"):
-                    return ["background-color: #f0f0f0"] * len(row)
-                else:
-                    return [""] * len(row)
-        
-            st.dataframe(df.style.apply(resaltar_total, axis=1).format(precision=0), use_container_width=True)
+                # Formateo y Visualización de la tabla
+                st.dataframe(
+                    df_disp.style.apply(resaltar_totales, axis=1).format({
+                        "Cuota Caviahue": "{:,.0f}", 
+                        "Venta Mes Actual": "{:,.0f}",
+                        "Avance %": "{:.0f}%", 
+                        "Venta Año Anterior": "{:,.0f}",
+                        "Acumulado año": "{:,.0f}", 
+                        "Crecimiento MMAA": "{:.0f}%"
+                    }), 
+                    use_container_width=True, 
+                    hide_index=True
+                )
                 
-        st.markdown("---")
-
-        def to_excel(df: pd.DataFrame) -> bytes:
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine="openpyxl") as writer:
-                df.to_excel(writer, index=False, sheet_name="Reporte")
-            return output.getvalue()
-
-        excel_file = to_excel(df)
-
-        st.download_button(
-            label="📥 Descargar Excel",
-            data=excel_file,
-            file_name=f"reporte_{fila['Representante']}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            key=f"download_{i}"
-        )
+                output = io.BytesIO()
+                with pd.ExcelWriter(output, engine="openpyxl") as writer:
+                    df_disp.to_excel(writer, index=False, sheet_name="Reporte")
+                st.download_button("📥 Excel", output.getvalue(), f"{r['Rep']}_2026.xlsx", key=f"d_{usuario_id}_{i}")
+            st.markdown("---")

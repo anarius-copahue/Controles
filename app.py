@@ -15,7 +15,8 @@ with cols[7]:
         st.image("logo.png")
 
 def decrypt_files():
-    ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted"]
+    ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted",
+                "data/Historico.xlsx.encrypted"]
     key = st.secrets["ENCRYPTION_KEY"]
 
     for archivo in ARCHIVOS:
@@ -101,7 +102,7 @@ if user_logged.upper() == "ADMIN":
     with tab2:
         cuotas()
 
-if user_logged.upper() == "ADMIN_DATA":
+elif user_logged.upper() == "ADMIN_DATA":
     # Tabs
     tab1, tab2, tab3 = st.tabs(["Ventas", "Cuota", "Actualizar Datos"])
     with tab1:

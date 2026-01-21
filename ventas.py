@@ -18,7 +18,7 @@ FARMACIA_POR_USUARIO = {
 }
 
 def ventas(representantes=[]):
-    st.set_page_config(page_title="Control SELL OUT/IN", layout="wide")
+
     st.title("Control SELL OUT/IN")
 
     # --- FILTROS EN LA PARTE SUPERIOR ---

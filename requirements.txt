@@ -7,4 +7,3 @@ seleniumbase
 webdriver-manager
 openpyxl
 xlrd
-altair.vegalite.v4

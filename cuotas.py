@@ -34,7 +34,6 @@ def cuotas(representantes=[], usuario_id="default"):
     archivo_excel = "data/representante.xlsx"
     archivo_historico = "data/Historico.xlsx"
     
-    # Clave de encriptación
     key_enc = st.secrets["ENCRYPTION_KEY"].encode() if "ENCRYPTION_KEY" in st.secrets else None
 
     # --- 0. PROCESAR HISTÓRICO ---
@@ -50,15 +49,12 @@ def cuotas(representantes=[], usuario_id="default"):
 
         cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
         
-        # Ventas AA
         cols_aa = [c for c, dt in cols_fechas.items() if dt.year == anio_anterior]
         df_hist["Venta Año Anterior"] = df_hist[cols_aa].sum(axis=1)
         
-        # Ventas AA YTD
         cols_aa_ytd = [c for c, dt in cols_fechas.items() if dt.year == anio_anterior and dt.month <= mes_actual]
         df_hist["Venta AA YTD"] = df_hist[cols_aa_ytd].sum(axis=1)
         
-        # Histórico Año Actual (meses cerrados)
         cols_act = [c for c, dt in cols_fechas.items() if dt.year == anio_actual]
         df_hist["Hist_Act"] = df_hist[cols_act].sum(axis=1)
         
@@ -66,16 +62,19 @@ def cuotas(representantes=[], usuario_id="default"):
     except Exception as e:
         df_hist_resumen = pd.DataFrame(columns=["N° CLIENTE", "Venta Año Anterior", "Venta AA YTD", "Hist_Act"])
 
-    # --- 1. CARGA VENTAS ACTUALES (MES EN CURSO) ---
+    # --- 1. CARGA VENTAS ACTUALES ---
     try:
+        # Preventa
         df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|").rename(columns={"Clie": "Cliente"})
         df_venta["Caviahue"] = df_venta["Unidades"]
         
+        # Venta Neta
         df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
         def limpiar_v(v): return float(str(v).replace('$', '').replace(' ', '').replace('.', '').replace(',', '.')) if pd.notnull(v) else 0
         df_preventa["Venta Unid."] = np.where(np.isclose(df_preventa["Venta Bruta"].apply(limpiar_v), df_preventa["Dtos. en Factura"].apply(limpiar_v), atol=2), 0, df_preventa["Venta Unid."])
         df_preventa["Caviahue"] = np.where(~df_preventa['PRODU.'].isin([21304, 21302]), df_preventa["Venta Unid."], 0)
 
+        # Multiplicadores
         def mult(df):
             for ids, m in [([22005,21663,22251,21657,21655,21658], 3), ([21653], 2), ([21656], 4)]:
                 target = 'PRODU.' if 'PRODU.' in df.columns else 'COD_ARTICU'
@@ -83,6 +82,7 @@ def cuotas(representantes=[], usuario_id="default"):
             return df
         df_preventa = mult(df_preventa)
 
+        # Tango
         try:
             df_tango = pd.read_csv("data/TANGO.csv").rename(columns={"COD_CLI": "Cliente", "CANTIDAD": "Venta Unid."})
             df_tango["Caviahue"] = np.where(~df_tango["COD_ARTICU"].isin([21304, 21302]), df_tango["Venta Unid."], 0)
@@ -95,18 +95,6 @@ def cuotas(representantes=[], usuario_id="default"):
         ventas_mes["Cliente"] = pd.to_numeric(ventas_mes["Cliente"], errors='coerce').fillna(0).astype(int)
     except:
         ventas_mes = pd.DataFrame(columns=["Cliente", "Venta Mes Actual"])
-
-    # --- CIERRE DÍA 30 ---
-    if ahora.day == 30:
-        nueva_col = f"1/{ahora.month}/{ahora.year}"
-        try:
-            df_c = pd.read_excel(archivo_historico)
-            if nueva_col not in df_c.columns:
-                df_c["N° CLIENTE"] = df_c["N° CLIENTE"].astype(int)
-                df_c[nueva_col] = df_c["N° CLIENTE"].map(ventas_mes.set_index("Cliente")["Venta Mes Actual"]).fillna(0)
-                df_c.to_excel(archivo_historico, index=False)
-                if key_enc: encrypt_file(archivo_historico, key_enc)
-        except: pass
 
     # --- 2. INTEGRACIÓN FINAL ---
     if not representantes: representantes = list(REPRESENTANTE_POR_USUARIO.keys())
@@ -125,7 +113,7 @@ def cuotas(representantes=[], usuario_id="default"):
             
             df_rep["Acumulado año"] = df_rep["Hist_Act"] + df_rep["Venta Mes Actual"]
             
-            # Totales por grupo
+            # Recálculo de filas TOTALES
             t_mask = df_rep["CLIENTE"].str.contains("TOTAL", case=False, na=False)
             gid = t_mask.cumsum()
             for g in gid[t_mask].unique():
@@ -145,6 +133,7 @@ def cuotas(representantes=[], usuario_id="default"):
     
     res_list = []
     for n, df in hojas_rep.items():
+        # Filtramos para el resumen solo clientes con ID para no duplicar con los TOTALES internos
         sc = df[pd.to_numeric(df["N° CLIENTE"], errors='coerce') > 0].copy()
         res_list.append({
             "Rep": n, "Cuota": sc["Cuota Caviahue"].sum(), "Venta": sc["Venta Mes Actual"].sum(), 
@@ -154,10 +143,12 @@ def cuotas(representantes=[], usuario_id="default"):
     
     resumen = pd.DataFrame(res_list)
     if not resumen.empty:
-        # --- RESUMEN TOTAL COMPAÑÍA ---
+        # --- SECCIÓN: RESUMEN TOTAL COMPAÑÍA ---
         st.subheader("📊 Resumen Total Compañía")
-        t_cuota, t_venta = resumen["Cuota"].sum(), resumen["Venta"].sum()
-        t_vaa_ytd, t_acum = resumen["VAA_YTD"].sum(), resumen["Acumulado año"].sum()
+        t_cuota = resumen["Cuota"].sum()
+        t_venta = resumen["Venta"].sum()
+        t_vaa_ytd = resumen["VAA_YTD"].sum()
+        t_acum = resumen["Acumulado año"].sum()
         
         t_avance = (t_venta / t_cuota * 100) if t_cuota > 0 else 0
         t_crec = ((t_acum / t_vaa_ytd) - 1) * 100 if t_vaa_ytd > 0 else 0
@@ -170,7 +161,7 @@ def cuotas(representantes=[], usuario_id="default"):
         
         st.markdown("---")
 
-        # --- TABLA DESGLOSADA ---
+        # --- LISTADO POR REPRESENTANTE ---
         for i, r in resumen.iterrows():
             key = f"exp_{usuario_id}_{i}"
             if key not in st.session_state: st.session_state[key] = False
@@ -185,12 +176,15 @@ def cuotas(representantes=[], usuario_id="default"):
             cols[4].write(f"{int(r['Venta']/r['Cuota']*100 if r['Cuota']>0 else 0)}%")
             cols[5].write(f"{int(r['VAA']):,}".replace(",", "."))
             cols[6].write(f"{int(r['Acumulado año']):,}".replace(",", "."))
-            color = "green" if t_crec >= 0 else "red"
-            cols[7].markdown(f":{color}[{int(((r['Acumulado año']/r['VAA_YTD'])-1)*100 if r['VAA_YTD']>0 else 0)}%]")
+            
+            rep_crec = ((r['Acumulado año']/r['VAA_YTD'])-1)*100 if r['VAA_YTD']>0 else 0
+            color = "green" if rep_crec >= 0 else "red"
+            cols[7].markdown(f":{color}[{int(rep_crec)}%]")
 
             if st.session_state[key]:
                 df_disp = hojas_rep[r["Rep"]].drop(columns=["Venta AA YTD"])
-                # Corrección hide_index: Se aplica al objeto Styler
+                
+                # Renderizado con el parche hide(axis="index")
                 st.dataframe(
                     df_disp.style.apply(resaltar_totales, axis=1).format({
                         "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",
@@ -199,8 +193,10 @@ def cuotas(representantes=[], usuario_id="default"):
                     }).hide(axis="index"), 
                     use_container_width=True
                 )
+                
+                # Botón de Descarga
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:
                     df_disp.to_excel(writer, index=False, sheet_name="Reporte")
-                st.download_button("📥 Excel", output.getvalue(), f"{r['Rep']}_2026.xlsx", key=f"d_{usuario_id}_{i}")
+                st.download_button("📥 Descargar Excel", output.getvalue(), f"{r['Rep']}_2026.xlsx", key=f"d_{usuario_id}_{i}")
             st.markdown("---")

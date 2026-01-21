@@ -219,7 +219,7 @@ def ventas(representantes=[]):
     styled_df = (
         resultado_con_totales.style
         .format(formato_columnas)
-        .applymap(highlight_variacion, subset=["Variación vs AA"])
+        .map(highlight_variacion, subset=["Variación vs AA"])
         .hide(axis="index")
         .apply(
             lambda row: ["font-weight: bold;" if row["CADENA"] == "TOTAL" else "" for _ in row],

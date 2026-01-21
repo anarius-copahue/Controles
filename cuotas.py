@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import io
 import datetime
-import os
 
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
 REPRESENTANTE_POR_USUARIO = {
@@ -22,6 +21,7 @@ REPRESENTANTE_POR_USUARIO = {
 
 def resaltar_totales(row):
     """Aplica color gris a las filas de TOTAL"""
+    # Usamos str() para asegurar que la comparación no falle por tipos de datos
     cliente_val = str(row.get('CLIENTE', '')).upper()
     if 'TOTAL' in cliente_val:
         return ['background-color: #f0f0f0'] * len(row)
@@ -40,7 +40,9 @@ def cuotas(representantes=[], usuario_id="default"):
         ahora = datetime.datetime.now()
         mes_actual, anio_actual, anio_anterior = ahora.month, ahora.year, ahora.year - 1
 
-        cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
+        # Mapeo de fechas
+        cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns 
+                       if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
         
         df_hist["Venta Año Anterior"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_anterior]].sum(axis=1)
         df_hist["Venta AA YTD"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_anterior and dt.month <= mes_actual]].sum(axis=1)
@@ -105,18 +107,23 @@ def cuotas(representantes=[], usuario_id="default"):
         except: pass
 
     # --- 3. UI ---
-    st.title("Reporte de avance de cuota Caviahue")
+    st.title("📊 Avance de Cuota Caviahue 2026")
     
     res_list = []
     for n, df in hojas_rep.items():
         mc = pd.to_numeric(df["N° CLIENTE"], errors='coerce') > 0
-        res_list.append({"Rep": n, "Cuota": df[mc]["Cuota Caviahue"].sum(), "Venta": df[mc]["Venta Mes Actual"].sum(), 
-                         "VAA_YTD": df[mc]["Venta AA YTD"].sum(), "Acum": df[mc]["Acumulado año"].sum(), 
-                         "VAA": df[mc]["Venta Año Anterior"].sum()})
+        res_list.append({
+            "Rep": n, 
+            "Cuota": float(df[mc]["Cuota Caviahue"].sum()), 
+            "Venta": float(df[mc]["Venta Mes Actual"].sum()), 
+            "VAA_YTD": float(df[mc]["Venta AA YTD"].sum()), 
+            "Acum": float(df[mc]["Acumulado año"].sum()), 
+            "VAA": float(df[mc]["Venta Año Anterior"].sum())
+        })
     
     resumen = pd.DataFrame(res_list)
     if not resumen.empty:
-        st.subheader("📊 Resumen Total Compañía")
+        st.subheader("Resumen Total Compañía")
         tc, tv, ta, ty = resumen["Cuota"].sum(), resumen["Venta"].sum(), resumen["Acum"].sum(), resumen["VAA_YTD"].sum()
         m1, m2, m3, m4 = st.columns(4)
         m1.metric("Venta Mes", f"{int(tv):,}".replace(",", "."), f"{int(tv/tc*100 if tc>0 else 0)}% Avance")
@@ -129,6 +136,7 @@ def cuotas(representantes=[], usuario_id="default"):
             key = f"exp_{usuario_id}_{i}"
             if key not in st.session_state: st.session_state[key] = False
             cols = st.columns([0.5, 2, 1, 1, 1, 1, 1, 1])
+            
             if cols[0].button("➕" if not st.session_state[key] else "➖", key=f"b_{usuario_id}_{i}"):
                 st.session_state[key] = not st.session_state[key]
             
@@ -142,31 +150,38 @@ def cuotas(representantes=[], usuario_id="default"):
             cols[7].markdown(f":{'green' if crec_val >= 0 else 'red'}[{int(crec_val)}%]")
 
             if st.session_state[key]:
-                # --- LIMPIEZA AGRESIVA PARA EVITAR LargeUtf8 ---
-                df_disp = hojas_rep[r["Rep"]].copy()
-                df_disp = df_disp.drop(columns=["Venta AA YTD"])
+                # --- LIMPIEZA TOTAL PARA EVITAR LargeUtf8 ---
+                # 1. Copia y drop de columnas no deseadas
+                df_disp = hojas_rep[r["Rep"]].copy().drop(columns=["Venta AA YTD"], errors="ignore")
                 
-                # Convertimos explícitamente a tipos básicos de Python
-                for col in df_disp.columns:
-                    if col in ["CLIENTE", "N° CLIENTE"]:
-                        df_disp[col] = df_disp[col].astype(str)
-                    else:
-                        df_disp[col] = pd.to_numeric(df_disp[col], errors='coerce').fillna(0).astype(float)
+                # 2. Conversión forzada de tipos: Esto "rompe" el formato Arrow LargeUtf8
+                #    Convertimos CLIENTE a string nativo y lo demás a float nativo
+                df_disp["CLIENTE"] = df_disp["CLIENTE"].astype(str)
+                df_disp["N° CLIENTE"] = df_disp["N° CLIENTE"].astype(str).replace("0.0", "")
                 
-                # --- RENDERIZADO CON TRY/EXCEPT ---
+                num_cols = ["Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta Año Anterior", "Acumulado año", "Crecimiento MMAA"]
+                for col in num_cols:
+                    df_disp[col] = pd.to_numeric(df_disp[col], errors='coerce').fillna(0).astype(float)
+
+                # 3. Renderizado seguro con bloque try
                 try:
+                    # Usamos .style pero SIN encadenar demasiadas funciones que puedan corromper el objeto
                     st.dataframe(
                         df_disp.style.apply(resaltar_totales, axis=1).format({
-                            "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",
-                            "Avance %": "{:.0f}%", "Venta Año Anterior": "{:,.0f}",
-                            "Acumulado año": "{:,.0f}", "Crecimiento MMAA": "{:.0f}%"
+                            "Cuota Caviahue": "{:,.0f}", 
+                            "Venta Mes Actual": "{:,.0f}",
+                            "Avance %": "{:.1f}%", 
+                            "Venta Año Anterior": "{:,.0f}",
+                            "Acumulado año": "{:,.0f}", 
+                            "Crecimiento MMAA": "{:.1f}%"
                         }).hide(axis="index"), 
                         use_container_width=True
                     )
-                except:
-                    # Si falla el Styler (LargeUtf8), mostramos la tabla pura
-                    st.dataframe(df_disp, use_container_width=True)
+                except Exception:
+                    # Si el estilo sigue fallando en el navegador del usuario, mostramos la tabla básica
+                    st.dataframe(df_disp, use_container_width=True, hide_index=True)
                 
+                # --- EXCEL ---
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:
                     df_disp.to_excel(writer, index=False)

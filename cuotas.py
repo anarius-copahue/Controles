@@ -42,7 +42,6 @@ def cuotas(representantes=[], usuario_id="default"):
         cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns 
                        if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
         
-        # Sumamos columnas por año
         df_hist["Venta Año Anterior"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_anterior]].sum(axis=1)
         df_hist["Venta AA YTD"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_anterior and dt.month <= mes_actual]].sum(axis=1)
         df_hist["Hist_Act"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_actual]].sum(axis=1)
@@ -51,7 +50,7 @@ def cuotas(representantes=[], usuario_id="default"):
     except:
         df_hist_resumen = pd.DataFrame(columns=["N° CLIENTE", "Venta Año Anterior", "Venta AA YTD", "Hist_Act"])
 
-    # --- 1. CARGA VENTAS ACTUALES (TANGO + PREVENTA) ---
+    # --- 1. CARGA VENTAS ACTUALES ---
     try:
         df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|").rename(columns={"Clie": "Cliente"})
         df_venta["Caviahue"] = df_venta["Unidades"]
@@ -59,7 +58,6 @@ def cuotas(representantes=[], usuario_id="default"):
         df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
         df_preventa["Caviahue"] = np.where(~df_preventa['PRODU.'].isin([21304, 21302]), df_preventa["Venta Unid."], 0)
 
-        # Lógica de Multiplicadores (Despaconado)
         def mult(df):
             for ids, m in [([22005,21663,22251,21657,21655,21658], 3), ([21653], 2), ([21656], 4)]:
                 target = 'PRODU.' if 'PRODU.' in df.columns else 'COD_ARTICU'
@@ -82,7 +80,7 @@ def cuotas(representantes=[], usuario_id="default"):
     except:
         ventas_mes = pd.DataFrame(columns=["Cliente", "Venta Mes Actual"])
 
-    # --- 2. INTEGRACIÓN Y CÁLCULOS POR REPRESENTANTE ---
+    # --- 2. INTEGRACIÓN ---
     if not representantes: representantes = list(REPRESENTANTE_POR_USUARIO.keys())
     nombres_planillas = [nombre for u in representantes if u in REPRESENTANTE_POR_USUARIO for nombre in REPRESENTANTE_POR_USUARIO[u]]
             
@@ -91,34 +89,25 @@ def cuotas(representantes=[], usuario_id="default"):
         try:
             df_rep = pd.read_excel(archivo_excel, sheet_name=nombre)
             df_rep["N° CLIENTE_INT"] = pd.to_numeric(df_rep["N° CLIENTE"], errors='coerce').fillna(0).astype(int)
-            
-            # Merges
             df_rep = df_rep.drop(columns=["Total Caviahue"], errors="ignore").merge(ventas_mes, left_on="N° CLIENTE_INT", right_on="Cliente", how="left").drop(columns=["Cliente"], errors="ignore")
             df_rep = df_rep.merge(df_hist_resumen, left_on="N° CLIENTE_INT", right_on="N° CLIENTE", how="left", suffixes=('', '_hist')).fillna(0)
-            
             df_rep["Acumulado año"] = df_rep["Hist_Act"] + df_rep["Venta Mes Actual"]
             
-            # Recalcular filas de TOTAL
             t_mask = df_rep["CLIENTE"].astype(str).str.contains("TOTAL", case=False, na=False)
             gid = t_mask.cumsum()
             for g in gid[t_mask].unique():
                 m = (gid == g); idx = df_rep[m & t_mask].index[0]; h = m & (~t_mask)
                 for c in ["Cuota Caviahue", "Venta Mes Actual", "Venta Año Anterior", "Acumulado año", "Venta AA YTD"]:
-                    if c in df_rep.columns:
-                        df_rep.loc[idx, c] = df_rep.loc[h, c].sum()
+                    df_rep.loc[idx, c] = df_rep.loc[h, c].sum()
 
             df_rep["Avance %"] = (df_rep["Venta Mes Actual"] / df_rep["Cuota Caviahue"] * 100).replace([np.inf, -np.inf], 0).fillna(0)
             df_rep["Crecimiento MMAA"] = np.where(df_rep["Venta AA YTD"] > 0, ((df_rep["Acumulado año"] / df_rep["Venta AA YTD"]) - 1) * 100, 0)
-            
             hojas_rep[nombre] = df_rep[["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta Año Anterior", "Acumulado año", "Crecimiento MMAA", "Venta AA YTD"]]
         except: pass
 
-    # --- 3. UI Y RENDERIZADO ---
-    st.markdown("""<style>
-        [data-testid="stMetricValue"] { font-size: 24px; }
-        .rep-header { background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin: 5px 0; border: 1px solid #eee; }
-    </style>""", unsafe_allow_html=True)
-
+    # --- 3. UI ---
+    st.title("📊 Control de Cuotas Caviahue")
+    
     res_list = []
     for n, df in hojas_rep.items():
         mc = pd.to_numeric(df["N° CLIENTE"], errors='coerce') > 0
@@ -160,15 +149,18 @@ def cuotas(representantes=[], usuario_id="default"):
             if st.session_state[key]:
                 df_disp = hojas_rep[r["Rep"]].copy().drop(columns=["Venta AA YTD"], errors="ignore")
                 
-                # Renderizado HTML para evitar error LargeUtf8
+                # Formatear N° CLIENTE como entero para que no aparezcan comas ni .0
+                df_disp["N° CLIENTE"] = pd.to_numeric(df_disp["N° CLIENTE"], errors='coerce').fillna(0).astype(int)
+                
                 styler = df_disp.style.apply(resaltar_totales, axis=1).format({
+                    "N° CLIENTE": "{:d}", # <--- Formato entero
                     "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",
                     "Avance %": "{:.1f}%", "Venta Año Anterior": "{:,.0f}",
                     "Acumulado año": "{:,.0f}", "Crecimiento MMAA": "{:.1f}%"
                 }).hide(axis="index")
 
                 custom_css = """<style>
-                    .table-container { width: 100%; overflow-x: auto; margin: 10px 0; }
+                    .table-container { width: 100%; overflow-x: auto; }
                     table { width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 13px; }
                     th { background-color: #f1f3f6; color: #333; padding: 10px; text-align: left; border: 1px solid #dee2e6; }
                     td { padding: 8px; border: 1px solid #dee2e6; }
@@ -176,9 +168,8 @@ def cuotas(representantes=[], usuario_id="default"):
                 
                 st.markdown(custom_css + f'<div class="table-container">{styler.to_html()}</div>', unsafe_allow_html=True)
                 
-                # Descarga Excel
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:
                     df_disp.to_excel(writer, index=False)
-                st.download_button("📥 Descargar Excel", output.getvalue(), f"{r['Rep']}.xlsx", key=f"d_{usuario_id}_{i}")
+                st.download_button("📥 Excel", output.getvalue(), f"{r['Rep']}.xlsx", key=f"d_{usuario_id}_{i}")
             st.markdown("---")

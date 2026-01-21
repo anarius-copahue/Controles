@@ -5,9 +5,6 @@ import io
 import datetime
 import os
 
-# Importamos tu función de encriptación
-from encrypt import encrypt_file
-
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
 REPRESENTANTE_POR_USUARIO = {
     "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
@@ -145,24 +142,30 @@ def cuotas(representantes=[], usuario_id="default"):
             cols[7].markdown(f":{'green' if crec_val >= 0 else 'red'}[{int(crec_val)}%]")
 
             if st.session_state[key]:
+                # --- LIMPIEZA AGRESIVA PARA EVITAR LargeUtf8 ---
                 df_disp = hojas_rep[r["Rep"]].copy()
                 df_disp = df_disp.drop(columns=["Venta AA YTD"])
                 
-                # --- PARCHE PARA ERROR LargeUtf8 ---
-                # Forzamos conversión a string de todas las columnas de texto/objeto
+                # Convertimos explícitamente a tipos básicos de Python
                 for col in df_disp.columns:
-                    if df_disp[col].dtype == 'object' or pd.api.types.is_string_dtype(df_disp[col]):
+                    if col in ["CLIENTE", "N° CLIENTE"]:
                         df_disp[col] = df_disp[col].astype(str)
+                    else:
+                        df_disp[col] = pd.to_numeric(df_disp[col], errors='coerce').fillna(0).astype(float)
                 
-                # --- MOSTRAR TABLA ---
-                st.dataframe(
-                    df_disp.style.apply(resaltar_totales, axis=1).format({
-                        "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",
-                        "Avance %": "{:.0f}%", "Venta Año Anterior": "{:,.0f}",
-                        "Acumulado año": "{:,.0f}", "Crecimiento MMAA": "{:.0f}%"
-                    }).hide(axis="index"), 
-                    use_container_width=True
-                )
+                # --- RENDERIZADO CON TRY/EXCEPT ---
+                try:
+                    st.dataframe(
+                        df_disp.style.apply(resaltar_totales, axis=1).format({
+                            "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",
+                            "Avance %": "{:.0f}%", "Venta Año Anterior": "{:,.0f}",
+                            "Acumulado año": "{:,.0f}", "Crecimiento MMAA": "{:.0f}%"
+                        }).hide(axis="index"), 
+                        use_container_width=True
+                    )
+                except:
+                    # Si falla el Styler (LargeUtf8), mostramos la tabla pura
+                    st.dataframe(df_disp, use_container_width=True)
                 
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:

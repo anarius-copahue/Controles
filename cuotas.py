@@ -145,15 +145,16 @@ def cuotas(representantes=[], usuario_id="default"):
             cols[7].markdown(f":{'green' if crec_val >= 0 else 'red'}[{int(crec_val)}%]")
 
             if st.session_state[key]:
-                df_disp = hojas_rep[r["Rep"]].drop(columns=["Venta AA YTD"])
+                df_disp = hojas_rep[r["Rep"]].copy()
+                df_disp = df_disp.drop(columns=["Venta AA YTD"])
                 
                 # --- PARCHE PARA ERROR LargeUtf8 ---
-                # Convertimos todas las columnas de texto a string estándar
+                # Forzamos conversión a string de todas las columnas de texto/objeto
                 for col in df_disp.columns:
                     if df_disp[col].dtype == 'object' or pd.api.types.is_string_dtype(df_disp[col]):
                         df_disp[col] = df_disp[col].astype(str)
                 
-                # --- RENDERIZADO CORREGIDO ---
+                # --- MOSTRAR TABLA ---
                 st.dataframe(
                     df_disp.style.apply(resaltar_totales, axis=1).format({
                         "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",

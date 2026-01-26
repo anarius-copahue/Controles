@@ -17,7 +17,7 @@ with cols[7]:
 
 def decrypt_files():
     ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted",
-                "data/Historico.xlsx.encrypted","data/Cuota_productos.xlsx.encrypted"]
+                "data/Historico.xlsx.encrypted","data/Cuota_Productos.xlsx.encrypted"]
     key = st.secrets["ENCRYPTION_KEY"]
 
     for archivo in ARCHIVOS:
@@ -29,7 +29,7 @@ def decrypt_files():
         
 a_representantes = [
         'Zona Norte',
-        'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Lucio Colombo',
+        'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Litoral',
         'Yanina Cuezzo',  'Yamila Arreche', 'Emiliano Veiga',
         'Jessica Andermarch', 'Vacante'
     ]

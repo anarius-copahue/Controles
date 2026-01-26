@@ -7,7 +7,7 @@ import datetime
 def productos(usuario_id="default"):
     archivo_historico = "data/Historico_Productos.xlsx" 
     archivo_ventas = "descargas/venta_neta_por_periodo_producto_cliente.csv"
-    archivo_cuotas = "data/Cuota_productos.xlsx"
+    archivo_cuotas = "data/Cuota_Productos.xlsx"
 
     st.title("Ventas por Producto (Sin preventa)")
 

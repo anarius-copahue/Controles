@@ -20,7 +20,6 @@ REPRESENTANTE_POR_USUARIO = {
 }
 
 def resaltar_totales(row):
-    """Lógica de color para las filas de TOTAL"""
     cliente_val = str(row.get('CLIENTE', '')).upper()
     if 'TOTAL' in cliente_val:
         return ['background-color: #f0f0f0; font-weight: bold'] * len(row)
@@ -37,24 +36,26 @@ def cuotas(representantes=[], usuario_id="default"):
         df_hist["N° CLIENTE"] = pd.to_numeric(df_hist["N° CLIENTE"], errors='coerce').fillna(0).astype(int)
         
         ahora = datetime.datetime.now()
-        mes_actual, anio_actual, anio_anterior = ahora.month, ahora.year, ahora.year - 1
+        mes_actual, anio_actual = ahora.month, ahora.year
+        a2024, a2025 = 2024, 2025
 
         cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns 
                        if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
         
-        df_hist["Venta Año Anterior"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_anterior]].sum(axis=1)
-        df_hist["Venta AA YTD"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_anterior and dt.month <= mes_actual]].sum(axis=1)
+        df_hist["Venta 2024"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == a2024]].sum(axis=1)
+        df_hist["Venta 2025"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == a2025]].sum(axis=1)
+        df_hist["Venta 2025 YTD"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == a2025 and dt.month <= mes_actual]].sum(axis=1)
         df_hist["Hist_Act"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_actual]].sum(axis=1)
         
-        df_hist_resumen = df_hist[["N° CLIENTE", "Venta Año Anterior", "Venta AA YTD", "Hist_Act"]].groupby("N° CLIENTE").sum().reset_index()
+        df_hist_resumen = df_hist[["N° CLIENTE", "Venta 2024", "Venta 2025", "Venta 2025 YTD", "Hist_Act"]].groupby("N° CLIENTE").sum().reset_index()
     except:
-        df_hist_resumen = pd.DataFrame(columns=["N° CLIENTE", "Venta Año Anterior", "Venta AA YTD", "Hist_Act"])
+        df_hist_resumen = pd.DataFrame(columns=["N° CLIENTE", "Venta 2024", "Venta 2025", "Venta 2025 YTD", "Hist_Act"])
 
     # --- 1. CARGA VENTAS ACTUALES ---
     try:
+        # (Misma lógica de carga que el anterior para no perder funcionalidad)
         df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|").rename(columns={"Clie": "Cliente"})
         df_venta["Caviahue"] = df_venta["Unidades"]
-        
         df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
         df_preventa["Caviahue"] = np.where(~df_preventa['PRODU.'].isin([21304, 21302]), df_preventa["Venta Unid."], 0)
 
@@ -66,13 +67,11 @@ def cuotas(representantes=[], usuario_id="default"):
             return df
         
         df_preventa = mult(df_preventa)
-
         try:
             df_tango = pd.read_csv("data/TANGO.csv").rename(columns={"COD_CLI": "Cliente", "CANTIDAD": "Venta Unid."})
             df_tango["Caviahue"] = np.where(~df_tango["COD_ARTICU"].isin([21304, 21302]), df_tango["Venta Unid."], 0)
             df_tango = mult(df_tango)
-        except: 
-            df_tango = pd.DataFrame(columns=["Cliente", "Caviahue"])
+        except: df_tango = pd.DataFrame(columns=["Cliente", "Caviahue"])
 
         ventas_mes = pd.concat([df_preventa[["Cliente", "Caviahue"]], df_venta[["Cliente", "Caviahue"]], df_tango[["Cliente", "Caviahue"]]])
         ventas_mes = ventas_mes.groupby("Cliente")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta Mes Actual"})
@@ -97,12 +96,14 @@ def cuotas(representantes=[], usuario_id="default"):
             gid = t_mask.cumsum()
             for g in gid[t_mask].unique():
                 m = (gid == g); idx = df_rep[m & t_mask].index[0]; h = m & (~t_mask)
-                for c in ["Cuota Caviahue", "Venta Mes Actual", "Venta Año Anterior", "Acumulado año", "Venta AA YTD"]:
+                for c in ["Cuota Caviahue", "Venta Mes Actual", "Venta 2024", "Venta 2025", "Acumulado año", "Venta 2025 YTD"]:
                     df_rep.loc[idx, c] = df_rep.loc[h, c].sum()
 
             df_rep["Avance %"] = (df_rep["Venta Mes Actual"] / df_rep["Cuota Caviahue"] * 100).replace([np.inf, -np.inf], 0).fillna(0)
-            df_rep["Crecimiento MMAA"] = np.where(df_rep["Venta AA YTD"] > 0, ((df_rep["Acumulado año"] / df_rep["Venta AA YTD"]) - 1) * 100, 0)
-            hojas_rep[nombre] = df_rep[["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta Año Anterior", "Acumulado año", "Crecimiento MMAA", "Venta AA YTD"]]
+            df_rep["growth 2025"] = np.where(df_rep["Venta 2024"] > 0, ((df_rep["Venta 2025"] / df_rep["Venta 2024"]) - 1) * 100, 0)
+            df_rep["growth 2026"] = np.where(df_rep["Venta 2025 YTD"] > 0, ((df_rep["Acumulado año"] / df_rep["Venta 2025 YTD"]) - 1) * 100, 0)
+            
+            hojas_rep[nombre] = df_rep[["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta 2024", "Venta 2025", "growth 2025", "Acumulado año", "growth 2026", "Venta 2025 YTD"]]
         except: pass
 
     # --- 3. UI ---
@@ -112,64 +113,80 @@ def cuotas(representantes=[], usuario_id="default"):
     for n, df in hojas_rep.items():
         mc = pd.to_numeric(df["N° CLIENTE"], errors='coerce') > 0
         res_list.append({
-            "Rep": n, "Cuota": float(df[mc]["Cuota Caviahue"].sum()), 
+            "Rep": n, 
+            "Cuota": float(df[mc]["Cuota Caviahue"].sum()), 
             "Venta": float(df[mc]["Venta Mes Actual"].sum()), 
-            "VAA_YTD": float(df[mc]["Venta AA YTD"].sum()), 
-            "Acum": float(df[mc]["Acumulado año"].sum()), 
-            "VAA": float(df[mc]["Venta Año Anterior"].sum())
+            "V24": float(df[mc]["Venta 2024"].sum()), 
+            "V25": float(df[mc]["Venta 2025"].sum()), 
+            "Acum": float(df[mc]["Acumulado año"].sum()),
+            "V25_YTD": float(df[mc]["Venta 2025 YTD"].sum())
         })
     
     resumen = pd.DataFrame(res_list)
     if not resumen.empty:
-        tc, tv, ta, ty = resumen["Cuota"].sum(), resumen["Venta"].sum(), resumen["Acum"].sum(), resumen["VAA_YTD"].sum()
-        m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Venta Mes", f"{int(tv):,}".replace(",", "."), f"{int(tv/tc*100 if tc>0 else 0)}% Avance")
-        m2.metric("Cuota Total", f"{int(tc):,}".replace(",", "."))
-        m3.metric("Acumulado Año", f"{int(ta):,}".replace(",", "."))
-        m4.metric("Crecimiento YTD", f"{int((ta/ty-1)*100 if ty>0 else 0)}%", delta_color="normal")
-        st.markdown("---")
+        # Definición de pesos de columnas (Única fuente de verdad para alineación)
+        col_weights = [0.4, 1.8, 0.8, 0.8, 0.6, 0.8, 0.8, 0.6, 0.8, 0.6]
 
+        # --- ENCABEZADO ALINEADO ---
+        # Usamos un contenedor con fondo gris para simular la cabecera
+        with st.container():
+            st.markdown("""
+                <style>
+                [data-testid="column"] { text-align: center; }
+                .header-text { font-weight: bold; font-size: 11px; color: #555; text-transform: uppercase; }
+                </style>
+            """, unsafe_allow_html=True)
+            
+            h_cols = st.columns(col_weights)
+            headers = ["", "Representante", "Cuota", "Venta", "Av %", "V. 2024", "V. 2025", "G'25", "Acum'26", "G'26"]
+            for col, text in zip(h_cols, headers):
+                if text: col.markdown(f"<p class='header-text'>{text}</p>", unsafe_allow_html=True)
+        
+        st.markdown("<hr style='margin-top:0; margin-bottom:10px; border: 0.5px solid #ddd;'>", unsafe_allow_html=True)
+
+        # --- FILAS DE DATOS ---
         for i, r in resumen.iterrows():
             key = f"exp_{usuario_id}_{i}"
             if key not in st.session_state: st.session_state[key] = False
             
-            cols = st.columns([0.5, 2, 1, 1, 1, 1, 1, 1])
+            cols = st.columns(col_weights)
+            
+            # Botón
             if cols[0].button("➕" if not st.session_state[key] else "➖", key=f"b_{usuario_id}_{i}"):
                 st.session_state[key] = not st.session_state[key]
+                st.rerun()
             
             cols[1].write(f"**{r['Rep']}**")
             cols[2].write(f"{int(r['Cuota']):,}".replace(",", "."))
             cols[3].write(f"{int(r['Venta']):,}".replace(",", "."))
             cols[4].write(f"{int(r['Venta']/r['Cuota']*100 if r['Cuota']>0 else 0)}%")
-            cols[5].write(f"{int(r['VAA']):,}".replace(",", "."))
-            cols[6].write(f"{int(r['Acum']):,}".replace(",", "."))
-            crec_val = (r['Acum']/r['VAA_YTD']-1)*100 if r['VAA_YTD']>0 else 0
-            cols[7].markdown(f":{'green' if crec_val >= 0 else 'red'}[{int(crec_val)}%]")
+            cols[5].write(f"{int(r['V24']):,}".replace(",", "."))
+            cols[6].write(f"{int(r['V25']):,}".replace(",", "."))
+            
+            g25 = ((r['V25']/r['V24'])-1)*100 if r['V24']>0 else 0
+            cols[7].markdown(f":{'green' if g25 >= 0 else 'red'}[{int(g25)}%]")
+            
+            cols[8].write(f"{int(r['Acum']):,}".replace(",", "."))
+            
+            g26 = ((r['Acum']/r['V25_YTD'])-1)*100 if r['V25_YTD']>0 else 0
+            cols[9].markdown(f":{'green' if g26 >= 0 else 'red'}[{int(g26)}%]")
 
+            # Expandible (Tabla Detalle)
             if st.session_state[key]:
-                df_disp = hojas_rep[r["Rep"]].copy().drop(columns=["Venta AA YTD"], errors="ignore")
-                
-                # Formatear N° CLIENTE como entero para que no aparezcan comas ni .0
+                df_disp = hojas_rep[r["Rep"]].copy().drop(columns=["Venta 2025 YTD"], errors="ignore")
                 df_disp["N° CLIENTE"] = pd.to_numeric(df_disp["N° CLIENTE"], errors='coerce').fillna(0).astype(int)
                 
                 styler = df_disp.style.apply(resaltar_totales, axis=1).format({
-                    "N° CLIENTE": "{:d}", # <--- Formato entero
-                    "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",
-                    "Avance %": "{:.1f}%", "Venta Año Anterior": "{:,.0f}",
-                    "Acumulado año": "{:,.0f}", "Crecimiento MMAA": "{:.1f}%"
+                    "N° CLIENTE": "{:d}", "Cuota Caviahue": "{:,.0f}", "Venta Mes Actual": "{:,.0f}",
+                    "Avance %": "{:.1f}%", "Venta 2024": "{:,.0f}", "Venta 2025": "{:,.0f}",
+                    "growth 2025": "{:.1f}%", "Acumulado año": "{:,.0f}", "growth 2026": "{:.1f}%"
                 }).hide(axis="index")
 
-                custom_css = """<style>
-                    .table-container { width: 100%; overflow-x: auto; }
-                    table { width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 13px; }
-                    th { background-color: #f1f3f6; color: #333; padding: 10px; text-align: left; border: 1px solid #dee2e6; }
-                    td { padding: 8px; border: 1px solid #dee2e6; }
-                </style>"""
-                
-                st.markdown(custom_css + f'<div class="table-container">{styler.to_html()}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div style="overflow-x:auto;">{styler.to_html()}</div>', unsafe_allow_html=True)
                 
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:
                     df_disp.to_excel(writer, index=False)
-                st.download_button("📥 Excel", output.getvalue(), f"{r['Rep']}.xlsx", key=f"d_{usuario_id}_{i}")
-            st.markdown("---")
+                st.download_button(f"📥 Excel {r['Rep']}", output.getvalue(), f"{r['Rep']}.xlsx", key=f"d_{usuario_id}_{i}")
+            
+            st.markdown("<hr style='margin:5px 0px; border: 0.2px solid #eee;'>", unsafe_allow_html=True)

@@ -5,6 +5,7 @@ from update_data import update_data
 from mapa import mapa
 from scrap import scrape_data
 from encrypt import decrypt_file
+from productos import productos
 from datetime import datetime, timedelta
 import os
 
@@ -16,7 +17,7 @@ with cols[7]:
 
 def decrypt_files():
     ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted",
-                "data/Historico.xlsx.encrypted"]
+                "data/Historico.xlsx.encrypted","data/Cuota_productos.xlsx.encrypted"]
     key = st.secrets["ENCRYPTION_KEY"]
 
     for archivo in ARCHIVOS:
@@ -27,7 +28,7 @@ def decrypt_files():
         decrypt_file(tango_path, key.encode())
         
 a_representantes = [
-        'Karina Macías', 'Karina Perfu y Supermercados', 'Zona Norte',
+        'Zona Norte',
         'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Lucio Colombo',
         'Yanina Cuezzo',  'Yamila Arreche', 'Emiliano Veiga',
         'Jessica Andermarch', 'Vacante'
@@ -96,11 +97,13 @@ st.success("Acceso concedido")
 
 if user_logged.upper() == "ADMIN":
     # Tabs
-    tab1, tab2 = st.tabs(["Ventas", "Cuota"])
+    tab1, tab2, tab3 = st.tabs(["Ventas", "Cuota","Productos"])
     with tab1:
         ventas()
     with tab2:
         cuotas()
+    with tab3:
+        productos()
 
 elif user_logged.upper() == "ADMIN_DATA":
     # Tabs

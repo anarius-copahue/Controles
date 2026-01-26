@@ -6,17 +6,16 @@ import datetime
 
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
 REPRESENTANTE_POR_USUARIO = {
-    "KMACIAS": ["Karina Macías", "Karina Perfu y Supermercados"],
+    "OTROS" : [ "Vacante","Perfu y Supermercados", "Gerencia" ],
     "SROCCHI": ["Zona Norte"],
     "PZACCA": ["Patricia Zacca"],
     "MROSSELOT": ["Marcela Rosselot"],
-    "LCOLOMBO": ["Lucio Colombo"],
     "YCUEZZO": ["Yanina Cuezzo"],
     "YARRECHE": ["Yamila Arreche"],
     "EVEIGA": ["Emiliano Veiga"],
     "JANDERMARCH": ["Jessica Andermarch"],
     "NBRIDI":["Natalia Bridi"],
-    "OTROS" : [ "Gerencia" ],
+    
 }
 
 def resaltar_totales(row):
@@ -109,7 +108,7 @@ def cuotas(representantes=[], usuario_id="default"):
         except: pass
 
     # --- 3. UI ---
-    st.title("📊 Control de Cuotas Caviahue")
+    st.title("Control de Avance - Caviahue")
     
     res_list = []
     for n, df in hojas_rep.items():
@@ -138,16 +137,16 @@ def cuotas(representantes=[], usuario_id="default"):
         st.markdown("""
         <div style='background-color: #f1f3f6; padding: 5px; border-radius: 5px; margin-bottom: 10px; font-weight: bold; font-size: 12px;'>
             <div style='display: flex; text-align: center;'>
-                <div style='flex: 0.6;'></div>
+                <div style='flex: 0.5;'></div>
                 <div style='flex: 1; text-align: left;'>REPRESENTANTE</div>
                 <div style='flex: 0.8;'>CUOTA</div>
-                <div style='flex: 0.7;'>VENTA</div>
+                <div style='flex: 0.8;'>VENTA</div>
                 <div style='flex: 0.7;'>AVANCE %</div>
                 <div style='flex: 0.7;'>VENTA 24</div>
                 <div style='flex: 0.7;'>VENTA 25</div>
                 <div style='flex: 0.7;'>GROWTH 25</div>
                 <div style='flex: 0.7;'>ACUMULADO 26</div>
-                <div style='flex: 0.7;'>GROWTH26</div>
+                <div style='flex: 0.7;'>GROWTH 26</div>
             </div>
         </div>
         """, unsafe_allow_html=True)

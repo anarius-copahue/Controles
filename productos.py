@@ -24,6 +24,7 @@ def productos(usuario_id="default"):
         cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns 
                        if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
         
+        # Procesar sumas por año
         df_hist["Venta 2024"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == 2024]].apply(pd.to_numeric, errors='coerce').sum(axis=1)
         df_hist["Venta 2025"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == 2025]].apply(pd.to_numeric, errors='coerce').sum(axis=1)
         df_hist["Venta 2025 YTD"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == 2025 and dt.month <= mes_actual]].apply(pd.to_numeric, errors='coerce').sum(axis=1)
@@ -46,6 +47,7 @@ def productos(usuario_id="default"):
         df_venta_actual.columns = df_venta_actual.columns.str.strip()
         df_venta_actual["Caviahue"] = df_venta_actual["Venta Unid."]
 
+        # Multiplicadores por código (Kits/Promos)
         for ids, m in [([22005,21663,22251,21657,21655,21658], 3), ([21653], 2), ([21656], 4)]:
             df_venta_actual["Caviahue"] = np.where(df_venta_actual["PRODU."].isin(ids), df_venta_actual["Caviahue"] * m, df_venta_actual["Caviahue"])
         
@@ -59,7 +61,6 @@ def productos(usuario_id="default"):
         df_cuotas_raw = pd.read_excel(archivo_cuotas)
         df_cuotas_raw["PRODU."] = pd.to_numeric(df_cuotas_raw["PRODU."], errors='coerce').fillna(0).astype(int)
         
-        # Identificar columna del mes actual en las cuotas
         cols_cuotas = {col: pd.to_datetime(col, dayfirst=True) for col in df_cuotas_raw.columns 
                        if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
         
@@ -77,7 +78,6 @@ def productos(usuario_id="default"):
     df_final = pd.merge(df_hist_resumen, ventas_mes, on="PRODU.", how="left")
     df_final = pd.merge(df_final, df_cuotas, on="PRODU.", how="left").fillna(0)
     
-    # Cálculos adicionales
     df_final["Acumulado 2026"] = df_final["Hist_Act"] + df_final["Venta Mes Actual"]
     df_final["Avance"] = np.where(df_final["Cuota"] > 0, (df_final["Venta Mes Actual"] / df_final["Cuota"]) * 100, 0)
     df_final["growth 2025"] = np.where(df_final["Venta 2024"] > 0, ((df_final["Venta 2025"] / df_final["Venta 2024"]) - 1) * 100, 0)
@@ -95,38 +95,35 @@ def productos(usuario_id="default"):
     m3.metric("Avance", f"{int((tv/tc)*100 if tc>0 else 0)}%")
     m4.metric("Growth 2026", f"{int((ta/ty-1)*100 if ty>0 else 0)}%")
 
-    # Formateo
-    fmt_entero = lambda x: f"{int(x):,}".replace(",", ".")
-    fmt_porcentaje = lambda x: f"{x:.1f}%"
-
+    # --- PREPARACIÓN PARA VISUALIZACIÓN ---
     df_disp = df_final.sort_values("Venta Mes Actual", ascending=False).copy()
-    
-    # Reordenar columnas para que Cuota y Avance estén cerca de Venta Mes Actual
     columnas_orden = ["PRODU.", "Producto", "Descripción", "Venta Mes Actual", "Cuota", "Avance",
-                       "Venta 2024", "Venta 2025", "growth 2025" , "Acumulado 2026", "growth 2026"]
+                      "Venta 2024", "Venta 2025", "growth 2025" , "Acumulado 2026", "growth 2026"]
     df_disp = df_disp[columnas_orden]
 
+    # --- ESTILO CORREGIDO ---
+    # Usamos .map() en lugar de .applymap() para compatibilidad con Pandas 2.1.0+
     styler = df_disp.style.format({
         "PRODU.": "{:d}",
-        "Venta Mes Actual": fmt_entero,
-        "Cuota": fmt_entero,
-        "Avance": fmt_porcentaje,          
-         "Venta 2024": fmt_entero,
-        "Venta 2025": fmt_entero,
-          "growth 2025": fmt_porcentaje,
-         "Acumulado 2026": fmt_entero,
-        "growth 2026": fmt_porcentaje,
-    }).applymap(
+        "Venta Mes Actual": lambda x: f"{int(x):,}".replace(",", "."),
+        "Cuota": lambda x: f"{int(x):,}".replace(",", "."),
+        "Avance": "{:.1f}%",          
+        "Venta 2024": lambda x: f"{int(x):,}".replace(",", "."),
+        "Venta 2025": lambda x: f"{int(x):,}".replace(",", "."),
+        "growth 2025": "{:.1f}%",
+        "Acumulado 2026": lambda x: f"{int(x):,}".replace(",", "."),
+        "growth 2026": "{:.1f}%",
+    }).map(
         lambda v: 'color: green;' if isinstance(v, (int, float)) and v > 0 else ('color: red;' if isinstance(v, (int, float)) and v < 0 else ''),
         subset=["growth 2025", "growth 2026"]
-    ).applymap(
-        lambda v: 'font-weight: bold; color: blue;' if isinstance(v, (int, float)) and v >= 100 else '',
+    ).map(
+        lambda v: 'font-weight: bold; color: #1f77b4;' if isinstance(v, (int, float)) and v >= 100 else '',
         subset=["Avance"]
     ).hide(axis="index")
 
     st.markdown(f'<div style="overflow-x:auto;">{styler.to_html()}</div>', unsafe_allow_html=True)
 
-    # Descarga
+    # --- BOTÓN DE DESCARGA ---
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df_final.to_excel(writer, index=False)

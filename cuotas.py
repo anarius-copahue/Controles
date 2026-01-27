@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import io
 import datetime
+import kits_config as KITS_ESTRUCTURA
 
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
 REPRESENTANTE_POR_USUARIO = {
@@ -52,17 +53,41 @@ def cuotas(representantes=[], usuario_id="default"):
 
     # --- 1. CARGA VENTAS ACTUALES ---
     try:
-        df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|").rename(columns={"Clie": "Cliente"})
+        df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|",decimal =',',thousands='.',quotechar='"', encoding='latin1').rename(columns={"Clie": "Cliente"})
         df_venta["Caviahue"] = df_venta["Unidades"]
+
         
-        df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
-        df_preventa["Caviahue"] = np.where(~df_preventa['PRODU.'].isin([21304, 21302]), df_preventa["Venta Unid."], 0)
+        df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|",decimal =',',thousands='.',quotechar='"', encoding='latin1').rename(columns={"Cliente": "Cliente"})
+        df_preventa["Importe Neto"] = pd.to_numeric(df_preventa["Importe Neto"], errors='coerce').fillna(0)
+        df_preventa = df_preventa[df_preventa["Importe Neto"] != 0].copy()
+        df_preventa["Caviahue"] =  df_preventa["Venta Unid."]
 
         def mult(df):
-            for ids, m in [([22005,21663,22251,21657,21655,21658], 3), ([21653], 2), ([21656], 4)]:
-                target = 'PRODU.' if 'PRODU.' in df.columns else 'COD_ARTICU'
-                if target in df.columns: 
-                    df["Caviahue"] = np.where(df[target].isin(ids), df["Caviahue"] * m, df["Caviahue"])
+            target = 'PRODU.' if 'PRODU.' in df.columns else 'COD_ARTICU'
+            
+            if target in df.columns:
+                # 1. ASEGURAR TIPOS: Convertimos el ID a número entero para que coincida con el diccionario
+                ids_df = pd.to_numeric(df[target], errors='coerce')
+                
+                # 2. DICCIONARIO: Creamos el mapa de multiplicadores
+                # Si importaste 'import kits_config as KITS_ESTRUCTURA', usá KITS_ESTRUCTURA.KITS_ESTRUCTURA
+                # Si usaste 'from kits_config import KITS_ESTRUCTURA', usá KITS_ESTRUCTURA a secas
+                try:
+                    # Intentamos extraer el dict si viene de un módulo
+                    dict_real = KITS_ESTRUCTURA if isinstance(KITS_ESTRUCTURA, dict) else KITS_ESTRUCTURA.KITS_ESTRUCTURA
+                    map_mult = {int(k): len(v) for k, v in dict_real.items()}
+                except:
+                    st.error("Error: No se pudo acceder al diccionario KITS_ESTRUCTURA")
+                    return df
+
+                # 3. MAPEO Y MULTIPLICACIÓN:
+                # .map() busca el ID en el dict. Si no está, devuelve NaN, por eso el .fillna(1)
+                multiplicadores = ids_df.map(map_mult).fillna(1)
+                
+                # Aseguramos que la columna Caviahue sea numérica antes de multiplicar
+                df["Caviahue"] = pd.to_numeric(df["Caviahue"], errors='coerce').fillna(0)
+                df["Caviahue"] = df["Caviahue"] * multiplicadores
+                
             return df
         
         df_preventa = mult(df_preventa)

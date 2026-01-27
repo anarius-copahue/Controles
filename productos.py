@@ -3,128 +3,190 @@ import pandas as pd
 import numpy as np
 import io
 import datetime
+import os
+from kits_config import KITS_ESTRUCTURA 
+
+def mult(df):
+    target = 'PRODU.' if 'PRODU.' in df.columns else 'COD_ARTICU'
+    if target in df.columns:
+        df[target] = pd.to_numeric(df[target], errors='coerce').fillna(0).astype(int)
+        map_mult = {int(k): len(v) for k, v in KITS_ESTRUCTURA.items()}
+        multiplicadores = df[target].map(map_mult).fillna(1)
+        if "Caviahue" not in df.columns: df["Caviahue"] = 0
+        df["Caviahue"] = pd.to_numeric(df["Caviahue"], errors='coerce').fillna(0)
+        df["Caviahue"] = df["Caviahue"] * multiplicadores
+    return df
 
 def productos(usuario_id="default"):
     archivo_historico = "data/Historico_Productos.xlsx" 
     archivo_ventas = "descargas/venta_neta_por_periodo_producto_cliente.csv"
     archivo_cuotas = "data/Cuota_Productos.xlsx"
+    archivo_preventa = "descargas/preventa_por_producto.csv"
+    archivo_stock = "descargas/stock_por_productos.csv"
 
-    st.title("Ventas por Producto (Sin preventa)")
+    st.title("Ventas, Preventa y Stock por Producto")
 
     ahora = datetime.datetime.now()
-    mes_actual, anio_actual = ahora.month, ahora.year
+    mes_act, anio_act = ahora.month, ahora.year 
 
     # --- 0. PROCESAR HISTÓRICO ---
+   
+        # --- 0. PROCESAR HISTÓRICO (CORRECCIÓN PARA FECHAS REALES) ---
     try:
         df_hist = pd.read_excel(archivo_historico)
-        df_hist = df_hist.dropna(subset=["PRODU."])
-        df_hist["PRODU."] = pd.to_numeric(df_hist["PRODU."], errors='coerce').fillna(0).astype(int)
-        df_hist = df_hist[df_hist["PRODU."] > 0]
+        
+        # Identificar la columna de ID (PRODU.)
+        # Buscamos 'PRODU.' sin importar mayúsculas/minúsculas
+        id_orig = next((c for c in df_hist.columns if str(c).strip().upper() == "PRODU."), df_hist.columns[0])
+        df_hist[id_orig] = pd.to_numeric(df_hist[id_orig], errors='coerce').fillna(0).astype(int)
+        
+        cols_2024, cols_25, cols_25_ytd, cols_26 = [], [], [], []
+        
+        for col in df_hist.columns:
+            # Intentamos convertir el encabezado a fecha (si ya es fecha, lo toma directo)
+            dt = pd.to_datetime(col, errors='coerce')
+            
+            if pd.notnull(dt):
+                if dt.year == 2024:
+                    cols_2024.append(col)
+                elif dt.year == 25:
+                    cols_25.append(col)
+                    # YTD: Meses anteriores o igual al mes actual de 26 (pero del año pasado)
+                    if dt.month <= mes_act:
+                        cols_25_ytd.append(col)
+                elif dt.year == 26:
+                    cols_26.append(col)
 
-        cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns 
-                       if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
+        # Aseguramos que las columnas detectadas sean numéricas antes de sumar
+        todas_las_columnas_datos = cols_2024 + cols_25 + cols_26
+        for c in todas_las_columnas_datos:
+            df_hist[c] = pd.to_numeric(df_hist[c], errors='coerce').fillna(0)
+
+        # Creamos los totales por año
+        df_hist["Venta 2024"] = df_hist[cols_2024].sum(axis=1) if cols_2024 else 0
+        df_hist["Venta 25"] = df_hist[cols_25].sum(axis=1) if cols_25 else 0
+        df_hist["Venta 25 YTD"] = df_hist[cols_25_ytd].sum(axis=1) if cols_25_ytd else 0
+        df_hist["Hist_Act"] = df_hist[cols_26].sum(axis=1) if cols_26 else 0
         
-        # Procesar sumas por año
-        df_hist["Venta 2024"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == 2024]].apply(pd.to_numeric, errors='coerce').sum(axis=1)
-        df_hist["Venta 2025"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == 2025]].apply(pd.to_numeric, errors='coerce').sum(axis=1)
-        df_hist["Venta 2025 YTD"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == 2025 and dt.month <= mes_actual]].apply(pd.to_numeric, errors='coerce').sum(axis=1)
-        df_hist["Hist_Act"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == anio_actual]].apply(pd.to_numeric, errors='coerce').sum(axis=1)
+        # Limpieza de nombres de columnas para el resto del reporte
+        df_hist = df_hist.rename(columns={
+            id_orig: "PRODU.",
+            "Producto": "Producto",
+            "Descripción": "Descripción"
+        })
         
+        # Agrupamos por si hay filas duplicadas
         df_hist_resumen = df_hist.groupby(["PRODU.", "Producto", "Descripción"]).agg({
             "Venta 2024": "sum", 
-            "Venta 2025": "sum", 
-            "Venta 2025 YTD": "sum", 
+            "Venta 25": "sum", 
+            "Venta 25 YTD": "sum", 
             "Hist_Act": "sum"
         }).reset_index()
 
     except Exception as e:
-        st.error(f"Error en histórico: {e}")
-        df_hist_resumen = pd.DataFrame(columns=["PRODU.", "Producto", "Descripción", "Venta 2024", "Venta 2025", "Venta 2025 YTD", "Hist_Act"])
+        st.error(f"Error procesando fechas del histórico: {e}")
+        df_hist_resumen = pd.DataFrame(columns=["PRODU.", "Producto", "Descripción", "Venta 2024", "Venta 25", "Venta 25 YTD", "Hist_Act"])
+
+        # Creamos las columnas de resumen
+        df_hist["Venta 2024"] = df_hist[cols_2024].apply(pd.to_numeric, errors='coerce').fillna(0).sum(axis=1) if cols_2024 else 0
+        df_hist["Venta 25"] = df_hist[cols_25].apply(pd.to_numeric, errors='coerce').fillna(0).sum(axis=1) if cols_25 else 0
+        df_hist["Venta 25 YTD"] = df_hist[cols_25_ytd].apply(pd.to_numeric, errors='coerce').fillna(0).sum(axis=1) if cols_25_ytd else 0
+        df_hist["Hist_Act"] = df_hist[cols_26].apply(pd.to_numeric, errors='coerce').fillna(0).sum(axis=1) if cols_26 else 0
+        
+        # Renombrar para asegurar compatibilidad con el resto del script
+        rename_dict = {id_orig: "PRODU."}
+        if "producto" in df_hist.columns: rename_dict["producto"] = "Producto"
+        if "descripción" in df_hist.columns: rename_dict["descripción"] = "Descripción"
+        
+        df_hist = df_hist.rename(columns=rename_dict)
+        
+        df_hist_resumen = df_hist.groupby(["PRODU.", "Producto", "Descripción"]).agg({
+            "Venta 2024": "sum", "Venta 25": "sum", "Venta 25 YTD": "sum", "Hist_Act": "sum"
+        }).reset_index()
+    except Exception as e:
+        st.error(f"Error crítico en histórico: {e}")
+        # Estructura de emergencia para que el merge no falle
+        df_hist_resumen = pd.DataFrame(columns=["PRODU.", "Producto", "Descripción", "Venta 2024", "Venta 25", "Venta 25 YTD", "Hist_Act"])
 
     # --- 1. CARGA VENTAS ACTUALES ---
     try:
-        df_venta_actual = pd.read_csv(archivo_ventas, sep="|")
-        df_venta_actual.columns = df_venta_actual.columns.str.strip()
-        df_venta_actual["Caviahue"] = df_venta_actual["Venta Unid."]
+        df_v = pd.read_csv(archivo_ventas, sep="|", decimal=',', thousands='.', encoding='latin1')
+        df_v.columns = df_v.columns.str.strip()
+        df_v["Caviahue"] = pd.to_numeric(df_v["Venta Unid."], errors='coerce').fillna(0)
+        df_v = mult(df_v)
+        ventas_mes = df_v.groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta mes"})
+    except: ventas_mes = pd.DataFrame(columns=["PRODU.", "Venta mes"])
 
-        # Multiplicadores por código (Kits/Promos)
-        for ids, m in [([22005,21663,22251,21657,21655,21658], 3), ([21653], 2), ([21656], 4)]:
-            df_venta_actual["Caviahue"] = np.where(df_venta_actual["PRODU."].isin(ids), df_venta_actual["Caviahue"] * m, df_venta_actual["Caviahue"])
-        
-        ventas_mes = df_venta_actual.groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta Mes Actual"})
-        ventas_mes["PRODU."] = pd.to_numeric(ventas_mes["PRODU."], errors='coerce').fillna(0).astype(int)
-    except:
-        ventas_mes = pd.DataFrame(columns=["PRODU.", "Venta Mes Actual"])
-
-    # --- 2. CARGA CUOTAS ---
+    # --- 2. CARGA PREVENTA ---
     try:
-        df_cuotas_raw = pd.read_excel(archivo_cuotas)
-        df_cuotas_raw["PRODU."] = pd.to_numeric(df_cuotas_raw["PRODU."], errors='coerce').fillna(0).astype(int)
-        
-        cols_cuotas = {col: pd.to_datetime(col, dayfirst=True) for col in df_cuotas_raw.columns 
-                       if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
-        
-        col_cuota_mes = [c for c, dt in cols_cuotas.items() if dt.year == anio_actual and dt.month == mes_actual]
-        
-        if col_cuota_mes:
-            df_cuotas = df_cuotas_raw[["PRODU.", col_cuota_mes[0]]].rename(columns={col_cuota_mes[0]: "Cuota"})
-        else:
-            df_cuotas = pd.DataFrame(columns=["PRODU.", "Cuota"])
-    except Exception as e:
-        st.warning(f"No se pudo cargar el archivo de cuotas: {e}")
-        df_cuotas = pd.DataFrame(columns=["PRODU.", "Cuota"])
+        df_p = pd.read_csv(archivo_preventa, sep="|", decimal=',', thousands='.', encoding='latin1')
+        df_p.columns = df_p.columns.str.strip()
+        df_p = df_p.rename(columns={"Producto": "PRODU."})
+        df_p["Caviahue"] = pd.to_numeric(df_p["Un. Reserv."], errors='coerce').fillna(0)
+        df_p = mult(df_p)
+        preventa_total = df_p.groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Preventa mes"})
+    except: preventa_total = pd.DataFrame(columns=["PRODU.", "Preventa mes"])
 
-    # --- 3. INTEGRACIÓN FINAL ---
+    # --- 3. CARGA STOCK ---
+    try:
+        df_s = pd.read_csv(archivo_stock, sep="|", decimal=',', thousands='.', encoding='latin1')
+        df_s.columns = df_s.columns.str.strip()
+        df_s["PRODU."] = pd.to_numeric(df_s["Cod"], errors='coerce').fillna(0).astype(int)
+        df_s["Caviahue"] = pd.to_numeric(df_s["Disp (31)"], errors='coerce').fillna(0)
+        df_s = mult(df_s)
+        stock_final = df_s.groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Stock"})
+    except: stock_final = pd.DataFrame(columns=["PRODU.", "Stock"])
+
+    # --- 4. CARGA PLAN ---
+    try:
+        df_c = pd.read_excel(archivo_cuotas)
+        df_c.columns = [str(c).strip() for c in df_c.columns]
+        col_plan = None
+        for col in df_c.columns:
+            dt_c = pd.to_datetime(col, dayfirst=True, errors='coerce')
+            if dt_c and dt_c.year == anio_act and dt_c.month == mes_act:
+                col_plan = col
+                break
+        df_plan = df_c[["PRODU.", col_plan]].rename(columns={col_plan: "Plan"}) if col_plan else pd.DataFrame(columns=["PRODU.", "Plan"])
+        df_plan["PRODU."] = pd.to_numeric(df_plan["PRODU."], errors='coerce').fillna(0).astype(int)
+    except: df_plan = pd.DataFrame(columns=["PRODU.", "Plan"])
+
+    # --- 5. INTEGRACIÓN TOTAL ---
     df_final = pd.merge(df_hist_resumen, ventas_mes, on="PRODU.", how="left")
-    df_final = pd.merge(df_final, df_cuotas, on="PRODU.", how="left").fillna(0)
+    df_final = pd.merge(df_final, preventa_total, on="PRODU.", how="left")
+    df_final = pd.merge(df_final, stock_final, on="PRODU.", how="left")
+    df_final = pd.merge(df_final, df_plan, on="PRODU.", how="left").fillna(0)
+
+    # --- CÁLCULOS ---
+    df_final["Total Mes"] = df_final["Venta mes"] + df_final["Preventa mes"]
+    df_final["Avance"] = np.where(df_final["Plan"] > 0, (df_final["Total Mes"] / df_final["Plan"]) * 100, 0)
+    df_final["Growth 25"] = np.where(df_final["Venta 2024"] > 0, ((df_final["Venta 25"] / df_final["Venta 2024"]) - 1) * 100, 0)
+    df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
+    df_final["Growth 26"] = np.where(df_final["Venta 25 YTD"] > 0, ((df_final["Acumulado 26"] / df_final["Venta 25 YTD"]) - 1) * 100, 0)
+
+    # --- 6. MÉTRICAS ---
+    m1, m2, m3, m4, m5 = st.columns(5)
+    m1.metric("Venta", f"{int(df_final['Venta mes'].sum()):,}".replace(",", "."))
+    m2.metric("Preventa", f"{int(df_final['Preventa mes'].sum()):,}".replace(",", "."))
+    m3.metric("Total Mes", f"{int(df_final['Total Mes'].sum()):,}".replace(",", "."))
+    m4.metric("Plan", f"{int(df_final['Plan'].sum()):,}".replace(",", "."))
+    tot_plan = df_final['Plan'].sum()
+    m5.metric("Avance", f"{(df_final['Total Mes'].sum()/tot_plan*100 if tot_plan>0 else 0):.1f}%")
+
+    # --- 7. TABLA ---
+    cols_orden = [
+        "Producto", "Venta mes", "Preventa mes", "Total Mes", "Plan", 
+        "Avance", "Stock", "Venta 25", "Growth 25", "Acumulado 26", "Growth 26"
+    ]
     
-    df_final["Acumulado 2026"] = df_final["Hist_Act"] + df_final["Venta Mes Actual"]
-    df_final["Avance"] = np.where(df_final["Cuota"] > 0, (df_final["Venta Mes Actual"] / df_final["Cuota"]) * 100, 0)
-    df_final["growth 2025"] = np.where(df_final["Venta 2024"] > 0, ((df_final["Venta 2025"] / df_final["Venta 2024"]) - 1) * 100, 0)
-    df_final["growth 2026"] = np.where(df_final["Venta 2025 YTD"] > 0, ((df_final["Acumulado 2026"] / df_final["Venta 2025 YTD"]) - 1) * 100, 0)
+    st.dataframe(df_final[cols_orden].sort_values("Total Mes", ascending=False).style.format({
+        "Venta mes": "{:,.0f}", "Preventa mes": "{:,.0f}", "Total Mes": "{:,.0f}", "Plan": "{:,.0f}",
+        "Avance": "{:.1f}%", "Stock": "{:,.0f}", "Venta 25": "{:,.0f}", "Growth 25": "{:.1f}%",
+        "Acumulado 26": "{:,.0f}", "Growth 26": "{:.1f}%"
+    }), use_container_width=True)
 
-    # --- 4. UI ---
-    tv = df_final["Venta Mes Actual"].sum()
-    ta = df_final["Acumulado 2026"].sum()
-    ty = df_final["Venta 2025 YTD"].sum()
-    tc = df_final["Cuota"].sum()
-
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Venta Mes", f"{int(tv):,}".replace(",", "."))
-    m2.metric("Cuota Mes", f"{int(tc):,}".replace(",", "."))
-    m3.metric("Avance", f"{int((tv/tc)*100 if tc>0 else 0)}%")
-    m4.metric("Growth 2026", f"{int((ta/ty-1)*100 if ty>0 else 0)}%")
-
-    # --- PREPARACIÓN PARA VISUALIZACIÓN ---
-    df_disp = df_final.sort_values("Venta Mes Actual", ascending=False).copy()
-    columnas_orden = ["PRODU.", "Producto", "Descripción", "Venta Mes Actual", "Cuota", "Avance",
-                      "Venta 2024", "Venta 2025", "growth 2025" , "Acumulado 2026", "growth 2026"]
-    df_disp = df_disp[columnas_orden]
-
-    # --- ESTILO CORREGIDO ---
-    # Usamos .map() en lugar de .applymap() para compatibilidad con Pandas 2.1.0+
-    styler = df_disp.style.format({
-        "PRODU.": "{:d}",
-        "Venta Mes Actual": lambda x: f"{int(x):,}".replace(",", "."),
-        "Cuota": lambda x: f"{int(x):,}".replace(",", "."),
-        "Avance": "{:.1f}%",          
-        "Venta 2024": lambda x: f"{int(x):,}".replace(",", "."),
-        "Venta 2025": lambda x: f"{int(x):,}".replace(",", "."),
-        "growth 2025": "{:.1f}%",
-        "Acumulado 2026": lambda x: f"{int(x):,}".replace(",", "."),
-        "growth 2026": "{:.1f}%",
-    }).map(
-        lambda v: 'color: green;' if isinstance(v, (int, float)) and v > 0 else ('color: red;' if isinstance(v, (int, float)) and v < 0 else ''),
-        subset=["growth 2025", "growth 2026"]
-    ).map(
-        lambda v: 'font-weight: bold; color: #1f77b4;' if isinstance(v, (int, float)) and v >= 100 else '',
-        subset=["Avance"]
-    ).hide(axis="index")
-
-    st.markdown(f'<div style="overflow-x:auto;">{styler.to_html()}</div>', unsafe_allow_html=True)
-
-    # --- BOTÓN DE DESCARGA ---
+    # --- 8. EXPORTAR ---
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df_final.to_excel(writer, index=False)
-    st.download_button("📥 Descargar Excel", output.getvalue(), "control_productos_completo.xlsx")
+    st.download_button("📥 Exportar Reporte", output.getvalue(), "reporte_consolidado.xlsx")

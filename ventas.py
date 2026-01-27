@@ -2,19 +2,20 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import io
+import datetime
+import os
 
 FARMACIA_POR_USUARIO = {
-"KMACIAS" : ["FARMACIA BELEN","DUTY PAID","CENTRAL OESTE","LA FRANCO","FARMACITY","FARMAPLUS"],
-"SROCCHI" :  ["SELMA","VASALLO","FARMATODO","FARMANOI"],
-"PZACCA" : ["SALVADO","FARMAQUEN (Global)","MEDIVEN","FARMACIAS PATAGONICAS (FARMA SRL)"],
-"MROSSELOT" : ["RED PERSCE","FARMACIA GENERAL PAZ","FARMACIA LÍDER","MAR JUFEC","FARMALIFE"],
-"LCOLOMBO" : ["FARMASHOP","FARMACIA ZENTNER","FARMAVIP"],
-"YCUEZZO" : ["BRADEL DEL PUEBLO","SAN FRANCISCO SALTA"],
-"YARRECHE" : ["ZORICH","SOY TU FARMACIA","PUNTO DE SALUD","FARMACIA MANES","VIDELA"],
-"EVEIGA" : ["RIADIGOS"],
-"JANDERMARCH" : [ ],
-"NBRIDI": ["TKL"]
-
+    "KMACIAS" : ["FARMACIA BELEN","DUTY PAID","CENTRAL OESTE","LA FRANCO","FARMACITY","FARMAPLUS"],
+    "SROCCHI" :  ["SELMA","VASALLO","FARMATODO","FARMANOI"],
+    "PZACCA" : ["SALVADO","FARMAQUEN (Global)","MEDIVEN","FARMACIAS PATAGONICAS (FARMA SRL)"],
+    "MROSSELOT" : ["RED PERSCE","FARMACIA GENERAL PAZ","FARMACIA LÍDER","MAR JUFEC","FARMALIFE"],
+    "LCOLOMBO" : ["FARMASHOP","FARMACIA ZENTNER","FARMAVIP"],
+    "YCUEZZO" : ["BRADEL DEL PUEBLO","SAN FRANCISCO SALTA"],
+    "YARRECHE" : ["ZORICH","SOY TU FARMACIA","PUNTO DE SALUD","FARMACIA MANES","VIDELA"],
+    "EVEIGA" : ["RIADIGOS"],
+    "JANDERMARCH" : [ ],
+    "NBRIDI": ["TKL"]
 }
 
 def ventas(representantes=[]):
@@ -48,6 +49,7 @@ def ventas(representantes=[]):
         "SELL IN": "IN",
         "SELL OUT": "OUT"
     })
+    
     # --- DETERMINAR PERÍODOS ---
     fecha_ultima = df["FECHA"].max()
     fechas_actuales = pd.date_range(end=fecha_ultima, periods=meses, freq="MS")
@@ -101,7 +103,7 @@ def ventas(representantes=[]):
 
     # --- UNIFICAR PREVENTAS Y VENTAS ---
     df_preventa = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|")
-    df_venta = pd.read_csv("descargas/ventas_netas_por_periodo_cliente.csv", sep="|")
+    df_venta = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|")
     diccionario = pd.read_excel("data/diccionario.xlsx")
     diccionario = diccionario.drop_duplicates(subset=["N° CLIENTE"])
     mapa_cadenas = diccionario.set_index("N° CLIENTE")["CADENA"]
@@ -120,12 +122,10 @@ def ventas(representantes=[]):
     ventas_totales = ventas_y_preventas.groupby("CADENA")["valor"].sum().reset_index()
     ventas_totales.rename(columns={"valor": "VENTA Y PREVENTA A HOY"}, inplace=True)
 
-    resultado = resultado.merge(ventas_totales, on="CADENA", how="left")
+    resultado = resultado.merge(ventas_totales, on="CADENA", how="left").fillna(0)
     resultado["FALTA"] = resultado["IN estimado mes actual (crecimiento)"] - resultado["VENTA Y PREVENTA A HOY"]
 
-
-
-    st.subheader(f"mes disponible: {fecha_ultima.strftime('%B %Y')} | Período comparado: {fechas_actuales[0].strftime('%Y-%m')} a {fechas_actuales[-1].strftime('%Y-%m')}")
+    st.subheader(f"Mes disponible: {fecha_ultima.strftime('%B %Y')} | Período: {fechas_actuales[0].strftime('%Y-%m')} a {fechas_actuales[-1].strftime('%Y-%m')}")
 
     # --- OPORTUNIDADES Y ALERTAS ---
     oportunidades = resultado[
@@ -151,15 +151,6 @@ def ventas(representantes=[]):
 
     st.markdown(mensaje, unsafe_allow_html=True)
 
-    # --- COLOREO ---
-    def highlight_variacion(val):
-        if pd.isna(val): return ""
-        elif val > 40: return "background-color: #66ff66"
-        elif val > 20: return "background-color: #ccffcc"
-        elif val > 0: return "background-color: #ffe0b3"
-        elif val > -10: return "background-color: #ffcccc"
-        else: return "background-color: #ff6666"
-
     # --- LIMPIEZA ---
     columnas_a_eliminar = [
         f"IN {meses} meses", f"OUT {meses} meses",
@@ -168,54 +159,52 @@ def ventas(representantes=[]):
     ]
     resultado.drop(columns=[col for col in columnas_a_eliminar if col in resultado.columns], inplace=True)
 
-    # --- FORMATEO FINAL ---
-    formato_columnas = {
-    f"IN {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-    f"OUT {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-    f"IN promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-    f"IN promedio MP AA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-    f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-    "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-    "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else "",
-    "Variación vs AA": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
-    "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) else "",
-    "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) else ""
-    }
-
-# --- BUSCADOR DE CADENAS ---
+    # --- BUSCADOR Y ORDENAMIENTO ---
     busqueda = st.text_input("🔍 Buscar cadena de farmacia:", "")
-
+    
     if busqueda:
-     resultado_filtrado = resultado[resultado["CADENA"].str.contains(busqueda, case=False, na=False)]
+        resultado_filtrado = resultado[resultado["CADENA"].str.contains(busqueda, case=False, na=False)].copy()
     else:
-        resultado_filtrado = resultado
+        resultado_filtrado = resultado.copy()
 
-# --- AGREGAR FILA DE TOTALES ---
+    # >>> AJUSTE SOLICITADO: Ordenar por mayor Sell In promedio <<<
+    col_orden = f"IN promedio {meses} meses"
+    if col_orden in resultado_filtrado.columns:
+        resultado_filtrado = resultado_filtrado.sort_values(by=col_orden, ascending=False)
+
+    # --- AGREGAR FILA DE TOTALES ---
     totales = resultado_filtrado.drop(columns=["CADENA"], errors="ignore").sum(numeric_only=True)
     totales["CADENA"] = "TOTAL"
-
     resultado_con_totales = pd.concat([resultado_filtrado, pd.DataFrame([totales])], ignore_index=True)
 
-# --- ESTILOS CSS ---
+    # --- FORMATEO Y ESTILOS ---
+    formato_columnas = {
+        f"IN promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) and x != "" else "",
+        f"IN promedio MP AA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) and x != "" else "",
+        f"OUT promedio {meses} meses": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) and x != "" else "",
+        "IN estimado mes actual (crecimiento)": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) and x != "" else "",
+        "VENTA Y PREVENTA A HOY": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) and x != "" else "",
+        "Variación vs AA": lambda x: f"{int(x):,}%" if pd.notnull(x) and x != "" else "",
+        "OUT / IN": lambda x: f"{int(x):,}%" if pd.notnull(x) and x != "" else "",
+        "FALTA": lambda x: f"{int(x):,}".replace(",", ".") if pd.notnull(x) and x != "" else ""
+    }
+
+    def highlight_variacion(val):
+        if pd.isna(val) or val == "": return ""
+        elif val > 40: return "background-color: #66ff66"
+        elif val > 20: return "background-color: #ccffcc"
+        elif val > 0: return "background-color: #ffe0b3"
+        elif val > -10: return "background-color: #ffcccc"
+        else: return "background-color: #ff6666"
+
     st.markdown("""
     <style>
-        table {
-            width: 100%;
-            table-layout: auto;
-        }
-        th {
-            white-space: nowrap;
-            text-align: center;
-            font-size: 14px;
-        }
-        td {
-            white-space: nowrap;
-            font-size: 13px;
-        }
+        table { width: 100%; table-layout: auto; }
+        th { white-space: nowrap; text-align: center; font-size: 14px; }
+        td { white-space: nowrap; font-size: 13px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- MOSTRAR ---
     styled_df = (
         resultado_con_totales.style
         .format(formato_columnas)
@@ -227,34 +216,20 @@ def ventas(representantes=[]):
         )
     )
 
-    def to_excel(df: pd.DataFrame):
+    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
+
+    # --- EXCEL ---
+    def to_excel(df_ex: pd.DataFrame):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
-            df.to_excel(writer, index=False, sheet_name="Reporte")
-            workbook = writer.book
-            worksheet = writer.sheets["Reporte"]
-
-        # Ajustar ancho de columnas
-            for col in worksheet.columns:
-                max_length = 0
-                col_letter = col[0].column_letter
-                for cell in col:
-                    try:
-                        if cell.value:
-                          max_length = max(max_length, len(str(cell.value)))
-                    except:
-                        pass
-                worksheet.column_dimensions[col_letter].width = max_length + 2
-
+            df_ex.to_excel(writer, index=False, sheet_name="Reporte")
         output.seek(0)
         return output
 
-    st.markdown(styled_df.to_html(), unsafe_allow_html=True)
     excel_file = to_excel(resultado_con_totales)
-
     st.download_button(
         label="📥 Descargar Excel",
         data=excel_file,
-        file_name="reporte.xlsx",
+        file_name="reporte_sell_in_out.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )

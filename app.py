@@ -107,12 +107,14 @@ if user_logged.upper() == "ADMIN":
 
 elif user_logged.upper() == "ADMIN_DATA":
     # Tabs
-    tab1, tab2, tab3 = st.tabs(["Ventas", "Cuota", "Actualizar Datos"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Ventas", "Cuota", "Productos", "Actualizar Datos"])
     with tab1:
         ventas()
     with tab2:
         cuotas()
     with tab3:
+        productos()
+    with tab4:
         update_data()
 
 else:

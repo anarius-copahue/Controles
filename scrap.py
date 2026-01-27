@@ -15,11 +15,15 @@ DOWNLOAD_DIR = os.path.join(os.getcwd(), "descargas")
 PREVENTA_REPORT_FILE_NAME = "preventa_por_cliente.csv"
 VENTA_REPORT_FILE_NAME = "ventas_netas_por_periodo_cliente.csv"
 VENTAS_PRODUCTO_REPORT_FILE_NAME = "venta_neta_por_periodo_producto_cliente.csv"
+PREVENTA_PRODUCTO_REPORT_FILE_NAME = "preventa_por_producto.csv"
+STOCK_REPORT_FILE_NAME = "stock_por_productos.csv"
 
 LOGIN_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Login.aspx"
 PREVENTA_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorCliente.aspx"
 VENTAS_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/VentasNetasPeriodoCliente.aspx"
 VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/ConsultaDinamica.aspx?param=Y29kaWdvTWVudSUzRDExMDk%3D"
+PREVENTA_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorProducto.aspx"
+STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV2.aspx"
 
 def setup_driver():
     options = Options()
@@ -103,6 +107,7 @@ def download_producto_report(driver):
     driver.wait = WebDriverWait(driver, 10)
 
     driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbinVtaporPeriodoProduClie_codigoVenta"]/option[3]')))
+    
     Select(driver.wait.until(EC.presence_of_element_located((By.ID, "tbinVtaporPeriodoProduClie_codigoVenta")))).select_by_visible_text("Ambas")
     # Obtain current date from the element by id tbinVtaporPeriodoProduClie_fechaDesde
     current_date = driver.wait.until(EC.presence_of_element_located((By.ID, "tbinVtaporPeriodoProduClie_fechaDesde"))).get_attribute("value")
@@ -121,6 +126,43 @@ def download_producto_report(driver):
     driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbinVtaporPeriodoProduClie_wrapper"]/div[1]/div/a[2]'))).click()
 
     wait_for_report_download(VENTAS_PRODUCTO_REPORT_FILE_NAME)
+
+def download_preventa_producto_report(driver):
+  
+    delete_previous_file(PREVENTA_PRODUCTO_REPORT_FILE_NAME)
+
+    driver.get(PREVENTA_PRODUCTO_URL)
+    driver.wait = WebDriverWait(driver, 10)
+
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="cmb_ventas"]')))
+    
+    Select(driver.wait.until(EC.presence_of_element_located((By.ID, "cmb_ventas")))).select_by_visible_text("Ambos")
+    # Obtain current date from the element by id tbinVtaporPeriodoProduClie_fechaDesde
+        
+    time.sleep(0.5) # Wait for the dropdown to update before clicking
+    driver.wait.until(EC.presence_of_element_located((By.ID, "btnFiltrar"))).click()
+
+    # Download report as a csv file
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbPreventaPorProducto_wrapper"]/div[1]/div/a[2]/span'))).click()
+
+    wait_for_report_download(PREVENTA_PRODUCTO_REPORT_FILE_NAME)
+
+def download_stock_report(driver):
+    delete_previous_file(STOCK_REPORT_FILE_NAME)
+
+    driver.get(STOCK_URL)
+    driver.wait = WebDriverWait(driver, 10)
+    
+    # Select the second option in the dropdown which is the last day
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="cmb_periodos"]/option[2]'))).click()
+    
+    time.sleep(0.5) # Wait for the dropdown to update before clicking
+    driver.wait.until(EC.presence_of_element_located((By.ID, "btnFiltrar"))).click()
+
+    # Download report as a csv file
+    driver.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="tbStockProductoV2_wrapper"]/div[1]/div/a[2]/span/i'))).click()
+
+    wait_for_report_download(STOCK_REPORT_FILE_NAME)
 
 
 def delete_previous_file(file_name):
@@ -144,8 +186,10 @@ def scrape_data():
     try:
         login_to_dispro(driver)
         download_preventa_report(driver)
-        download_venta_report(driver)
+        #download_venta_report(driver)
         download_producto_report(driver)
+        download_preventa_producto_report(driver)
+        download_stock_report(driver)
     finally:
         driver.quit()
     return

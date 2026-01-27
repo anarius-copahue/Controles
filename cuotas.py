@@ -7,7 +7,7 @@ import kits_config as KITS_ESTRUCTURA
 
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
 REPRESENTANTE_POR_USUARIO = {
-    "OTROS" : [ "Vacante","Perfu y Supermercados", "Gerencia" ],
+    "OTROS" : [ "Vacante","Perfu y Supermercados", "Gerencia" , "Litoral"],
     "SROCCHI": ["Zona Norte"],
     "PZACCA": ["Patricia Zacca"],
     "MROSSELOT": ["Marcela Rosselot"],

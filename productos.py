@@ -127,12 +127,17 @@ def productos(usuario_id="default"):
     try:
         df_v = pd.read_csv(archivo_ventas, sep="|", decimal=',', thousands='.', encoding='latin1')
         df_v["Caviahue"] = pd.to_numeric(df_v["Venta Unid."], errors='coerce').fillna(0)
+        
+        df_v["Importe Neto"] = pd.to_numeric(df_v["Importe Neto"], errors='coerce').fillna(0)
+        df_v = df_v[df_v["Importe Neto"] != 0].copy()
         ventas_mes = mult(df_v).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta mes"})
     except: ventas_mes = pd.DataFrame(columns=["PRODU.", "Venta mes"])
 
     try:
         df_p = pd.read_csv(archivo_preventa, sep="|", decimal=',', thousands='.', encoding='latin1').rename(columns={"Producto": "PRODU."})
         df_p["Caviahue"] = pd.to_numeric(df_p["Un. Reserv."], errors='coerce').fillna(0)
+        df_p["Importe Neto"] = pd.to_numeric(df_p["Importe Neto"], errors='coerce').fillna(0)
+       
         preventa_total = mult(df_p).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Preventa mes"})
     except: preventa_total = pd.DataFrame(columns=["PRODU.", "Preventa mes"])
 

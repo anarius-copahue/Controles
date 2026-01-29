@@ -165,11 +165,13 @@ def productos(usuario_id="default"):
     # El Total Mes ahora incluye Tango
     df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
     # Convert to numpy arrays to ensure 'where' works as expected
+    # Convert to numpy arrays
     total_mes = df_final["Total Mes"].values
     plan = df_final["Plan"].values
 
+    # Ensure the output array is float to accommodate decimals
     df_final["Avance"] = np.divide(
-        total_mes * 100, 
+        total_mes * 100.0, # Using 100.0 forces float precision
         plan, 
         out=np.zeros_like(total_mes, dtype=float), 
         where=plan != 0

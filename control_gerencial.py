@@ -41,7 +41,7 @@ def control_gerencial():
     try:
         df_t = pd.read_csv("data/TANGO.csv")
         df_t.columns = [c.strip().upper() for c in df_t.columns]
-        df_t = df_t[~df_t['COD_ARTICU'].isin([1, 2, 3, 6])]
+        df_t = df_t[~df_t['COD_ARTICU'].isin([4, 10, 3, 12])]
         
         def limpiar_tango(col):
             return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)

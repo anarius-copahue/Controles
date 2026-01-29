@@ -2,8 +2,6 @@ import pandas as pd
 import streamlit as st
 from datetime import datetime
 
-
-
 def control_gerencial():
     st.markdown("### Tablero de Control Gerencial - Caviahue")
     mes_act = datetime.now().month
@@ -43,7 +41,8 @@ def control_gerencial():
     try:
         df_t = pd.read_csv("data/TANGO.csv")
         df_t.columns = [c.strip().upper() for c in df_t.columns]
-        df_t = df_t[~df_t['COD_ARTICU'].isin([4, 10, 3, 12])]
+        df_t["COD_ARTICU"] = pd.to_numeric(df_t["COD_ARTICU"], errors='coerce').fillna(0).astype(int)
+        df_t = df_t[~df_t['COD_ARTICU'].isin([4, 10, 3,12])]
         
         def limpiar_tango(col):
             return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)
@@ -130,4 +129,3 @@ def control_gerencial():
 
     # Renderizado final
     st.write(table_html, unsafe_allow_html=True)
-

@@ -108,11 +108,10 @@ if user_logged.upper() == "ADMIN":
     tab1, tab2, tab3, tab5 = st.tabs(["Ventas", "Cuota","Productos", "Control Gerencial"])
     with tab1:
         ventas()
-    with tab3:
-        productos()
     with tab2:
         cuotas()
-    
+    with tab3:
+        productos()
     with tab5:
         control_gerencial()
 

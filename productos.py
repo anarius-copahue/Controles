@@ -149,23 +149,20 @@ def productos(usuario_id="default"):
     df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
 
-    # Inicialización de columnas como float para evitar conflictos de tipos (CastingError)
+    # REGLA DE ORO: Inicializar columnas de cálculo como Float (0.0)
     df_final["Avance"] = 0.0
     df_final["Growth 25"] = 0.0
     df_final["Growth 26"] = 0.0
 
-    # Cálculos seguros usando .loc y máscaras (Evita ZeroDivision y Casting Errors)
-    # 1. Avance
-    m_plan = df_final["Plan"] > 0
-    df_final.loc[m_plan, "Avance"] = (df_final.loc[m_plan, "Total Mes"] / df_final.loc[m_plan, "Plan"]) * 100
+    # Lógica de cálculo usando .loc (Pandas puro, sin conflictos de casting de NumPy)
+    mask_avance = df_final["Plan"] > 0
+    df_final.loc[mask_avance, "Avance"] = (df_final.loc[mask_avance, "Total Mes"] / df_final.loc[mask_avance, "Plan"]) * 100
 
-    # 2. Growth 25
-    m_24 = df_final["Venta 2024"] > 0
-    df_final.loc[m_24, "Growth 25"] = ((df_final.loc[m_24, "Venta 25"] / df_final.loc[m_24, "Venta 2024"]) - 1) * 100
+    mask_25 = df_final["Venta 2024"] > 0
+    df_final.loc[mask_25, "Growth 25"] = ((df_final.loc[mask_25, "Venta 25"] / df_final.loc[mask_25, "Venta 2024"]) - 1) * 100
 
-    # 3. Growth 26
-    m_25ytd = df_final["Venta 25 YTD"] > 0
-    df_final.loc[m_25ytd, "Growth 26"] = ((df_final.loc[m_25ytd, "Acumulado 26"] / df_final.loc[m_25ytd, "Venta 25 YTD"]) - 1) * 100
+    mask_26 = df_final["Venta 25 YTD"] > 0
+    df_final.loc[mask_26, "Growth 26"] = ((df_final.loc[mask_26, "Acumulado 26"] / df_final.loc[mask_26, "Venta 25 YTD"]) - 1) * 100
 
     # --- 3. MÉTRICAS ---
     m = st.columns(6)
@@ -177,8 +174,8 @@ def productos(usuario_id="default"):
     m[3].metric("Total Mes", f_m(df_final['Total Mes'].sum()))
     m[4].metric("Plan", f_m(df_final['Plan'].sum()))
     
-    suma_plan = df_final['Plan'].sum()
-    avance_total = (df_final['Total Mes'].sum() / suma_plan * 100) if suma_plan > 0 else 0
+    plan_total = df_final['Plan'].sum()
+    avance_total = (df_final['Total Mes'].sum() / plan_total * 100) if plan_total > 0 else 0
     m[5].metric("Avance", f"{f_m(avance_total)}%")
     
     # --- 4. TABLA ---

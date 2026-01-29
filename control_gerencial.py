@@ -1,6 +1,57 @@
 import pandas as pd
 import streamlit as st
 from datetime import datetime
+from kits_config import KITS_ESTRUCTURA, KITS_SHOPIFY
+
+def mult_farma(df, col_prod, col_unid):
+    df = df.copy()
+
+    # normalizar producto
+    df[col_prod] = pd.to_numeric(df[col_prod], errors="coerce")
+    df = df[df[col_prod].notna()]
+    df[col_prod] = df[col_prod].astype(int)
+
+    # normalizar unidades
+    df[col_unid] = pd.to_numeric(df[col_unid], errors="coerce").fillna(0)
+
+    # separar kits
+    es_kit = df[col_prod].isin(KITS_ESTRUCTURA)
+
+    df_kits = df[es_kit]
+    df_prod = df[~es_kit]
+
+    acumulado = 0
+
+    # redistribuir kits → productos
+    for _, row in df_kits.iterrows():
+        unidades = row[col_unid]
+        kit = row[col_prod]
+        acumulado += unidades * len(KITS_ESTRUCTURA[kit])
+
+    # sumar productos normales
+    total = df_prod[col_unid].sum() + acumulado
+
+    return total
+def mult_shopify(df, col_prod, col_unid):
+    df = df.copy()
+
+    df[col_prod] = df[col_prod].astype(str).str.strip().str.upper()
+    df[col_unid] = pd.to_numeric(df[col_unid], errors="coerce").fillna(0)
+
+    dict_shop = {k.upper(): v for k, v in KITS_SHOPIFY.items()}
+    es_kit = df[col_prod].isin(dict_shop)
+
+    df_kits = df[es_kit]
+    df_prod = df[~es_kit]
+
+    acumulado = 0
+    for _, r in df_kits.iterrows():
+        acumulado += r[col_unid] * len(dict_shop[r[col_prod]])
+
+    return df_prod[col_unid].sum() + acumulado
+
+
+
 
 def control_gerencial():
     st.markdown("### Tablero de Control Gerencial - Caviahue")
@@ -55,7 +106,18 @@ def control_gerencial():
 
     try:
         df_s = pd.read_csv("descargas/ventas_caviahue_shopify.csv")
-        u_shp, n_shp = df_s['unidades'].sum(), df_s['neta_sin_impuestos'].sum()
+
+        u_shp = mult_shopify(
+                df_s,
+                col_prod="product_title",
+                col_unid="unidades"
+            )
+
+        n_shp = pd.to_numeric(
+                df_s["neta_sin_impuestos"],
+                errors="coerce"
+            ).fillna(0).sum()
+
     except: u_shp, n_shp = 0, 0
 
     v_plan_online = obtener_valor_excel("data/Cuota_Productos.xlsx", "ONLINE", 2026, mes_act)

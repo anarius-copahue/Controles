@@ -6,16 +6,50 @@ import datetime
 import os
 from kits_config import KITS_ESTRUCTURA 
 
-def mult(df):
-    target = 'PRODU.' if 'PRODU.' in df.columns else 'COD_ARTICU'
-    if target in df.columns:
-        df[target] = pd.to_numeric(df[target], errors='coerce').fillna(0).astype(int)
-        map_mult = {int(k): len(v) for k, v in KITS_ESTRUCTURA.items()}
-        multiplicadores = df[target].map(map_mult).fillna(1)
-        if "Caviahue" not in df.columns: df["Caviahue"] = 0
-        df["Caviahue"] = pd.to_numeric(df["Caviahue"], errors='coerce').fillna(0)
-        df["Caviahue"] = df["Caviahue"] * multiplicadores
+def normalizar_producto(df, col="PRODU."):
+    df = df.copy()
+    df[col] = pd.to_numeric(df[col], errors="coerce")
+    df = df[df[col].notna()]
+    df[col] = df[col].astype(int)
     return df
+
+
+def aplicar_kits(df, col_prod="PRODU.", col_unid="Caviahue"):
+    df = df.copy()
+
+    df = normalizar_producto(df, col_prod)
+    df[col_unid] = pd.to_numeric(df[col_unid], errors="coerce").fillna(0)
+
+    es_kit = df[col_prod].isin(KITS_ESTRUCTURA)
+
+    df_kits = df[es_kit]
+    df_prod = df[~es_kit]
+
+    acumulado = {}
+
+    for _, row in df_kits.iterrows():
+        kit = row[col_prod]
+        unidades = row[col_unid]
+
+        for prod in KITS_ESTRUCTURA[kit]:
+            acumulado[prod] = acumulado.get(prod, 0) + unidades
+
+    if acumulado:
+        df_kits_prod = pd.DataFrame(
+            acumulado.items(),
+            columns=[col_prod, col_unid]
+        )
+        df_final = pd.concat([df_prod[[col_prod, col_unid]], df_kits_prod])
+    else:
+        df_final = df_prod[[col_prod, col_unid]]
+
+    return (
+        df_final
+        .groupby(col_prod, as_index=False)[col_unid]
+        .sum()
+    )
+
+
 
 def formato_miles(valor):
     if pd.isna(valor):
@@ -118,27 +152,35 @@ def productos(usuario_id="default"):
     # --- 1. CARGA DE OTROS DATOS (Ventas, Preventa, Stock, Plan) ---
     # (Lógica simplificada para brevedad, mantenemos la de tu script anterior)
     try:
-        df_v = pd.read_csv(archivo_ventas, sep="|", decimal=',', thousands='.', encoding='latin1')
-        df_v["Caviahue"] = pd.to_numeric(df_v["Venta Unid."], errors='coerce').fillna(0)
-        
-        df_v["Importe Neto"] = pd.to_numeric(df_v["Importe Neto"], errors='coerce').fillna(0)
-        df_v = df_v[df_v["Importe Neto"] != 0].copy()
-        ventas_mes = mult(df_v).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta"})
-    except: ventas_mes = pd.DataFrame(columns=["PRODU.", "Venta"])
+        df_v = pd.read_csv(archivo_ventas, sep="|", decimal=",", thousands=".", encoding="latin1")
+        df_v = normalizar_producto(df_v, "PRODU.")
+
+        df_v["Caviahue"] = pd.to_numeric(df_v["Venta Unid."], errors="coerce").fillna(0)
+        df_v["Importe Neto"] = pd.to_numeric(df_v["Importe Neto"], errors="coerce").fillna(0)
+        df_v = df_v[df_v["Importe Neto"] != 0]
+
+        ventas_mes = aplicar_kits(df_v).rename(columns={"Caviahue": "Venta"})
+
+    except Exception as e:
+        st.error(e)
+        ventas_mes = pd.DataFrame(columns=["PRODU.", "Venta"])
+
 
     try:
-        df_p = pd.read_csv(archivo_preventa, sep="|", decimal=',', thousands='.', encoding='latin1').rename(columns={"Producto": "PRODU."})
-        df_p["Caviahue"] = pd.to_numeric(df_p["Un. Reserv."], errors='coerce').fillna(0)
-        df_p["Importe Neto"] = pd.to_numeric(df_p["Importe Neto"], errors='coerce').fillna(0)
-       
-        preventa_total = mult(df_p).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Preventa"})
+        df_p = pd.read_csv(archivo_preventa, sep="|", decimal=",", thousands=".", encoding="latin1")
+        df_p = df_p.rename(columns={"Producto": "PRODU."})
+        df_p = normalizar_producto(df_p, "PRODU.")
+
+        df_p["Caviahue"] = pd.to_numeric(df_p["Un. Reserv."], errors="coerce").fillna(0)
+        preventa_total = aplicar_kits(df_p).rename(columns={"Caviahue": "Preventa"})
+
     except: preventa_total = pd.DataFrame(columns=["PRODU.", "Preventa"])
 
     try:
         df_s = pd.read_csv(archivo_stock, sep="|", decimal=',', thousands='.', encoding='latin1')
         df_s["PRODU."] = pd.to_numeric(df_s["Cod"], errors='coerce').fillna(0).astype(int)
         df_s["Caviahue"] = pd.to_numeric(df_s["Disp (31)"], errors='coerce').fillna(0)
-        stock_final = mult(df_s).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Stock"})
+        stock_final = aplicar_kits(df_s).rename(columns={"Caviahue": "Stock"})
     except: stock_final = pd.DataFrame(columns=["PRODU.", "Stock"])
 
     try:
@@ -150,7 +192,15 @@ def productos(usuario_id="default"):
 
     try:
         df_t = pd.read_csv("data/TANGO.csv").rename(columns={"COD_ARTICU": "PRODU.", "CANTIDAD": "Caviahue"})
-        tango_total = mult(df_t).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Tango"})
+        
+        def limpiar_tango(col):
+            return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)
+
+        df_t['NETO_LIMPIO'] = limpiar_tango(df_t['TOT_S_IMP'])        
+        # Filtramos antes de multiplicar
+        df_t = df_t[df_t['NETO_LIMPIO'] != 0].copy()
+        tango_total = aplicar_kits(df_t).rename(columns={"Caviahue": "Tango"})
+        
     except: 
         #saltear si no existe el archivo
         tango_total = pd.DataFrame(columns=["PRODU.", "Tango"])

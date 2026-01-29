@@ -17,42 +17,36 @@ def mult(df):
         df["Caviahue"] = df["Caviahue"] * multiplicadores
     return df
 
+def formato_miles(valor):
+    if pd.isna(valor):
+        return "0"
+    # Formatea con coma y luego cambia coma por punto
+    return "{:,.0f}".format(valor).replace(",", ".")
+
 def estilo_html(df):
-    """
-    Genera una tabla HTML con encabezado fijo y colores condicionales.
-    """
-    # Definir estilos condicionales
-    def aplicar_colores(row):
-        styles = [''] * len(row)
-        # Índice de columnas: Stock está en la pos 6, Avance en la 5
-        # Pero es más seguro usar nombres si el styler lo permite
-        return styles
-
-    # Formateo inicial
-    styler = df.style.format({
-        "Venta mes": "{:,.0f}", "Preventa mes": "{:,.0f}", "Total Mes": "{:,.0f}", 
-        "Plan": "{:,.0f}", "Avance": "{:.1f}%", "Stock": "{:,.0f}", 
-        "Venta 25": "{:,.0f}", "Growth 25": "{:.1f}%",
-        "Acumulado 26": "{:,.0f}", "Growth 26": "{:.1f}%"
-    })
-
-    # Color Rojo para Stock <= 0
-    styler = styler.map(lambda v: 'color: red; font-weight: bold;' if v <= 0 else '', subset=['Stock'])
+    # Definimos el formato para cada columna
+    formato_dict = {col: formato_miles for col in df.select_dtypes(include=[np.number]).columns}
     
-    # Color Verde para Avance >= 100
+    # Ajuste para porcentajes (si querés mantener el %)
+    cols_pct = ["Avance", "Growth 25", "Growth 26"]
+    for c in cols_pct:
+        if c in df.columns:
+            formato_dict[c] = lambda v: f"{formato_miles(v)}%"
+
+    styler = df.style.format(formato_dict)
+
+    # --- COLORES CONDICIONALES ---
+    # Rojo para Stock <= 0
+    styler = styler.map(lambda v: 'color: red; font-weight: bold;' if v <= 0 else '', subset=['Stock'])
+    # Verde para Avance >= 100
     styler = styler.map(lambda v: 'color: green; font-weight: bold;' if v >= 100 else '', subset=['Avance'])
 
-    # CSS para encabezado fijo y diseño
-    # 'sticky' hace que el th se quede arriba al hacer scroll en el div padre
+    # CSS para encabezado fijo
     estilos_css = [
         {'selector': 'table', 'props': [('width', '100%'), ('border-collapse', 'collapse')]},
         {'selector': 'th', 'props': [
-            ('position', 'sticky'), 
-            ('top', '0'), 
-            ('background-color', '#f0f2f6'), 
-            ('color', '#31333F'), 
-            ('z-index', '1'), 
-            ('padding', '12px'),
+            ('position', 'sticky'), ('top', '0'), ('background-color', '#f0f2f6'),
+            ('color', '#31333F'), ('z-index', '1'), ('padding', '12px'),
             ('border-bottom', '2px solid #dcdfe4')
         ]},
         {'selector': 'td', 'props': [('padding', '10px'), ('text-align', 'center'), ('border-bottom', '1px solid #eee')]}
@@ -60,7 +54,6 @@ def estilo_html(df):
 
     styler = styler.set_table_styles(estilos_css).hide(axis="index")
 
-    # Envolvemos la tabla en un DIV con scroll
     html = f"""
     <div style="height: 600px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
         {styler.to_html()}
@@ -87,7 +80,7 @@ def productos(usuario_id="default"):
 
     # --- 0. PROCESAR HISTÓRICO ---
     try:
-        df_hist = pd.read_excel(archivo_historico)
+        df_hist = pd.read_excel(archivo_historico, sheet_name="FARMA")
         id_orig = next((c for c in df_hist.columns if "PRODU" in str(c).upper()), df_hist.columns[0])
         df_hist[id_orig] = pd.to_numeric(df_hist[id_orig], errors='coerce').fillna(0).astype(int)
         
@@ -130,16 +123,16 @@ def productos(usuario_id="default"):
         
         df_v["Importe Neto"] = pd.to_numeric(df_v["Importe Neto"], errors='coerce').fillna(0)
         df_v = df_v[df_v["Importe Neto"] != 0].copy()
-        ventas_mes = mult(df_v).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta mes"})
-    except: ventas_mes = pd.DataFrame(columns=["PRODU.", "Venta mes"])
+        ventas_mes = mult(df_v).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta"})
+    except: ventas_mes = pd.DataFrame(columns=["PRODU.", "Venta"])
 
     try:
         df_p = pd.read_csv(archivo_preventa, sep="|", decimal=',', thousands='.', encoding='latin1').rename(columns={"Producto": "PRODU."})
         df_p["Caviahue"] = pd.to_numeric(df_p["Un. Reserv."], errors='coerce').fillna(0)
         df_p["Importe Neto"] = pd.to_numeric(df_p["Importe Neto"], errors='coerce').fillna(0)
        
-        preventa_total = mult(df_p).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Preventa mes"})
-    except: preventa_total = pd.DataFrame(columns=["PRODU.", "Preventa mes"])
+        preventa_total = mult(df_p).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Preventa"})
+    except: preventa_total = pd.DataFrame(columns=["PRODU.", "Preventa"])
 
     try:
         df_s = pd.read_csv(archivo_stock, sep="|", decimal=',', thousands='.', encoding='latin1')
@@ -149,46 +142,63 @@ def productos(usuario_id="default"):
     except: stock_final = pd.DataFrame(columns=["PRODU.", "Stock"])
 
     try:
-        df_c = pd.read_excel(archivo_cuotas)
+        df_c = pd.read_excel(archivo_cuotas, sheet_name="FARMA")
         col_plan = next((c for c in df_c.columns if pd.to_datetime(c, errors='coerce').month == mes_act and pd.to_datetime(c, errors='coerce').year == anio_act), None)
         df_plan = df_c[["PRODU.", col_plan]].rename(columns={col_plan: "Plan"}) if col_plan else pd.DataFrame(columns=["PRODU.", "Plan"])
         df_plan["PRODU."] = pd.to_numeric(df_plan["PRODU."], errors='coerce').fillna(0).astype(int)
     except: df_plan = pd.DataFrame(columns=["PRODU.", "Plan"])
 
-    # --- 2. INTEGRACIÓN Y CÁLCULOS ---
-    df_final = pd.merge(df_hist_resumen, ventas_mes, on="PRODU.", how="left")
-    df_final = pd.merge(df_final, preventa_total, on="PRODU.", how="left")
-    df_final = pd.merge(df_final, stock_final, on="PRODU.", how="left")
-    df_final = pd.merge(df_final, df_plan, on="PRODU.", how="left").fillna(0)
+    try:
+        df_t = pd.read_csv("data/TANGO.csv").rename(columns={"COD_ARTICU": "PRODU.", "CANTIDAD": "Caviahue"})
+        tango_total = mult(df_t).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Tango"})
+    except: 
+        #saltear si no existe el archivo
+        tango_total = pd.DataFrame(columns=["PRODU.", "Tango"])
 
-    df_final["Total Mes"] = df_final["Venta mes"] + df_final["Preventa mes"]
+    # --- 2. INTEGRACIÓN Y CÁLCULOS ---
+    df_final = df_hist_resumen.merge(ventas_mes, on="PRODU.", how="left") \
+                              .merge(preventa_total, on="PRODU.", how="left") \
+                              .merge(tango_total, on="PRODU.", how="left") \
+                              .merge(stock_final, on="PRODU.", how="left") \
+                              .merge(df_plan, on="PRODU.", how="left").fillna(0)
+    
+    # El Total Mes ahora incluye Tango
+    df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
     df_final["Avance"] = np.where(df_final["Plan"] > 0, (df_final["Total Mes"] / df_final["Plan"]) * 100, 0)
     df_final["Growth 25"] = np.where(df_final["Venta 2024"] > 0, ((df_final["Venta 25"] / df_final["Venta 2024"]) - 1) * 100, 0)
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
     df_final["Growth 26"] = np.where(df_final["Venta 25 YTD"] > 0, ((df_final["Acumulado 26"] / df_final["Venta 25 YTD"]) - 1) * 100, 0)
 
-    # --- 3. MÉTRICAS (KPIs) ---
-    m = st.columns(5)
-    m[0].metric("Venta", f"{int(df_final['Venta mes'].sum()):,}")
-    m[1].metric("Preventa", f"{int(df_final['Preventa mes'].sum()):,}")
-    m[2].metric("Total Mes", f"{int(df_final['Total Mes'].sum()):,}")
-    m[3].metric("Plan", f"{int(df_final['Plan'].sum()):,}")
-    m[4].metric("Avance", f"{(df_final['Total Mes'].sum()/df_final['Plan'].sum()*100 if df_final['Plan'].sum()>0 else 0):.1f}%")
 
-    # --- 4. RENDERIZADO HTML ---
+    # --- 3. MÉTRICAS ---
+    # --- 3. MÉTRICAS CON SEPARADOR DE MILES (.) ---
+    m = st.columns(6)
+    
+    # Función auxiliar rápida para las métricas
+    f_m = lambda x: "{:,.0f}".format(x).replace(",", ".")
+
+    m[0].metric("Venta", f_m(df_final['Venta'].sum()))
+    m[1].metric("Preventa", f_m(df_final['Preventa'].sum()))
+    m[2].metric("Tango", f_m(df_final['Tango'].sum()))
+    m[3].metric("Total Mes", f_m(df_final['Total Mes'].sum()))
+    m[4].metric("Plan", f_m(df_final['Plan'].sum()))
+    
+    avance_total = (df_final['Total Mes'].sum() / df_final['Plan'].sum() * 100 
+                    if df_final['Plan'].sum() > 0 else 0)
+    m[5].metric("Avance", f"{f_m(avance_total)}%")
+    
+    # --- 4. TABLA ---
     st.write("### Detalle por Producto")
-    cols_orden = ["Producto", "Venta mes", "Preventa mes", "Total Mes", "Plan", "Avance", "Stock", "Venta 25", "Growth 25", "Acumulado 26", "Growth 26"]
+    cols_orden = ["Producto", "Venta", "Preventa", "Tango", "Total Mes", "Plan", "Avance", "Stock", "Venta 25", "Growth 25", "Acumulado 26", "Growth 26"]
     df_html = df_final[cols_orden].sort_values("Total Mes", ascending=False)
-
-    # Renderizar la tabla con encabezado fijo
     st.markdown(estilo_html(df_html), unsafe_allow_html=True)
 
     # --- 5. EXPORTAR ---
-    st.divider()
+    st.markdown("---")
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         df_final.to_excel(writer, index=False)
-    st.download_button("📥 Descargar Excel", output.getvalue(), "reporte.xlsx")
+    st.download_button("📥 Descargar Excel", output.getvalue(), "reporte_completo.xlsx")
 
 if __name__ == "__main__":
     productos()

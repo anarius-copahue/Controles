@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import TimeoutException
 import os
 import time
 import streamlit as st
@@ -179,17 +180,34 @@ def wait_for_report_download(file_name):
     while not os.path.exists(file_path) and (time.time() - start_time) < timeout_seconds:
         time.sleep(1)
 
-def scrape_data():
 
+
+def scrape_data():
     driver = setup_driver()
 
     try:
+        st.info("Iniciando proceso de extracción de datos...")
+        
         login_to_dispro(driver)
-        download_preventa_report(driver)
-        #download_venta_report(driver)
-        download_producto_report(driver)
-        download_preventa_producto_report(driver)
-        download_stock_report(driver)
+        tasks = [
+            ("Preventa General", download_preventa_report),
+            # ("Venta", download_venta_report),
+            ("Productos", download_producto_report),
+            ("Preventa por Producto", download_preventa_producto_report),
+            ("Stock", download_stock_report)
+        ]
+
+        for nombre, funcion in tasks:
+            try:
+                funcion(driver)
+            except TimeoutException:
+                st.error(f"Error al ejecutar el scraper en el archivo de {nombre.lower()}. Intente de nuevo en los próximos minutos.")
+                return # Cortamos la ejecución para no arrastrar errores
+            except Exception as e:
+                st.error(f"Error inesperado en {nombre}: {e}")
+                return
+
+        st.success("¡Datos actualizados correctamente!")
     finally:
         driver.quit()
     return

@@ -55,7 +55,7 @@ def cuotas(representantes=[], usuario_id="default"):
     try:
         df_venta = pd.read_csv("descargas/preventa_por_cliente.csv", sep="|",decimal =',',thousands='.',quotechar='"', encoding='latin1').rename(columns={"Clie": "Cliente"})
         df_venta["Caviahue"] = df_venta["Unidades"]
-
+        
         
         df_preventa = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|",decimal =',',thousands='.',quotechar='"', encoding='latin1').rename(columns={"Cliente": "Cliente"})
         df_preventa["Importe Neto"] = pd.to_numeric(df_preventa["Importe Neto"], errors='coerce').fillna(0)

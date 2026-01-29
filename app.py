@@ -7,6 +7,9 @@ from scrap import scrape_data
 from encrypt import decrypt_file
 from productos import productos
 from datetime import datetime, timedelta
+from shopify import scrap_shopify
+from control_gerencial import control_gerencial 
+from shopify import scrap_shopify
 import os
 
 st.set_page_config(page_title="Panel SELL", layout="wide")
@@ -54,9 +57,13 @@ def run_scraping_if_needed():
 
     if (last_scrape is None) or (now - last_scrape > timedelta(hours=1)):
         with st.spinner("Ejecutando scraping..."):
+            #Shopify api
+            ventas_cav_shopify = scrap_shopify(st.secrets["CAVIAHUE_SHOP_DOMAIN"],st.secrets["CAVIAHUE_SHOP_TOKEN"])
+            ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
             scrape_data()  # Ejecuta tu función de scraping
+            
         set_last_scrape_time(now)
-        st.success("Scraping ejecutado correctamente.")
+        
     else:
         tiempo_restante = timedelta(hours=1) - (now - last_scrape)
         st.info(f"Último scraping fue hace menos de 1 hora. Próximo en {tiempo_restante}.")
@@ -107,13 +114,15 @@ if user_logged.upper() == "ADMIN":
 
 elif user_logged.upper() == "ADMIN_DATA":
     # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["Ventas", "Cuota", "Productos", "Actualizar Datos"])
+    tab1, tab2, tab3, tab5, tab4 = st.tabs(["Ventas", "Cuota", "Productos", "Control Gerencial", "Actualizar Datos"])
     with tab1:
         ventas()
     with tab2:
         cuotas()
     with tab3:
         productos()
+    with tab5:
+        control_gerencial()
     with tab4:
         update_data()
 

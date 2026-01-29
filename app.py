@@ -12,7 +12,7 @@ from control_gerencial import control_gerencial
 from shopify import scrap_shopify
 import os
 
-st.set_page_config(page_title="Panel SELL", layout="wide")
+st.set_page_config(page_title="Caviahue Avance", layout="wide", page_icon="📦")
 
 cols = st.columns([2, 3, 3, 3, 3, 3, 2, 2])
 with cols[7]:

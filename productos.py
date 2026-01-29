@@ -150,18 +150,24 @@ def productos(usuario_id="default"):
     df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
 
-    # Inicialización de columnas como float para evitar UFuncOutputCastingError
+    # --- SOLUCIÓN A ERRORES DE DIVISIÓN Y TIPO DE DATOS ---
+    # Inicializamos las columnas como float explícitamente para evitar UFuncOutputCastingError
     df_final["Avance"] = 0.0
     df_final["Growth 25"] = 0.0
     df_final["Growth 26"] = 0.0
 
-    # Cálculos usando máscaras para evitar ZeroDivisionError
+    # Usamos .loc con máscaras: Solo divide donde el denominador es mayor a 0
+    # Esto evita ZeroDivisionError y asegura compatibilidad total
+    
+    # 1. Avance
     m_plan = df_final["Plan"] > 0
     df_final.loc[m_plan, "Avance"] = (df_final.loc[m_plan, "Total Mes"] / df_final.loc[m_plan, "Plan"]) * 100
 
+    # 2. Growth 25
     m_24 = df_final["Venta 2024"] > 0
     df_final.loc[m_24, "Growth 25"] = ((df_final.loc[m_24, "Venta 25"] / df_final.loc[m_24, "Venta 2024"]) - 1) * 100
 
+    # 3. Growth 26
     m_25ytd = df_final["Venta 25 YTD"] > 0
     df_final.loc[m_25ytd, "Growth 26"] = ((df_final.loc[m_25ytd, "Acumulado 26"] / df_final.loc[m_25ytd, "Venta 25 YTD"]) - 1) * 100
 
@@ -175,8 +181,8 @@ def productos(usuario_id="default"):
     m[3].metric("Total Mes", f_m(df_final['Total Mes'].sum()))
     m[4].metric("Plan", f_m(df_final['Plan'].sum()))
     
-    plan_sum = df_final['Plan'].sum()
-    avance_total = (df_final['Total Mes'].sum() / plan_sum * 100) if plan_sum > 0 else 0
+    total_plan = df_final['Plan'].sum()
+    avance_total = (df_final['Total Mes'].sum() / total_plan * 100) if total_plan > 0 else 0
     m[5].metric("Avance", f"{f_m(avance_total)}%")
     
     # --- 4. TABLA ---
@@ -192,3 +198,5 @@ def productos(usuario_id="default"):
         df_final.to_excel(writer, index=False)
     st.download_button("📥 Descargar Excel", output.getvalue(), "reporte_completo.xlsx")
 
+if __name__ == "__main__":
+    productos()

@@ -20,14 +20,11 @@ def mult(df):
 def formato_miles(valor):
     if pd.isna(valor):
         return "0"
-    # Formatea con coma y luego cambia coma por punto
     return "{:,.0f}".format(valor).replace(",", ".")
 
 def estilo_html(df):
-    # Definimos el formato para cada columna
     formato_dict = {col: formato_miles for col in df.select_dtypes(include=[np.number]).columns}
     
-    # Ajuste para porcentajes (si querés mantener el %)
     cols_pct = ["Avance", "Growth 25", "Growth 26"]
     for c in cols_pct:
         if c in df.columns:
@@ -36,12 +33,11 @@ def estilo_html(df):
     styler = df.style.format(formato_dict)
 
     # --- COLORES CONDICIONALES ---
-    # Rojo para Stock <= 0
-    styler = styler.map(lambda v: 'color: red; font-weight: bold;' if v <= 0 else '', subset=['Stock'])
-    # Verde para Avance >= 100
-    styler = styler.map(lambda v: 'color: green; font-weight: bold;' if v >= 100 else '', subset=['Avance'])
+    if 'Stock' in df.columns:
+        styler = styler.map(lambda v: 'color: red; font-weight: bold;' if v <= 0 else '', subset=['Stock'])
+    if 'Avance' in df.columns:
+        styler = styler.map(lambda v: 'color: green; font-weight: bold;' if v >= 100 else '', subset=['Avance'])
 
-    # CSS para encabezado fijo
     estilos_css = [
         {'selector': 'table', 'props': [('width', '100%'), ('border-collapse', 'collapse')]},
         {'selector': 'th', 'props': [
@@ -61,12 +57,7 @@ def estilo_html(df):
     """
     return html
 
-# --- En tu función productos(), reemplaza la sección de renderizado por esto: ---
-
-
-
 def productos(usuario_id="default"):
-    # --- Configuración de Archivos ---
     archivo_historico = "data/Historico_Productos.xlsx" 
     archivo_ventas = "descargas/venta_neta_por_periodo_producto_cliente.csv"
     archivo_cuotas = "data/Cuota_Productos.xlsx"
@@ -115,12 +106,10 @@ def productos(usuario_id="default"):
         st.error(f"Error Histórico: {e}")
         df_hist_resumen = pd.DataFrame(columns=["PRODU.", "Producto", "Venta 2024", "Venta 25", "Venta 25 YTD", "Hist_Act"])
 
-    # --- 1. CARGA DE OTROS DATOS (Ventas, Preventa, Stock, Plan) ---
-    # (Lógica simplificada para brevedad, mantenemos la de tu script anterior)
+    # --- 1. CARGA DE OTROS DATOS ---
     try:
         df_v = pd.read_csv(archivo_ventas, sep="|", decimal=',', thousands='.', encoding='latin1')
         df_v["Caviahue"] = pd.to_numeric(df_v["Venta Unid."], errors='coerce').fillna(0)
-        
         df_v["Importe Neto"] = pd.to_numeric(df_v["Importe Neto"], errors='coerce').fillna(0)
         df_v = df_v[df_v["Importe Neto"] != 0].copy()
         ventas_mes = mult(df_v).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Venta"})
@@ -129,8 +118,6 @@ def productos(usuario_id="default"):
     try:
         df_p = pd.read_csv(archivo_preventa, sep="|", decimal=',', thousands='.', encoding='latin1').rename(columns={"Producto": "PRODU."})
         df_p["Caviahue"] = pd.to_numeric(df_p["Un. Reserv."], errors='coerce').fillna(0)
-        df_p["Importe Neto"] = pd.to_numeric(df_p["Importe Neto"], errors='coerce').fillna(0)
-       
         preventa_total = mult(df_p).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Preventa"})
     except: preventa_total = pd.DataFrame(columns=["PRODU.", "Preventa"])
 
@@ -151,41 +138,35 @@ def productos(usuario_id="default"):
     try:
         df_t = pd.read_csv("data/TANGO.csv").rename(columns={"COD_ARTICU": "PRODU.", "CANTIDAD": "Caviahue"})
         tango_total = mult(df_t).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Tango"})
-    except: 
-        #saltear si no existe el archivo
-        tango_total = pd.DataFrame(columns=["PRODU.", "Tango"])
+    except: tango_total = pd.DataFrame(columns=["PRODU.", "Tango"])
 
-    # --- 2. INTEGRACIÓN Y CÁLCULOS ---
+    # --- 2. INTEGRACIÓN Y CÁLCULOS SEGUROS ---
     df_final = df_hist_resumen.merge(ventas_mes, on="PRODU.", how="left") \
                               .merge(preventa_total, on="PRODU.", how="left") \
                               .merge(tango_total, on="PRODU.", how="left") \
                               .merge(stock_final, on="PRODU.", how="left") \
                               .merge(df_plan, on="PRODU.", how="left").fillna(0)
     
-    # El Total Mes ahora incluye Tango
     df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
-    # Convert to numpy arrays to ensure 'where' works as expected
-    # Convert to numpy arrays
-    total_mes = df_final["Total Mes"].values
-    plan = df_final["Plan"].values
-
-    # Ensure the output array is float to accommodate decimals
-    df_final["Avance"] = np.divide(
-        total_mes * 100.0, # Using 100.0 forces float precision
-        plan, 
-        out=np.zeros_like(total_mes, dtype=float), 
-        where=plan != 0
-    )
-    df_final["Growth 25"] = np.where(df_final["Venta 2024"] > 0, ((df_final["Venta 25"] / df_final["Venta 2024"]) - 1) * 100, 0)
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
-    df_final["Growth 26"] = np.where(df_final["Venta 25 YTD"] > 0, ((df_final["Acumulado 26"] / df_final["Venta 25 YTD"]) - 1) * 100, 0)
 
+    # Inicialización de columnas como float para evitar UFuncOutputCastingError
+    df_final["Avance"] = 0.0
+    df_final["Growth 25"] = 0.0
+    df_final["Growth 26"] = 0.0
+
+    # Cálculos usando máscaras para evitar ZeroDivisionError
+    m_plan = df_final["Plan"] > 0
+    df_final.loc[m_plan, "Avance"] = (df_final.loc[m_plan, "Total Mes"] / df_final.loc[m_plan, "Plan"]) * 100
+
+    m_24 = df_final["Venta 2024"] > 0
+    df_final.loc[m_24, "Growth 25"] = ((df_final.loc[m_24, "Venta 25"] / df_final.loc[m_24, "Venta 2024"]) - 1) * 100
+
+    m_25ytd = df_final["Venta 25 YTD"] > 0
+    df_final.loc[m_25ytd, "Growth 26"] = ((df_final.loc[m_25ytd, "Acumulado 26"] / df_final.loc[m_25ytd, "Venta 25 YTD"]) - 1) * 100
 
     # --- 3. MÉTRICAS ---
-    # --- 3. MÉTRICAS CON SEPARADOR DE MILES (.) ---
     m = st.columns(6)
-    
-    # Función auxiliar rápida para las métricas
     f_m = lambda x: "{:,.0f}".format(x).replace(",", ".")
 
     m[0].metric("Venta", f_m(df_final['Venta'].sum()))
@@ -194,8 +175,8 @@ def productos(usuario_id="default"):
     m[3].metric("Total Mes", f_m(df_final['Total Mes'].sum()))
     m[4].metric("Plan", f_m(df_final['Plan'].sum()))
     
-    avance_total = (df_final['Total Mes'].sum() / df_final['Plan'].sum() * 100 
-                    if df_final['Plan'].sum() > 0 else 0)
+    plan_sum = df_final['Plan'].sum()
+    avance_total = (df_final['Total Mes'].sum() / plan_sum * 100) if plan_sum > 0 else 0
     m[5].metric("Avance", f"{f_m(avance_total)}%")
     
     # --- 4. TABLA ---
@@ -211,5 +192,3 @@ def productos(usuario_id="default"):
         df_final.to_excel(writer, index=False)
     st.download_button("📥 Descargar Excel", output.getvalue(), "reporte_completo.xlsx")
 
-if __name__ == "__main__":
-    productos()

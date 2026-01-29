@@ -32,7 +32,6 @@ def estilo_html(df):
 
     styler = df.style.format(formato_dict)
 
-    # --- COLORES CONDICIONALES ---
     if 'Stock' in df.columns:
         styler = styler.map(lambda v: 'color: red; font-weight: bold;' if v <= 0 else '', subset=['Stock'])
     if 'Avance' in df.columns:
@@ -138,8 +137,7 @@ def productos(usuario_id="default"):
     try:
         df_t = pd.read_csv("data/TANGO.csv").rename(columns={"COD_ARTICU": "PRODU.", "CANTIDAD": "Caviahue"})
         tango_total = mult(df_t).groupby("PRODU.")["Caviahue"].sum().reset_index().rename(columns={"Caviahue": "Tango"})
-    except: 
-        tango_total = pd.DataFrame(columns=["PRODU.", "Tango"])
+    except: tango_total = pd.DataFrame(columns=["PRODU.", "Tango"])
 
     # --- 2. INTEGRACIÓN Y CÁLCULOS SEGUROS ---
     df_final = df_hist_resumen.merge(ventas_mes, on="PRODU.", how="left") \
@@ -151,20 +149,23 @@ def productos(usuario_id="default"):
     df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
 
-    # INICIALIZACIÓN COMO FLOAT PARA EVITAR UFuncOutputCastingError
+    # Inicialización de columnas como float para evitar conflictos de tipos (CastingError)
     df_final["Avance"] = 0.0
     df_final["Growth 25"] = 0.0
     df_final["Growth 26"] = 0.0
 
-    # CÁLCULOS CON MÁSCARAS PARA EVITAR ZeroDivisionError
-    mask_plan = df_final["Plan"] > 0
-    df_final.loc[mask_plan, "Avance"] = (df_final.loc[mask_plan, "Total Mes"] / df_final.loc[mask_plan, "Plan"]) * 100
+    # Cálculos seguros usando .loc y máscaras (Evita ZeroDivision y Casting Errors)
+    # 1. Avance
+    m_plan = df_final["Plan"] > 0
+    df_final.loc[m_plan, "Avance"] = (df_final.loc[m_plan, "Total Mes"] / df_final.loc[m_plan, "Plan"]) * 100
 
-    mask_24 = df_final["Venta 2024"] > 0
-    df_final.loc[mask_24, "Growth 25"] = ((df_final.loc[mask_24, "Venta 25"] / df_final.loc[mask_24, "Venta 2024"]) - 1) * 100
+    # 2. Growth 25
+    m_24 = df_final["Venta 2024"] > 0
+    df_final.loc[m_24, "Growth 25"] = ((df_final.loc[m_24, "Venta 25"] / df_final.loc[m_24, "Venta 2024"]) - 1) * 100
 
-    mask_25ytd = df_final["Venta 25 YTD"] > 0
-    df_final.loc[mask_25ytd, "Growth 26"] = ((df_final.loc[mask_25ytd, "Acumulado 26"] / df_final.loc[mask_25ytd, "Venta 25 YTD"]) - 1) * 100
+    # 3. Growth 26
+    m_25ytd = df_final["Venta 25 YTD"] > 0
+    df_final.loc[m_25ytd, "Growth 26"] = ((df_final.loc[m_25ytd, "Acumulado 26"] / df_final.loc[m_25ytd, "Venta 25 YTD"]) - 1) * 100
 
     # --- 3. MÉTRICAS ---
     m = st.columns(6)

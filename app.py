@@ -58,9 +58,10 @@ def run_scraping_if_needed():
     if (last_scrape is None) or (now - last_scrape > timedelta(hours=1)):
         with st.spinner("Ejecutando scraping..."):
             #Shopify api
+            scrape_data()  # Ejecuta tu función de scraping
             ventas_cav_shopify = scrap_shopify(st.secrets["CAVIAHUE_SHOP_DOMAIN"],st.secrets["CAVIAHUE_SHOP_TOKEN"])
             ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
-            scrape_data()  # Ejecuta tu función de scraping
+            
             
         set_last_scrape_time(now)
         

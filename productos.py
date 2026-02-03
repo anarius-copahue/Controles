@@ -219,7 +219,9 @@ def productos(usuario_id="default"):
     df_final["Growth 25"] = (    df_final["Venta"]    / df_final["Venta 2024"].replace(0, np.nan)) - 1
     df_final["Growth 25"] = df_final["Growth 25"].fillna(0)
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
-    df_final["Growth 26"] = np.where(df_final["Venta 25 YTD"] > 0, ((df_final["Acumulado 26"] / df_final["Venta 25 YTD"]) - 1) * 100, 0)
+    df_final["Growth 26"] = (    df_final["Acumulado 26"]    / df_final["Venta 25 YTD"].replace(0, np.nan)    - 1) * 100
+    df_final["Growth 26"] = df_final["Growth 26"].fillna(0)
+
 
 
     # --- 3. MÉTRICAS ---

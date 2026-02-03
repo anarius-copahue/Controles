@@ -206,21 +206,50 @@ def productos(usuario_id="default"):
         tango_total = pd.DataFrame(columns=["PRODU.", "Tango"])
 
     # --- 2. INTEGRACIÓN Y CÁLCULOS ---
-    df_final = df_hist_resumen.merge(ventas_mes, on="PRODU.", how="left") \
-                              .merge(preventa_total, on="PRODU.", how="left") \
-                              .merge(tango_total, on="PRODU.", how="left") \
-                              .merge(stock_final, on="PRODU.", how="left") \
-                              .merge(df_plan, on="PRODU.", how="left").fillna(0)
-    
-    # El Total Mes ahora incluye Tango
-    df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
-    df_final["Avance"] = (    df_final["Total Mes"]    / df_final["Plan"].replace(0, np.nan))
+    # --- 2. INTEGRACIÓN Y CÁLCULOS ---
+    df_final = (
+        df_hist_resumen
+        .merge(ventas_mes, on="PRODU.", how="left")
+        .merge(preventa_total, on="PRODU.", how="left")
+        .merge(tango_total, on="PRODU.", how="left")
+        .merge(stock_final, on="PRODU.", how="left")
+        .merge(df_plan, on="PRODU.", how="left")
+        .fillna(0)
+    )
+
+    # Total Mes
+    df_final["Total Mes"] = (
+        df_final["Venta"]
+        + df_final["Preventa"]
+        + df_final["Tango"]
+    )
+
+    # === AVANCE % CORRECTO ===
+    df_final["Avance"] = (
+        df_final["Total Mes"]
+        / df_final["Plan"].replace(0, np.nan)
+    ) * 100
     df_final["Avance"] = df_final["Avance"].fillna(0)
-    df_final["Growth 25"] = (    df_final["Venta"]    / df_final["Venta 2024"].replace(0, np.nan)) - 1
+
+    # === GROWTH 25 % ===
+    df_final["Growth 25"] = (
+        df_final["Venta"]
+        / df_final["Venta 2024"].replace(0, np.nan)
+        - 1
+    ) * 100
     df_final["Growth 25"] = df_final["Growth 25"].fillna(0)
+
+    # === ACUMULADO 26 ===
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
-    df_final["Growth 26"] = (    df_final["Acumulado 26"]    / df_final["Venta 25 YTD"].replace(0, np.nan)    - 1) * 100
+
+    # === GROWTH 26 % ===
+    df_final["Growth 26"] = (
+        df_final["Acumulado 26"]
+        / df_final["Venta 25 YTD"].replace(0, np.nan)
+        - 1
+    ) * 100
     df_final["Growth 26"] = df_final["Growth 26"].fillna(0)
+
 
 
 

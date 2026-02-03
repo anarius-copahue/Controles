@@ -217,37 +217,22 @@ def productos(usuario_id="default"):
         .fillna(0)
     )
 
-    # Total Mes
-    df_final["Total Mes"] = (
-        df_final["Venta"]
-        + df_final["Preventa"]
-        + df_final["Tango"]
-    )
+    # Total Mes como int
+    df_final["Total Mes"] = (        df_final["Venta"]  + df_final["Preventa"]  + df_final["Tango"]    ).astype(int)
 
     # === AVANCE % CORRECTO ===
-    df_final["Avance"] = (
-        df_final["Total Mes"]
-        / df_final["Plan"].replace(0, np.nan)
-    ) * 100
+    df_final["Avance"] = (  df_final["Total Mes"]   / df_final["Plan"].replace(0, np.nan) ) * 100
     df_final["Avance"] = df_final["Avance"].fillna(0)
 
     # === GROWTH 25 % ===
-    df_final["Growth 25"] = (
-        df_final["Venta"]
-        / df_final["Venta 2024"].replace(0, np.nan)
-        - 1
-    ) * 100
+    df_final["Growth 25"] = ( df_final["Venta"] / df_final["Venta 2024"].replace(0, np.nan)   - 1    ) * 100
     df_final["Growth 25"] = df_final["Growth 25"].fillna(0)
 
     # === ACUMULADO 26 ===
-    df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
+    df_final["Acumulado 26"] = (df_final["Hist_Act"] + df_final["Total Mes"]).astype(int)
 
     # === GROWTH 26 % ===
-    df_final["Growth 26"] = (
-        df_final["Acumulado 26"]
-        / df_final["Venta 25 YTD"].replace(0, np.nan)
-        - 1
-    ) * 100
+    df_final["Growth 26"] = ( df_final["Acumulado 26"]    / df_final["Venta 25 YTD"].replace(0, np.nan)        - 1    ) * 100
     df_final["Growth 26"] = df_final["Growth 26"].fillna(0)
 
 

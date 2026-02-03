@@ -138,7 +138,9 @@ def cuotas(representantes=[], usuario_id="default"):
             df_rep["growth 2026"] = df_rep["growth 2026"].fillna(0)
 
             hojas_rep[nombre] = df_rep[["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta 2024", "Venta 2025", "growth 2025", "Acumulado año", "growth 2026", "Venta 2025 YTD"]]
-        except: pass
+        except Exception as e:
+            st.error(f"Error en hoja {nombre}: {e}")
+
 
     # --- 3. UI ---
     st.title("Control de Avance - Caviahue")

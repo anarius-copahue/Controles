@@ -109,10 +109,9 @@ if user_logged.upper() == "ADMIN":
     with tab1:
         ventas()
     with tab2:
-        productos()
-    with tab3:
-        
         cuotas()
+    with tab3:
+        productos()
     with tab5:
         control_gerencial()
 

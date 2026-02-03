@@ -39,8 +39,14 @@ def cuotas(representantes=[], usuario_id="default"):
         mes_actual, anio_actual = ahora.month, ahora.year
         a2024, a2025 = 2024, 2025
 
-        cols_fechas = {col: pd.to_datetime(col, dayfirst=True) for col in df_hist.columns 
-                       if isinstance(col, (datetime.datetime, str)) and any(char.isdigit() for char in str(col))}
+        cols_fechas = {}
+        for col in df_hist.columns:
+            try:
+                dt = pd.to_datetime(col, dayfirst=True, errors="coerce")
+                if pd.notna(dt):
+                    cols_fechas[col] = dt
+            except:
+                pass
         
         df_hist["Venta 2024"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == a2024]].sum(axis=1)
         df_hist["Venta 2025"] = df_hist[[c for c, dt in cols_fechas.items() if dt.year == a2025]].sum(axis=1)
@@ -124,8 +130,8 @@ def cuotas(representantes=[], usuario_id="default"):
                 m = (gid == g); idx = df_rep[m & t_mask].index[0]; h = m & (~t_mask)
                 for c in ["Cuota Caviahue", "Venta Mes Actual", "Venta 2024", "Venta 2025", "Acumulado año", "Venta 2025 YTD"]:
                     df_rep.loc[idx, c] = df_rep.loc[h, c].sum()
-
-            df_rep["Avance %"] = (df_rep["Venta Mes Actual"] / df_rep["Cuota Caviahue"] * 100).replace([np.inf, -np.inf], 0).fillna(0)
+            df_rep["Avance %"] = (    df_rep["Venta Mes Actual"] /    df_rep["Cuota Caviahue"].replace(0, np.nan)) * 100
+            df_rep["Avance %"] = df_rep["Avance %"].fillna(0)
             df_rep["growth 2025"] = np.where(df_rep["Venta 2024"] > 0, ((df_rep["Venta 2025"] / df_rep["Venta 2024"]) - 1) * 100, 0)
             df_rep["growth 2026"] = np.where(df_rep["Venta 2025 YTD"] > 0, ((df_rep["Acumulado año"] / df_rep["Venta 2025 YTD"]) - 1) * 100, 0)
             

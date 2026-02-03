@@ -132,9 +132,11 @@ def cuotas(representantes=[], usuario_id="default"):
                     df_rep.loc[idx, c] = df_rep.loc[h, c].sum()
             df_rep["Avance %"] = (    df_rep["Venta Mes Actual"] /    df_rep["Cuota Caviahue"].replace(0, np.nan)) * 100
             df_rep["Avance %"] = df_rep["Avance %"].fillna(0)
-            df_rep["growth 2025"] = np.where(df_rep["Venta 2024"] > 0, ((df_rep["Venta 2025"] / df_rep["Venta 2024"]) - 1) * 100, 0)
-            df_rep["growth 2026"] = np.where(df_rep["Venta 2025 YTD"] > 0, ((df_rep["Acumulado año"] / df_rep["Venta 2025 YTD"]) - 1) * 100, 0)
-            
+            df_rep["growth 2025"] = (    df_rep["Venta 2025"] /    df_rep["Venta 2024"].replace(0, np.nan)    - 1) * 100
+            df_rep["growth 2025"] = df_rep["growth 2025"].fillna(0)
+            df_rep["growth 2026"] = ( df_rep["Acumulado año"] /  df_rep["Venta 2025 YTD"].replace(0, np.nan) - 1          ) * 100
+            df_rep["growth 2026"] = df_rep["growth 2026"].fillna(0)
+
             hojas_rep[nombre] = df_rep[["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta 2024", "Venta 2025", "growth 2025", "Acumulado año", "growth 2026", "Venta 2025 YTD"]]
         except: pass
 

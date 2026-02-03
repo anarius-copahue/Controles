@@ -214,8 +214,10 @@ def productos(usuario_id="default"):
     
     # El Total Mes ahora incluye Tango
     df_final["Total Mes"] = df_final["Venta"] + df_final["Preventa"] + df_final["Tango"]
-    df_final["Avance"] = np.where(df_final["Plan"] > 0, (df_final["Total Mes"] / df_final["Plan"]) * 100, 0)
-    df_final["Growth 25"] = np.where(df_final["Venta 2024"] > 0, ((df_final["Venta 25"] / df_final["Venta 2024"]) - 1) * 100, 0)
+    df_final["Avance"] = (    df_final["Total Mes"]    / df_final["Plan"].replace(0, np.nan))
+    df_final["Avance"] = df_final["Avance"].fillna(0)
+    df_final["Growth 25"] = (    df_final["Venta"]    / df_final["Venta 2024"].replace(0, np.nan)) - 1
+    df_final["Growth 25"] = df_final["Growth 25"].fillna(0)
     df_final["Acumulado 26"] = df_final["Hist_Act"] + df_final["Total Mes"]
     df_final["Growth 26"] = np.where(df_final["Venta 25 YTD"] > 0, ((df_final["Acumulado 26"] / df_final["Venta 25 YTD"]) - 1) * 100, 0)
 

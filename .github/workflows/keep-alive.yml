@@ -1,0 +1,44 @@
+name: Streamlit Keepalive
+
+on:
+  schedule:
+    - cron: "15 */8 * * *"   # cada 8 horas (UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+
+      - name: Update keepalive marker
+        run: |
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .keepalive
+          git add .keepalive
+
+      - name: Create or amend keepalive commit (no history spam)
+        run: |
+          if git log -1 --pretty=%B | grep -q "^keepalive$"; then
+            git commit --amend --no-edit
+          else
+            git commit -m "keepalive"
+          fi
+
+      - name: Push (force-with-lease)
+        run: |
+          git push --force-with-lease

@@ -225,7 +225,7 @@ def productos(usuario_id="default"):
     df_final["Avance"] = df_final["Avance"].fillna(0)
 
     # === GROWTH 25 % ===
-    df_final["Growth 25"] = ( df_final["Venta"] / df_final["Venta 2024"].replace(0, np.nan)   - 1    ) * 100
+    df_final["Growth 25"] = ( df_final["Venta 25"] / df_final["Venta 2024"].replace(0, np.nan)   - 1    ) * 100
     df_final["Growth 25"] = df_final["Growth 25"].fillna(0)
 
     # === ACUMULADO 26 ===

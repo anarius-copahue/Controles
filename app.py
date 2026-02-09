@@ -56,22 +56,19 @@ def run_scraping_if_needed():
     last_scrape = get_last_scrape_time()
 
     if (last_scrape is None) or (now - last_scrape > timedelta(hours=1)):
+        scraped_correctly = False
         with st.spinner("Ejecutando scraping..."):
             #Shopify api
-
-            reintentos = 3
-            for intento in range(reintentos):
-                try:
-                    scrape_data()  # Ejecuta tu función de scraping
-                except Exception as e:
-                    st.warning(f"Error en el scraping. Reintentando...")
-                    if intento == reintentos - 1:
-                        st.error("Error en el scraping")
-            
-            ventas_cav_shopify = scrap_shopify(st.secrets["CAVIAHUE_SHOP_DOMAIN"],st.secrets["CAVIAHUE_SHOP_TOKEN"])
-            ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
-            
-            
+            try:
+                scrape_data()  # Ejecuta tu función de scraping
+                ventas_cav_shopify = scrap_shopify(st.secrets["CAVIAHUE_SHOP_DOMAIN"],st.secrets["CAVIAHUE_SHOP_TOKEN"])
+                ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
+                scraped_correctly = True
+            except Exception as e:
+                st.error("Error en el scraping, estamos trabajando para solucionarlo. Por favor, intentá nuevamente más tarde.")
+                scraped_correctly = False
+        if not scraped_correctly:
+            st.stop()
         set_last_scrape_time(now)
         
     else:
@@ -114,7 +111,7 @@ st.success("Acceso concedido")
 
 if user_logged.upper() == "ADMIN":
     # Tabs
-    tab1, tab2, tab3, tab5 = st.tabs(["Ventas", "Cuota","Productos", "Control Gerencial"])
+    tab1, tab2, tab3, tab5 = st.tabs(["Ventas", "Cuota","Productos", "Cuadro de avance"])
     with tab1:
         ventas()
     with tab2:
@@ -126,7 +123,7 @@ if user_logged.upper() == "ADMIN":
 
 elif user_logged.upper() == "ADMIN_DATA":
     # Tabs
-    tab1, tab2, tab3, tab5, tab4 = st.tabs(["Ventas", "Cuota", "Productos", "Control Gerencial", "Actualizar Datos"])
+    tab1, tab2, tab3, tab5, tab4 = st.tabs(["Ventas", "Cuota", "Productos", "Cuadro de avance", "Actualizar Datos"])
     with tab1:
         ventas()
     with tab2:

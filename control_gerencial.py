@@ -54,7 +54,7 @@ def mult_shopify(df, col_prod, col_unid):
 
 
 def control_gerencial():
-    st.markdown("### Tablero de Control Gerencial - Caviahue")
+    st.markdown("### Cuadro de avance del mes - Caviahue")
     mes_act = datetime.now().month
 
     # ==========================================

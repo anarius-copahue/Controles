@@ -12,7 +12,7 @@ REPRESENTANTE_mapa= {
         "YARRECHE": "mapa_ventas_ZONA_SUR.html",
         "EVEIGA": "mapa_ventas_COSTA_ATLANTIDA.html",
         "JANDERMARCH": "mapa_ventas_CUYO.html",
-        "NBRIDI" : "mapa_ventas_ZONA_CABA_1425"
+        "NBRIDI" : "mapa_ventas_ZONA_CABA_1425.html",
        
 }
 

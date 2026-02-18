@@ -7,7 +7,7 @@ REPRESENTANTE_mapa= {
         "SROCCHI": "mapa_ventas_ZONA_NORTE.html",
         "PZACCA": "mapa_ventas_PATAGONIA.html",
         "MROSSELOT": "mapa_ventas_CORDOBA_+_NORESTE.html",
-        "LCOLOMBO": "mapa_ventas_LITORAL.html",
+        "AFLEBA": "mapa_ventas_LITORAL.html",
         "YCUEZZO": "mapa_ventas_NORTE.html",
         "YARRECHE": "mapa_ventas_ZONA_SUR.html",
         "EVEIGA": "mapa_ventas_COSTA_ATLANTIDA.html",

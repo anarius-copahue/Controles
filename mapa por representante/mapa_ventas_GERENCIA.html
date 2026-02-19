@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_e8647378f7164728c64bf5249cdb956d {
+                #map_7b2798dd6ff4fcf0ae40411b4f1ba1ff {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -55,32 +55,27 @@
     
     
     <div style="
-         position: fixed;
-         bottom: 40px; left: 30px; width: 220px;
-         background-color: white;
-         border: 2px solid grey;
-         z-index:9999;
-         font-size: 14px;
-         padding: 10px;
-         box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-    ">
-    <b>🗺️ Leyenda</b><br>
-    <span style="font-size:18px; color: green;">●</span> Aumento de Share (Q3 vs Q2)<br>
-    <span style="font-size:18px; color: red;">●</span> Disminución de Share (Q3 vs Q2)<br>
-    <span style="font-size:18px; color: yellow;">●</span> Sin cambio o sin share en Q2<br>
-    <span style="font-size:18px; color: #337AFF;">●</span> Competencia<br>
-    <small>Tamaño = Volumen Total (Q3)</small>
+        position: fixed; bottom: 40px; left: 30px; width: 220px;
+        background-color: white; border: 2px solid grey;
+        z-index:9999; font-size: 14px; padding: 10px;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.3);">
+        <b>🗺️ Leyenda</b><br>
+        <span style="font-size:18px; color: green;">●</span> Aumento de Share (Q4 vs Q3)<br>
+        <span style="font-size:18px; color: red;">●</span> Disminución de Share (Q4 vs Q3)<br>
+        <span style="font-size:18px; color: yellow;">●</span> Sin cambio o sin share en Q3<br>
+        <span style="font-size:18px; color:#337AFF;">●</span> Competencia<br>
+        <small>Tamaño = Volumen Total (Q4)</small>
     </div>
     
     
-            <div class="folium-map" id="map_e8647378f7164728c64bf5249cdb956d" ></div>
+            <div class="folium-map" id="map_7b2798dd6ff4fcf0ae40411b4f1ba1ff" ></div>
         
 </body>
 <script>
     
     
-            var map_e8647378f7164728c64bf5249cdb956d = L.map(
-                "map_e8647378f7164728c64bf5249cdb956d",
+            var map_7b2798dd6ff4fcf0ae40411b4f1ba1ff = L.map(
+                "map_7b2798dd6ff4fcf0ae40411b4f1ba1ff",
                 {
                     center: [-27.79, -64.264],
                     crs: L.CRS.EPSG3857,
@@ -97,7 +92,7 @@
 
         
     
-            var tile_layer_928fa55bf8c4860a83e0ce0e57e283cd = L.tileLayer(
+            var tile_layer_8a288df595f2c57fe1080e3bd9702601 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
@@ -114,39 +109,39 @@
             );
         
     
-            tile_layer_928fa55bf8c4860a83e0ce0e57e283cd.addTo(map_e8647378f7164728c64bf5249cdb956d);
+            tile_layer_8a288df595f2c57fe1080e3bd9702601.addTo(map_7b2798dd6ff4fcf0ae40411b4f1ba1ff);
         
     
-            var feature_group_20a2db00de5cbd9de892bdfd4c557529 = L.featureGroup(
+            var feature_group_fa45a9a8e5953229db9363f203d2fa7f = L.featureGroup(
                 {
 }
             );
         
     
-            var circle_marker_c9b1c4b054a97d4964490e932bf6b898 = L.circleMarker(
+            var circle_marker_2e4f9b9ad9f6e84b225d99c77be0e6e1 = L.circleMarker(
                 [-27.79, -64.264],
-                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 38.45958178989638, "stroke": true, "weight": 3}
-            ).addTo(feature_group_20a2db00de5cbd9de892bdfd4c557529);
+                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 36.628776449189054, "stroke": true, "weight": 3}
+            ).addTo(feature_group_fa45a9a8e5953229db9363f203d2fa7f);
         
     
-        var popup_320a080ebf76d5566ff9099aee09e9c2 = L.popup({
+        var popup_91082b15e5ae1bebd423c03f389ee315 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_79dda7206bffc6bc1d2885c14619131e = $(`<div id="html_79dda7206bffc6bc1d2885c14619131e" style="width: 100.0%; height: 100.0%;"><b>SANTIAGO DEL ESTERO<br>                     <b>CP:</b> 4200<br>                     <b>Caviahue Q3:</b> 1196.0<br>                     <b>Share Caviahue Q3:</b> 13.0%<br>                     <b>Share Caviahue f'Q2:</b> 9.3%<br>                     <b>Total Q3:</b> 9173.0</div>`)[0];
-                popup_320a080ebf76d5566ff9099aee09e9c2.setContent(html_79dda7206bffc6bc1d2885c14619131e);
+                var html_eddbfbf22102d77511060d67c5123c8f = $(`<div id="html_eddbfbf22102d77511060d67c5123c8f" style="width: 100.0%; height: 100.0%;"><b>CP:</b> 4200<br><b>Caviahue Q4:</b> 901.0<br><b>Share Caviahue Q4:</b> 11.1%<br><b>Share Caviahue Q3:</b> 13.0%<br><b>Total Q4:</b> 8120.0</div>`)[0];
+                popup_91082b15e5ae1bebd423c03f389ee315.setContent(html_eddbfbf22102d77511060d67c5123c8f);
             
         
 
-        circle_marker_c9b1c4b054a97d4964490e932bf6b898.bindPopup(popup_320a080ebf76d5566ff9099aee09e9c2)
+        circle_marker_2e4f9b9ad9f6e84b225d99c77be0e6e1.bindPopup(popup_91082b15e5ae1bebd423c03f389ee315)
         ;
 
         
     
     
-            circle_marker_c9b1c4b054a97d4964490e932bf6b898.bindTooltip(
+            circle_marker_2e4f9b9ad9f6e84b225d99c77be0e6e1.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -156,30 +151,30 @@
             );
         
     
-            var circle_marker_35b1ce6e638403db303b628f60f1a8b1 = L.circleMarker(
+            var circle_marker_d9aa6f008b85eda95359899d15c08d1b = L.circleMarker(
                 [-27.49, -64.83],
-                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.979565641633144, "stroke": true, "weight": 3}
-            ).addTo(feature_group_20a2db00de5cbd9de892bdfd4c557529);
+                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 18.10110591222529, "stroke": true, "weight": 3}
+            ).addTo(feature_group_fa45a9a8e5953229db9363f203d2fa7f);
         
     
-        var popup_1096dd6e57f347d07c99efe6c7ea5d45 = L.popup({
+        var popup_ffd55970458aa787f025f5b56e198510 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_eaaf229a70d1116b2b9bfd5aedfeb35a = $(`<div id="html_eaaf229a70d1116b2b9bfd5aedfeb35a" style="width: 100.0%; height: 100.0%;"><b>TERMAS DE RIO HONDO<br>                     <b>CP:</b> 4220<br>                     <b>Caviahue Q3:</b> 174.0<br>                     <b>Share Caviahue Q3:</b> 14.6%<br>                     <b>Share Caviahue f'Q2:</b> 4.9%<br>                     <b>Total Q3:</b> 1188.0</div>`)[0];
-                popup_1096dd6e57f347d07c99efe6c7ea5d45.setContent(html_eaaf229a70d1116b2b9bfd5aedfeb35a);
+                var html_3d5a60800f616e395bc5d0b09f0d504d = $(`<div id="html_3d5a60800f616e395bc5d0b09f0d504d" style="width: 100.0%; height: 100.0%;"><b>CP:</b> 4220<br><b>Caviahue Q4:</b> 39.0<br><b>Share Caviahue Q4:</b> 2.8%<br><b>Share Caviahue Q3:</b> 14.6%<br><b>Total Q4:</b> 1394.0</div>`)[0];
+                popup_ffd55970458aa787f025f5b56e198510.setContent(html_3d5a60800f616e395bc5d0b09f0d504d);
             
         
 
-        circle_marker_35b1ce6e638403db303b628f60f1a8b1.bindPopup(popup_1096dd6e57f347d07c99efe6c7ea5d45)
+        circle_marker_d9aa6f008b85eda95359899d15c08d1b.bindPopup(popup_ffd55970458aa787f025f5b56e198510)
         ;
 
         
     
     
-            circle_marker_35b1ce6e638403db303b628f60f1a8b1.bindTooltip(
+            circle_marker_d9aa6f008b85eda95359899d15c08d1b.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -189,30 +184,30 @@
             );
         
     
-            var circle_marker_c1c3dff01ab1a9f5c43e2abd931e9493 = L.circleMarker(
+            var circle_marker_500e5bc1607b3626725615c99256a409 = L.circleMarker(
                 [-27.76, -64.26],
-                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 14.767181320693757, "stroke": true, "weight": 3}
-            ).addTo(feature_group_20a2db00de5cbd9de892bdfd4c557529);
+                {"bubblingMouseEvents": true, "color": "#337AFF", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#337AFF", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 13.670714669483297, "stroke": true, "weight": 3}
+            ).addTo(feature_group_fa45a9a8e5953229db9363f203d2fa7f);
         
     
-        var popup_345276f6685ba937cf4c2665ebefd80c = L.popup({
+        var popup_6cc5e241a6219d3c8611a4bafee84fd0 = L.popup({
   "maxWidth": 250,
 });
 
         
             
-                var html_393ff62f9fca50e6638aecdf8fb860b3 = $(`<div id="html_393ff62f9fca50e6638aecdf8fb860b3" style="width: 100.0%; height: 100.0%;"><b>LA BANDA<br>                     <b>CP:</b> 4300<br>                     <b>Caviahue Q3:</b> 14.0<br>                     <b>Share Caviahue Q3:</b> 1.7%<br>                     <b>Share Caviahue f'Q2:</b> 3.0%<br>                     <b>Total Q3:</b> 838.0</div>`)[0];
-                popup_345276f6685ba937cf4c2665ebefd80c.setContent(html_393ff62f9fca50e6638aecdf8fb860b3);
+                var html_62217d78c5bb6944164b074bde945753 = $(`<div id="html_62217d78c5bb6944164b074bde945753" style="width: 100.0%; height: 100.0%;"><b>CP:</b> 4300<br><b>Caviahue Q4:</b> 39.0<br><b>Share Caviahue Q4:</b> 5.6%<br><b>Share Caviahue Q3:</b> 1.7%<br><b>Total Q4:</b> 691.0</div>`)[0];
+                popup_6cc5e241a6219d3c8611a4bafee84fd0.setContent(html_62217d78c5bb6944164b074bde945753);
             
         
 
-        circle_marker_c1c3dff01ab1a9f5c43e2abd931e9493.bindPopup(popup_345276f6685ba937cf4c2665ebefd80c)
+        circle_marker_500e5bc1607b3626725615c99256a409.bindPopup(popup_6cc5e241a6219d3c8611a4bafee84fd0)
         ;
 
         
     
     
-            circle_marker_c1c3dff01ab1a9f5c43e2abd931e9493.bindTooltip(
+            circle_marker_500e5bc1607b3626725615c99256a409.bindTooltip(
                 `<div>
                      Competencia
                  </div>`,
@@ -222,22 +217,22 @@
             );
         
     
-            feature_group_20a2db00de5cbd9de892bdfd4c557529.addTo(map_e8647378f7164728c64bf5249cdb956d);
+            feature_group_fa45a9a8e5953229db9363f203d2fa7f.addTo(map_7b2798dd6ff4fcf0ae40411b4f1ba1ff);
         
     
-            var feature_group_afcbd8f08818f58fda9f8295ea53ccc9 = L.featureGroup(
+            var feature_group_d2d1905ba225ad2c60b1c2a62166d119 = L.featureGroup(
                 {
 }
             );
         
     
-            var circle_marker_cc996be95ac50f90ea6ae5dc0b2c418b = L.circleMarker(
+            var circle_marker_fa11d17741029362bbf642192a702d80 = L.circleMarker(
                 [-27.79, -64.264],
-                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 17.025209779403774, "stroke": true, "weight": 1}
-            ).addTo(feature_group_afcbd8f08818f58fda9f8295ea53ccc9);
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15.201621549392797, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d2d1905ba225ad2c60b1c2a62166d119);
         
     
-            circle_marker_cc996be95ac50f90ea6ae5dc0b2c418b.bindTooltip(
+            circle_marker_fa11d17741029362bbf642192a702d80.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -247,13 +242,13 @@
             );
         
     
-            var circle_marker_0a2c3d726c46543a5a3deaba5581c4a5 = L.circleMarker(
+            var circle_marker_d06fdf94b2424dcbcd8d64f2cb97ea4b = L.circleMarker(
                 [-27.49, -64.83],
-                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.874440382805996, "stroke": true, "weight": 1}
-            ).addTo(feature_group_afcbd8f08818f58fda9f8295ea53ccc9);
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 4.329381358372115, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d2d1905ba225ad2c60b1c2a62166d119);
         
     
-            circle_marker_0a2c3d726c46543a5a3deaba5581c4a5.bindTooltip(
+            circle_marker_d06fdf94b2424dcbcd8d64f2cb97ea4b.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -263,13 +258,13 @@
             );
         
     
-            var circle_marker_2ad37d40547ce2df70e19888f2bc09a6 = L.circleMarker(
+            var circle_marker_1d8071f2ee800196339b9ab672cbd8fb = L.circleMarker(
                 [-27.76, -64.26],
-                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2.8737647560281374, "stroke": true, "weight": 1}
-            ).addTo(feature_group_afcbd8f08818f58fda9f8295ea53ccc9);
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 4.329381358372115, "stroke": true, "weight": 1}
+            ).addTo(feature_group_d2d1905ba225ad2c60b1c2a62166d119);
         
     
-            circle_marker_2ad37d40547ce2df70e19888f2bc09a6.bindTooltip(
+            circle_marker_1d8071f2ee800196339b9ab672cbd8fb.bindTooltip(
                 `<div>
                      Caviahue
                  </div>`,
@@ -279,27 +274,27 @@
             );
         
     
-            feature_group_afcbd8f08818f58fda9f8295ea53ccc9.addTo(map_e8647378f7164728c64bf5249cdb956d);
+            feature_group_d2d1905ba225ad2c60b1c2a62166d119.addTo(map_7b2798dd6ff4fcf0ae40411b4f1ba1ff);
         
     
-            var layer_control_3233da2ff175719cd28e35f51bbbd993_layers = {
+            var layer_control_f64a37b993b66281290a35aec0eb08e9_layers = {
                 base_layers : {
-                    "cartodbpositron" : tile_layer_928fa55bf8c4860a83e0ce0e57e283cd,
+                    "cartodbpositron" : tile_layer_8a288df595f2c57fe1080e3bd9702601,
                 },
                 overlays :  {
-                    "Competencia" : feature_group_20a2db00de5cbd9de892bdfd4c557529,
-                    "Caviahue" : feature_group_afcbd8f08818f58fda9f8295ea53ccc9,
+                    "Competencia" : feature_group_fa45a9a8e5953229db9363f203d2fa7f,
+                    "Caviahue" : feature_group_d2d1905ba225ad2c60b1c2a62166d119,
                 },
             };
-            let layer_control_3233da2ff175719cd28e35f51bbbd993 = L.control.layers(
-                layer_control_3233da2ff175719cd28e35f51bbbd993_layers.base_layers,
-                layer_control_3233da2ff175719cd28e35f51bbbd993_layers.overlays,
+            let layer_control_f64a37b993b66281290a35aec0eb08e9 = L.control.layers(
+                layer_control_f64a37b993b66281290a35aec0eb08e9_layers.base_layers,
+                layer_control_f64a37b993b66281290a35aec0eb08e9_layers.overlays,
                 {
   "position": "topright",
   "collapsed": false,
   "autoZIndex": true,
 }
-            ).addTo(map_e8647378f7164728c64bf5249cdb956d);
+            ).addTo(map_7b2798dd6ff4fcf0ae40411b4f1ba1ff);
 
         
 </script>

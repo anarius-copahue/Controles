@@ -218,27 +218,110 @@ def cuotas(representantes=[], usuario_id="default"):
                 df_disp = hojas_rep[r["Rep"]].copy().drop(columns=["Venta 2025 YTD"], errors="ignore")
                 df_disp["N° CLIENTE"] = pd.to_numeric(df_disp["N° CLIENTE"], errors='coerce').fillna(0).astype(int)
                 
-                styler = df_disp.style.apply(resaltar_totales, axis=1).format({
-                    "N° CLIENTE": "{:d}",
-                    "Cuota Caviahue": "{:,.0f}", 
-                    "Venta Mes Actual": "{:,.0f}",
-                    "Avance %": "{:.1f}%", 
-                    "Venta 2024": "{:,.0f}",
-                    "Venta 2025": "{:,.0f}",
-                    "growth 2025": "{:.1f}%",
-                    "Acumulado año": "{:,.0f}", 
-                    "growth 2026": "{:.1f}%"
-                }).hide(axis="index")
+                                # =============================================
+                # DETALLE DEL REPRESENTANTE CON TOTALES
+                # =============================================
 
-                custom_css = """<style>
-                    .table-container { width: 100%; overflow-x: auto; margin-top: 10px; }
-                    table { width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 12px; }
-                    th { background-color: #f8f9fa; color: #333; padding: 8px; text-align: left; border: 1px solid #dee2e6; }
-                    td { padding: 6px; border: 1px solid #dee2e6; }
-                </style>"""
-                
-                st.markdown(custom_css + f'<div class="table-container">{styler.to_html()}</div>', unsafe_allow_html=True)
-                
+                df_disp = hojas_rep[r["Rep"]].copy()
+
+                df_disp["N° CLIENTE"] = pd.to_numeric(
+                    df_disp["N° CLIENTE"], errors="coerce"
+                ).fillna(0).astype(int)
+
+                # Identificar filas TOTAL
+                df_disp["es_total"] = df_disp["N° CLIENTE"] == 0
+                indices_totales = df_disp.index[df_disp["es_total"]].tolist()
+
+                # ---------------------------------------------
+                # RECORRER CADA TOTAL
+                # ---------------------------------------------
+
+                for i, idx_total in enumerate(indices_totales):
+
+                    total_row = df_disp.loc[idx_total]
+
+                    total_key = f"total_{usuario_id}_{r['Rep']}_{idx_total}"
+
+                    if total_key not in st.session_state:
+                        st.session_state[total_key] = False
+
+                    # MISMAS 10 COLUMNAS ORIGINALES
+                    cols = st.columns([0.5, 1.5, 0.8, 0.8, 0.6, 0.8, 0.8, 0.6, 0.8, 0.6])
+
+                    # Botón expandir
+                    if cols[0].button(
+                        "➕" if not st.session_state[total_key] else "➖",
+                        key=f"btn_{total_key}"
+                    ):
+                        st.session_state[total_key] = not st.session_state[total_key]
+
+                    # ===== FILA TOTAL =====
+
+                    cuota = total_row.get("Cuota Caviahue", 0)
+                    venta_mes = total_row.get("Venta Mes Actual", 0)
+                    venta_24 = total_row.get("Venta 2024", 0)
+                    venta_25 = total_row.get("Venta 2025", 0)
+                    acum = total_row.get("Acumulado año", 0)
+                    g26 = total_row.get("growth 2026", 0)
+
+                    avance = (venta_mes / cuota * 100) if cuota > 0 else 0
+                    g25 = ((venta_25 / venta_24) - 1) * 100 if venta_24 > 0 else 0
+
+                    cols[1].markdown(f"**{total_row['CLIENTE']}**")
+                    cols[2].write(f"{int(cuota):,}".replace(",", "."))
+                    cols[3].write(f"{int(venta_mes):,}".replace(",", "."))
+                    cols[4].write(f"{int(avance)}%")
+                    cols[5].write(f"{int(venta_24):,}".replace(",", "."))
+                    cols[6].write(f"{int(venta_25):,}".replace(",", "."))
+                    cols[7].markdown(f":{'green' if g25 >= 0 else 'red'}[{int(g25)}%]")
+                    cols[8].write(f"{int(acum):,}".replace(",", "."))
+                    cols[9].markdown(f":{'green' if g26 >= 0 else 'red'}[{int(g26)}%]")
+
+                    # ---------------------------------------------
+                    # CLIENTES DE ESTE TOTAL
+                    # ---------------------------------------------
+
+                    start = idx_total + 1
+
+                    if i + 1 < len(indices_totales):
+                        end = indices_totales[i + 1]
+                    else:
+                        end = df_disp.index.max() + 1
+
+                    clientes_del_total = df_disp.loc[start:end-1]
+                    clientes_del_total = clientes_del_total[clientes_del_total["N° CLIENTE"] != 0]
+
+                    # Mostrar clientes debajo si expandido
+                    if st.session_state[total_key] and not clientes_del_total.empty:
+
+                        for _, row_cli in clientes_del_total.iterrows():
+
+                            cuota = row_cli.get("Cuota Caviahue", 0)
+                            venta_mes = row_cli.get("Venta Mes Actual", 0)
+                            venta_24 = row_cli.get("Venta 2024", 0)
+                            venta_25 = row_cli.get("Venta 2025", 0)
+                            acum = row_cli.get("Acumulado año", 0)
+                            g26 = row_cli.get("growth 2026", 0)
+
+                            avance = (venta_mes / cuota * 100) if cuota > 0 else 0
+                            g25 = ((venta_25 / venta_24) - 1) * 100 if venta_24 > 0 else 0
+
+                            cols_cli = st.columns([0.5, 1.5, 0.8, 0.8, 0.6, 0.8, 0.8, 0.6, 0.8, 0.6])
+
+                            cols_cli[0].write("")
+                            cols_cli[1].write("  " + row_cli["CLIENTE"])  # indentación visual
+                            cols_cli[2].write(f"{int(cuota):,}".replace(",", "."))
+                            cols_cli[3].write(f"{int(venta_mes):,}".replace(",", "."))
+                            cols_cli[4].write(f"{int(avance)}%")
+                            cols_cli[5].write(f"{int(venta_24):,}".replace(",", "."))
+                            cols_cli[6].write(f"{int(venta_25):,}".replace(",", "."))
+                            cols_cli[7].markdown(
+                                f":{'green' if g25 >= 0 else 'red'}[{int(g25)}%]"
+                            )
+                            cols_cli[8].write(f"{int(acum):,}".replace(",", "."))
+                            cols_cli[9].markdown(
+                                f":{'green' if g26 >= 0 else 'red'}[{int(g26)}%]"
+                            )
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:
                     df_disp.to_excel(writer, index=False)

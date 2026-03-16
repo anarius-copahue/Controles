@@ -191,12 +191,14 @@ def productos(usuario_id="default"):
     except: df_plan = pd.DataFrame(columns=["PRODU.", "Plan"])
 
     try:
-        df_t = pd.read_csv("data/TANGO.csv").rename(columns={"COD_ARTICU": "PRODU.", "CANTIDAD": "Caviahue"})
+        df_t = pd.read_csv("data/TANGO.csv").rename(columns={"Cód. Artículo": "PRODU.", "Cantidad": "Caviahue"})
         
         def limpiar_tango(col):
             return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)
+        
+        df_t['NETO_LIMPIO'] = limpiar_tango(df_t['Total'])
 
-        df_t['NETO_LIMPIO'] = limpiar_tango(df_t['TOT_S_IMP'])        
+        df_t = df_t[~df_t['PRODU.'].isin([4, 10, 3,12])]
         # Filtramos antes de multiplicar
         df_t = df_t[df_t['NETO_LIMPIO'] != 0].copy()
         tango_total = aplicar_kits(df_t).rename(columns={"Caviahue": "Tango"})

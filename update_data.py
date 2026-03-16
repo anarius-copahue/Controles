@@ -104,7 +104,7 @@ def update_data():
                 return
 
             # Validar que las columnas esperadas estén presentes
-            expected_columns = ["COD_CLI","COD_ARTICU", "CANTIDAD"]
+            expected_columns = ["Cód. cliente","Cód. Artículo", "Cantidad"]
 
             # Verificar si las columnas coinciden
             if not all(col in df.columns for col in expected_columns):

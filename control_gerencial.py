@@ -91,18 +91,19 @@ def control_gerencial():
 
     try:
         df_t = pd.read_csv("data/TANGO.csv")
-        df_t.columns = [c.strip().upper() for c in df_t.columns]
-        df_t["COD_ARTICU"] = pd.to_numeric(df_t["COD_ARTICU"], errors='coerce').fillna(0).astype(int)
-        df_t = df_t[~df_t['COD_ARTICU'].isin([4, 10, 3,12])]
+    
+        df_t["Cód. Artículo"] = pd.to_numeric(df_t["Cód. Artículo"], errors='coerce').fillna(0).astype(int)
+        df_t = df_t[~df_t['Cód. Artículo'].isin([4, 10, 3,12])]
         
         def limpiar_tango(col):
             return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)
 
-        df_t['NETO_LIMPIO'] = limpiar_tango(df_t['TOT_S_IMP'])
-        df_t['CANT_LIMPIA'] = limpiar_tango(df_t['CANTIDAD'])
-        u_tan = df_t.loc[df_t['NETO_LIMPIO'] != 0, 'CANT_LIMPIA'].sum()
-        n_tan = df_t.loc[df_t['NETO_LIMPIO'] != 0, 'NETO_LIMPIO'].sum()/100
+        df_t['Total'] = limpiar_tango(df_t['Total'])
+        df_t['Cantidad'] = limpiar_tango(df_t['Cantidad'])
+        u_tan = df_t.loc[df_t['Total'] != 0, 'Cantidad'].sum()
+        n_tan = df_t.loc[df_t['Total'] != 0, 'Total'].sum()/100
     except: u_tan, n_tan = 0, 0
+    
 
     try:
         df_s = pd.read_csv("descargas/ventas_caviahue_shopify.csv")

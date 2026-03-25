@@ -198,7 +198,7 @@ def productos(usuario_id="default"):
         
         df_t['NETO_LIMPIO'] = (df_t['Total'])
 
-        df_t = df_t[~df_t['PRODU.'].isin([4, 10, 3,12])]
+        df_t = df_t[~df_t['PRODU.'].isin([4, 10, 3,12,21302,21304])]
         # Filtramos antes de multiplicar
         df_t = df_t[df_t['NETO_LIMPIO'] != 0].copy()
         tango_total = aplicar_kits(df_t).rename(columns={"Caviahue": "Tango"})

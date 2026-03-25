@@ -93,7 +93,7 @@ def control_gerencial():
         df_t = pd.read_excel("data/TANGO.xlsx", sheet_name="Datos")
         print("Columnas detectadas:", df_t.columns.tolist())
         df_t["Cód. Artículo"] = pd.to_numeric(df_t["Cód. Artículo"], errors='coerce').fillna(0).astype(int)
-        df_t = df_t[~df_t['Cód. Artículo'].isin([4, 10, 3,12])]
+        df_t = df_t[~df_t['Cód. Artículo'].isin([4, 10, 3,12,21302,21304,21633,19039])]
             
         def limpiar_tango(col):
             return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)

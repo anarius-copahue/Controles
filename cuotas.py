@@ -99,7 +99,7 @@ def cuotas(representantes=[], usuario_id="default"):
         
         df_preventa = mult(df_preventa)
         try:
-            df_tango = pd.read_csv("data/TANGO.csv").rename(columns={"Cód. cliente": "Cliente", "Cantidad": "Venta Unid."})
+            df_tango = pd.read_excel("data/TANGO.xlsx",sheet_name="Datos").rename(columns={"Cód. cliente": "Cliente", "Cantidad": "Venta Unid."})
             df_tango["Caviahue"] = np.where(~df_tango["Cód. Artículo"].isin([21304, 21302]), df_tango["Venta Unid."], 0)
             df_tango = mult(df_tango)
         except: 

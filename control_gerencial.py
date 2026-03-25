@@ -89,20 +89,20 @@ def control_gerencial():
     u_dis, n_dis = cargar_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", "Venta Unid.")
     u_pre, n_pre = cargar_csv("descargas/preventa_por_producto.csv", "Un. Reserv.")
 
-    try:
-        df_t = pd.read_csv("data/TANGO.csv")
     
-        df_t["Cód. Artículo"] = pd.to_numeric(df_t["Cód. Artículo"], errors='coerce').fillna(0).astype(int)
-        df_t = df_t[~df_t['Cód. Artículo'].isin([4, 10, 3,12])]
+    df_t = pd.read_excel("data/TANGO.xlsx", sheet_name="Datos")
+    print("Columnas detectadas:", df_t.columns.tolist())
+    df_t["Cód. Artículo"] = pd.to_numeric(df_t["Cód. Artículo"], errors='coerce').fillna(0).astype(int)
+    df_t = df_t[~df_t['Cód. Artículo'].isin([4, 10, 3,12])]
         
-        def limpiar_tango(col):
-            return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)
+    def limpiar_tango(col):
+        return pd.to_numeric(col.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False).str.strip(), errors='coerce').fillna(0)
 
-        df_t['Total'] = limpiar_tango(df_t['Total'])
-        df_t['Cantidad'] = limpiar_tango(df_t['Cantidad'])
-        u_tan = df_t.loc[df_t['Total'] != 0, 'Cantidad'].sum()
-        n_tan = df_t.loc[df_t['Total'] != 0, 'Total'].sum()/100
-    except: u_tan, n_tan = 0, 0
+    df_t['Total'] = df_t['Total']
+    df_t['Cantidad'] = df_t['Cantidad']
+    u_tan = df_t.loc[df_t['Total'] != 0, 'Cantidad'].sum()
+    n_tan = df_t.loc[df_t['Total'] != 0, 'Total'].sum()
+    #except: u_tan, n_tan = 0, 0
     
 
     try:

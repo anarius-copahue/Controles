@@ -114,12 +114,12 @@ def update_data():
             # encriptar el archivo usando el modulo encrypt
             
             # Guardar el archivo temporalmente antes de encriptar como csv
-            temp_path = "data/TANGO.csv"
-            df.to_csv(temp_path, index=False)
+            temp_path = "data/TANGO.xlsx"
+            df.to_excel(temp_path, index=False)
             # Encriptar el archivo
             encrypt_file(temp_path, st.secrets["ENCRYPTION_KEY"])
 
-            st.success("Archivo encriptado y guardado correctamente como TANGO.csv")
+            st.success("Archivo encriptado y guardado correctamente como TANGO.xlsx")
 
            
         except Exception as e:
@@ -128,14 +128,14 @@ def update_data():
         
     # Este archivo dura una semana y luego se vacia automaticamente
 
-    st.info("Nota: El archivo TANGO.csv se mantiene por una semana antes de ser eliminado automáticamente.")
+    st.info("Nota: El archivo TANGO.xlsx se mantiene por una semana antes de ser eliminado automáticamente.")
       
     def remove_old_tango_file():
-        tango_path = "data/TANGO.csv"
+        tango_path = "data/TANGO.xlsx"
         if os.path.exists(tango_path):
             file_mod_time = datetime.fromtimestamp(os.path.getmtime(tango_path))
             if datetime.now() - file_mod_time > timedelta(weeks=1):
                 os.remove(tango_path)
-                st.info("El archivo TANGO.csv ha sido eliminado automáticamente después de una semana.")
+                st.info("El archivo TANGO.xlsx ha sido eliminado automáticamente después de una semana.")
     remove_old_tango_file()
         

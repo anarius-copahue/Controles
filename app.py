@@ -20,14 +20,13 @@ with cols[7]:
 
 def decrypt_files():
     ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted",
-                "data/Historico.xlsx.encrypted","data/Cuota_Productos.xlsx.encrypted", "data/Historico_Productos.xlsx.encrypted",
-                "data/TANGO.xlsx.encrypted"]
+                "data/Historico.xlsx.encrypted","data/Cuota_Productos.xlsx.encrypted", "data/Historico_Productos.xlsx.encrypted"]
     key = st.secrets["ENCRYPTION_KEY"]
 
     for archivo in ARCHIVOS:
         decrypt_file(archivo, key.encode())
     #si existe desencriptar tambien el archivo TANGO si existe
-    tango_path = "data/TANGO.csv.encrypted"
+    tango_path = "data/TANGO.xlsx.encrypted"
     if os.path.exists(tango_path):
         decrypt_file(tango_path, key.encode())
         

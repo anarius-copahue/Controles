@@ -19,7 +19,7 @@ with cols[7]:
         st.image("logo.png")
 
 def decrypt_files():
-    ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/SELL_IN_OUT.csv.encrypted",
+    ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/db_SELL_IN_OUT.xlsx.encrypted",
                 "data/Historico.xlsx.encrypted","data/Cuota_Productos.xlsx.encrypted", "data/Historico_Productos.xlsx.encrypted"]
     key = st.secrets["ENCRYPTION_KEY"]
 

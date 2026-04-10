@@ -30,10 +30,10 @@ def ventas(representantes=[]):
         tasa_crecimiento = (st.number_input("Tasa de crecimiento (%)", value=40) / 100)+1
 
     # --- CARGA DE DATOS ---
-    df = pd.read_csv("data/SELL_IN_OUT.csv")
-    df = df.rename(columns={"Unnamed: 0": "CADENA"})
-    df["FECHA"] = pd.to_datetime(df["FECHA"], errors="coerce")
-    df.dropna(subset=["FECHA", "CADENA"], inplace=True)
+    df = pd.read_excel("data/db_SELL_IN_OUT.xlsx", sheet_name="AMBOS")
+    #cambiar formatode fecha a d/m/a
+    df["FECHA"] = pd.to_datetime(df["FECHA"], dayfirst=False, errors='coerce')
+
 
     # Lista de farmacias según el representante
     lista = []

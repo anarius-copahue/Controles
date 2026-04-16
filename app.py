@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from shopify import scrap_shopify
 from control_gerencial import control_gerencial 
 from shopify import scrap_shopify
+from cuadro_stock import app_ventas_stock
 import os
 
 st.set_page_config(page_title="Caviahue Avance", layout="wide", page_icon="📦")
@@ -111,7 +112,7 @@ st.success("Acceso concedido")
 
 if user_logged.upper() == "ADMIN":
     # Tabs
-    tab1, tab2, tab3, tab5 = st.tabs(["Ventas", "Cuota","Productos", "Cuadro de avance"])
+    tab1, tab2, tab3, tab5, tab6 = st.tabs(["Ventas", "Cuota","Productos", "Cuadro de avance","Ventas y Stock"])
     with tab1:
         ventas()
     with tab2:
@@ -120,10 +121,12 @@ if user_logged.upper() == "ADMIN":
         productos()
     with tab5:
         control_gerencial()
+    with tab6:
+        app_ventas_stock()
 
 elif user_logged.upper() == "ADMIN_DATA":
     # Tabs
-    tab1, tab2, tab3, tab5, tab4 = st.tabs(["Ventas", "Cuota", "Productos", "Cuadro de avance", "Actualizar Datos"])
+    tab1, tab2, tab3, tab5, tab4, tab6 = st.tabs(["Ventas", "Cuota", "Productos", "Cuadro de avance", "Actualizar Datos","Ventas y Stock"])
     with tab1:
         ventas()
     with tab2:
@@ -134,6 +137,8 @@ elif user_logged.upper() == "ADMIN_DATA":
         control_gerencial()
     with tab4:
         update_data()
+    with tab6:
+        app_ventas_stock()
 
 else:
     ventas([user_logged.upper()])

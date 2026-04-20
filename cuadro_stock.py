@@ -47,12 +47,19 @@ def app_ventas_stock():
         preventa_dispro = df_p.groupby("Producto")["Un. Reserv."].sum().reset_index().rename(columns={"Producto": "PRODU.", "Un. Reserv.": "Preventa Dispro"})
 
         # 2. TANGO (CON TRY/EXCEPT)
+        # 2. TANGO (CON TRY/EXCEPT)
         try:
             df_t = pd.read_excel("data/TANGO.xlsx", sheet_name="Datos")
             tango_total = df_t.groupby("Cód. Artículo")["Cantidad"].sum().reset_index().rename(columns={"Cód. Artículo": "PRODU.", "Cantidad": "Venta Tango"})
+            
+            # Forzamos a que sea numérico por si el Excel lo leyó como texto
+            tango_total["PRODU."] = pd.to_numeric(tango_total["PRODU."], errors='coerce')
+            
         except Exception:
-            st.warning("Archivo TANGO.xlsx no disponible. Se asumen ventas 0.")
+            st.warning("Archivo TANGO.xlsx no disponible o error en formato. Se asumen ventas 0.")
+            # IMPORTANTE: Definimos el tipo de dato al crear el DF vacío
             tango_total = pd.DataFrame(columns=["PRODU.", "Venta Tango"])
+            tango_total["PRODU."] = tango_total["PRODU."].astype(float) # <--- ESTO arregla el error de merge
 
         # 3. CUOTAS Y SHOPIFY
         plan_farma = obtener_plan_df("data/Cuota_Productos.xlsx", "FARMA", anio_act, mes_act, "Plan Farma")

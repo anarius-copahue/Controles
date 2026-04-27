@@ -32,10 +32,10 @@ def decrypt_files():
         decrypt_file(tango_path, key.encode())
         
 a_representantes = [
-        'Zona Norte',
-        'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Litoral',
+        'Santiago Rocchi',
+        'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Agustin Fleba',
         'Yanina Cuezzo',  'Yamila Arreche', 'Emiliano Veiga',
-        'Jessica Andermarch', 'Vacante'
+        'Mendoza', 'Vacante'
     ]
 
 def get_last_scrape_time():

@@ -140,6 +140,10 @@ elif user_logged.upper() == "ADMIN_DATA":
     with tab6:
         app_ventas_stock()
 
+elif user_logged.upper() == "DISPROADMIN":
+    cuotas()
+    
+
 else:
     ventas([user_logged.upper()])
     cuotas([user_logged.upper()])

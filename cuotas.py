@@ -15,7 +15,6 @@ REPRESENTANTE_POR_USUARIO = {
     "YCUEZZO": ["Yanina Cuezzo"],
     "YARRECHE": ["Yamila Arreche"],
     "EVEIGA": ["Emiliano Veiga"],
-    "JANDERMARCH": ["Mendoza"],
     "NBRIDI":["Natalia Bridi"],
     
 }

@@ -325,5 +325,15 @@ def cuotas(representantes=[], usuario_id="default"):
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:
                     df_disp.to_excel(writer, index=False)
-                st.download_button(f"📥 Excel {r['Rep']}", output.getvalue(), f"{r['Rep']}.xlsx", key=f"d_{usuario_id}_{i}")
+
+                # 3. CRUCIAL: Movemos el puntero al principio del archivo en memoria
+                    output.seek(0)
+
+                # 4. Botón con KEY TRIPLE IMPACTO (Imposible que se duplique)
+                    st.download_button(
+                    label=f"📥 Excel {r['Rep']}",
+                    data=output.getvalue(),
+                    file_name=f"{r['Rep']}.xlsx",
+                    key=f"btn_dl_{usuario_id}_{r['Rep']}_{i}"  # Mezclamos ID, Nombre de Reporte e Índice
+)
             st.markdown("<hr style='margin:5px 0px'>", unsafe_allow_html=True)

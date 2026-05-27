@@ -215,31 +215,19 @@ def cuotas(representantes=[], usuario_id="default"):
             cols[9].markdown(f":{'green' if g26_total >= 0 else 'red'}[{int(g26_total)}%]")
 
             if st.session_state[key]:
-                df_disp = hojas_rep[r["Rep"]].copy().drop(columns=["Venta 2025 YTD"], errors="ignore")
-                df_disp["N° CLIENTE"] = pd.to_numeric(df_disp["N° CLIENTE"], errors='coerce').fillna(0).astype(int)
-                
-                                # =============================================
-                # DETALLE DEL REPRESENTANTE CON TOTALES
-                # =============================================
-
+                # 1. Copiamos y preparamos el DataFrame limpio para mostrar y descargar
                 df_disp = hojas_rep[r["Rep"]].copy()
-
-                df_disp["N° CLIENTE"] = pd.to_numeric(
-                    df_disp["N° CLIENTE"], errors="coerce"
-                ).fillna(0).astype(int)
+                df_disp["N° CLIENTE"] = pd.to_numeric(df_disp["N° CLIENTE"], errors="coerce").fillna(0).astype(int)
 
                 # Identificar filas TOTAL
                 df_disp["es_total"] = df_disp["N° CLIENTE"] == 0
                 indices_totales = df_disp.index[df_disp["es_total"]].tolist()
 
                 # ---------------------------------------------
-                # RECORRER CADA TOTAL
+                # RECORRER CADA TOTAL DEL REPRESENTANTE
                 # ---------------------------------------------
-
-                for i, idx_total in enumerate(indices_totales):
-
+                for idx_tot, idx_total in enumerate(indices_totales):
                     total_row = df_disp.loc[idx_total]
-
                     total_key = f"total_{usuario_id}_{r['Rep']}_{idx_total}"
 
                     if total_key not in st.session_state:
@@ -248,15 +236,14 @@ def cuotas(representantes=[], usuario_id="default"):
                     # MISMAS 10 COLUMNAS ORIGINALES
                     cols = st.columns([0.5, 1.5, 0.8, 0.8, 0.6, 0.8, 0.8, 0.6, 0.8, 0.6])
 
-                    # Botón expandir
+                    # Botón expandir totalizador
                     if cols[0].button(
                         "➕" if not st.session_state[total_key] else "➖",
-                        key=f"btn_{total_key}"
+                        key=f"btn_{total_key}_{idx_tot}"
                     ):
                         st.session_state[total_key] = not st.session_state[total_key]
 
                     # ===== FILA TOTAL =====
-
                     cuota = total_row.get("Cuota Caviahue", 0)
                     venta_mes = total_row.get("Venta Mes Actual", 0)
                     venta_24 = total_row.get("Venta 2024", 0)
@@ -278,62 +265,60 @@ def cuotas(representantes=[], usuario_id="default"):
                     cols[9].markdown(f":{'green' if g26 >= 0 else 'red'}[{int(g26)}%]")
 
                     # ---------------------------------------------
-                    # CLIENTES DE ESTE TOTAL
+                    # FILTRAR Y MOSTRAR CLIENTES DE ESTE TOTAL
                     # ---------------------------------------------
-
                     start = idx_total + 1
-
-                    if i + 1 < len(indices_totales):
-                        end = indices_totales[i + 1]
+                    if idx_tot + 1 < len(indices_totales):
+                        end = indices_totales[idx_tot + 1]
                     else:
                         end = df_disp.index.max() + 1
 
                     clientes_del_total = df_disp.loc[start:end-1]
                     clientes_del_total = clientes_del_total[clientes_del_total["N° CLIENTE"] != 0]
 
-                    # Mostrar clientes debajo si expandido
                     if st.session_state[total_key] and not clientes_del_total.empty:
-
                         for _, row_cli in clientes_del_total.iterrows():
+                            c_cuota = row_cli.get("Cuota Caviahue", 0)
+                            c_venta_mes = row_cli.get("Venta Mes Actual", 0)
+                            c_venta_24 = row_cli.get("Venta 2024", 0)
+                            c_venta_25 = row_cli.get("Venta 2025", 0)
+                            c_acum = row_cli.get("Acumulado año", 0)
+                            c_g26 = row_cli.get("growth 2026", 0)
 
-                            cuota = row_cli.get("Cuota Caviahue", 0)
-                            venta_mes = row_cli.get("Venta Mes Actual", 0)
-                            venta_24 = row_cli.get("Venta 2024", 0)
-                            venta_25 = row_cli.get("Venta 2025", 0)
-                            acum = row_cli.get("Acumulado año", 0)
-                            g26 = row_cli.get("growth 2026", 0)
-
-                            avance = (venta_mes / cuota * 100) if cuota > 0 else 0
-                            g25 = ((venta_25 / venta_24) - 1) * 100 if venta_24 > 0 else 0
+                            c_avance = (c_venta_mes / c_cuota * 100) if c_cuota > 0 else 0
+                            c_g25 = ((c_venta_25 / c_venta_24) - 1) * 100 if c_venta_24 > 0 else 0
 
                             cols_cli = st.columns([0.5, 1.5, 0.8, 0.8, 0.6, 0.8, 0.8, 0.6, 0.8, 0.6])
-
                             cols_cli[0].write("")
-                            cols_cli[1].write("  " + row_cli["CLIENTE"])  # indentación visual
-                            cols_cli[2].write(f"{int(cuota):,}".replace(",", "."))
-                            cols_cli[3].write(f"{int(venta_mes):,}".replace(",", "."))
-                            cols_cli[4].write(f"{int(avance)}%")
-                            cols_cli[5].write(f"{int(venta_24):,}".replace(",", "."))
-                            cols_cli[6].write(f"{int(venta_25):,}".replace(",", "."))
-                            cols_cli[7].markdown(
-                                f":{'green' if g25 >= 0 else 'red'}[{int(g25)}%]"
-                            )
-                            cols_cli[8].write(f"{int(acum):,}".replace(",", "."))
-                            cols_cli[9].markdown(
-                                f":{'green' if g26 >= 0 else 'red'}[{int(g26)}%]"
-                            )
+                            cols_cli[1].write("  " + str(row_cli["CLIENTE"]))  # Indentación visual
+                            cols_cli[2].write(f"{int(c_cuota):,}".replace(",", "."))
+                            cols_cli[3].write(f"{int(c_venta_mes):,}".replace(",", "."))
+                            cols_cli[4].write(f"{int(c_avance)}%")
+                            cols_cli[5].write(f"{int(c_venta_24):,}".replace(",", "."))
+                            cols_cli[6].write(f"{int(c_venta_25):,}".replace(",", "."))
+                            cols_cli[7].markdown(f":{'green' if c_g25 >= 0 else 'red'}[{int(c_g25)}%]")
+                            cols_cli[8].write(f"{int(c_acum):,}".replace(",", "."))
+                            cols_cli[9].markdown(f":{'green' if c_g26 >= 0 else 'red'}[{int(c_g26)}%]")
+
+                # =============================================
+                # BOTÓN DE DESCARGA (Fuera del bucle de subtotales)
+                # =============================================
+                st.write("")  # Espacio estético antes del botón
                 output = io.BytesIO()
+                
+                # Eliminamos columnas auxiliares antes de mandar al Excel del usuario
+                df_excel = df_disp.drop(columns=["es_total"], errors="ignore")
+                
                 with pd.ExcelWriter(output, engine="openpyxl") as writer:
-                    df_disp.to_excel(writer, index=False)
+                    df_excel.to_excel(writer, index=False)
+                
+                output.seek(0)  # Forzar lectura desde el byte cero
+                
+                st.download_button(
+                    label=f"📥 Descargar Excel {r['Rep']}", 
+                    data=output.getvalue(), 
+                    file_name=f"Avance_Caviahue_{r['Rep']}.xlsx", 
+                    key=f"dl_final_{usuario_id}_{r['Rep']}_{i}"  # Key ultra específica combinada
+                )
 
-                # 3. CRUCIAL: Movemos el puntero al principio del archivo en memoria
-                    output.seek(0)
-
-                # 4. Botón con KEY TRIPLE IMPACTO (Imposible que se duplique)
-                    st.download_button(
-                    label=f"📥 Excel {r['Rep']}",
-                    data=output.getvalue(),
-                    file_name=f"{r['Rep']}.xlsx",
-                    key=f"btn_dl_{usuario_id}_{r['Rep']}_{i}"  # Mezclamos ID, Nombre de Reporte e Índice
-)
             st.markdown("<hr style='margin:5px 0px'>", unsafe_allow_html=True)

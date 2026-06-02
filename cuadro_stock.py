@@ -34,10 +34,15 @@ def app_ventas_stock():
     mes_act, anio_act = ahora.month, 2026 
 
     try:
-        # 1. CARGA DISPRO
+        # 1. CARGA DISPRO (Modificado para incluir la columna "Otros (34, 35, 39)")
         df_s_dispro = pd.read_csv("descargas/stock_por_productos.csv", sep="|", decimal=",", encoding="latin1")
-        stock_dispro = df_s_dispro[["Cod", "Descripcion", "Disp (31)"]].rename(
-            columns={"Cod": "PRODU.", "Descripcion": "Producto", "Disp (31)": "Stock Dispro"}
+        stock_dispro = df_s_dispro[["Cod", "Descripcion", "Disp (31)", "Otros (34, 35, 39)"]].rename(
+            columns={
+                "Cod": "PRODU.", 
+                "Descripcion": "Producto", 
+                "Disp (31)": "Stock Dispro",
+                "Otros (34, 35, 39)": "En reserva"  # <-- Nuevo nombre asignado
+            }
         )
 
         df_v = pd.read_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", sep="|", decimal=",", encoding="latin1")
@@ -46,7 +51,6 @@ def app_ventas_stock():
         df_p = pd.read_csv("descargas/preventa_por_producto.csv", sep="|", decimal=",", encoding="latin1")
         preventa_dispro = df_p.groupby("Producto")["Un. Reserv."].sum().reset_index().rename(columns={"Producto": "PRODU.", "Un. Reserv.": "Preventa Dispro"})
 
-        # 2. TANGO (CON TRY/EXCEPT)
         # 2. TANGO (CON TRY/EXCEPT)
         try:
             df_t = pd.read_excel("data/TANGO.xlsx", sheet_name="Datos")
@@ -57,9 +61,8 @@ def app_ventas_stock():
             
         except Exception:
             st.warning("Archivo TANGO.xlsx no disponible o error en formato. Se asumen ventas 0.")
-            # IMPORTANTE: Definimos el tipo de dato al crear el DF vacío
             tango_total = pd.DataFrame(columns=["PRODU.", "Venta Tango"])
-            tango_total["PRODU."] = tango_total["PRODU."].astype(float) # <--- ESTO arregla el error de merge
+            tango_total["PRODU"] = tango_total["PRODU."].astype(float)
 
         # 3. CUOTAS Y SHOPIFY
         plan_farma = obtener_plan_df("data/Cuota_Productos.xlsx", "FARMA", anio_act, mes_act, "Plan Farma")
@@ -94,12 +97,11 @@ def app_ventas_stock():
     df_final["Stock total"] = df_final["Stock Dispro"] + df_final["Stock Shopify"]
     df_final = df_final.sort_values("Plan Farma", ascending=False)
 
-    #ordenar las columnas de df_final
+    # Ordenar las columnas de df_final (Modificado: "En reserva" agregado después de "Stock Dispro")
     df_final = df_final[["PRODU.", "Producto", "Venta Dispro", "Preventa Dispro", "Venta Tango", 
-                         "Total Farma", "Stock Dispro", "Plan Farma", 
-                         "Venta Shopify", "Stock Shopify", "Plan Shopify","Venta total", "Stock total", "Dif_Quiebre_Farma",
-                           "Dif_Quiebre_Shopify"
-                         ]]
+                         "Total Farma", "Stock Dispro", "En reserva", "Plan Farma", 
+                         "Venta Shopify", "Stock Shopify", "Plan Shopify", "Venta total", "Stock total", 
+                         "Dif_Quiebre_Farma", "Dif_Quiebre_Shopify"]]
 
     # --- ALERTAS FARMA (ARRIBA) ---
     productos_alerta = df_final[df_final["Dif_Quiebre_Farma"] > 10].sort_values("Plan Farma", ascending=False)
@@ -133,6 +135,7 @@ def app_ventas_stock():
         return estilos
 
     # --- TABLA FINAL ---
+    # Modificado: Se agrega "En reserva" al column_order de la visualización
     st.dataframe(
         df_final.style.format(precision=0, thousands=".")
         .apply(aplicar_estilos, axis=1),
@@ -141,7 +144,7 @@ def app_ventas_stock():
         hide_index=True,
         column_order=[
             "PRODU.", "Producto", "Venta Dispro", "Preventa Dispro", "Venta Tango", 
-            "Total Farma", "Stock Dispro", "Plan Farma", 
+            "Total Farma", "Stock Dispro", "En reserva", "Plan Farma", 
             "Venta Shopify", "Stock Shopify", "Plan Shopify"
         ]
     )

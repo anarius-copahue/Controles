@@ -7,14 +7,17 @@ import kits_config as KITS_ESTRUCTURA
 
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
 REPRESENTANTE_POR_USUARIO = {
-    "OTROS" : [ "Mendoza","Mar del Plata","Gerencia" ],
-    "AFLEBA": ["Agustin Fleba"],
-    "SROCCHI": ["Santiago Rocchi"],
-    "PZACCA": ["Patricia Zacca"],
     "MROSSELOT": ["Marcela Rosselot"],
-    "YCUEZZO": ["Yanina Cuezzo"],
+    "PZACCA": ["Patricia Zacca"],
+    
     "YARRECHE": ["Yamila Arreche"],
+    "AFLEBA": ["Agustin Fleba"],
+    "YCUEZZO": ["Yanina Cuezzo"],
+    "SROCCHI": ["Santiago Rocchi"],
+    
+    
     "NBRIDI":["Natalia Bridi"],
+    "OTROS" : [ "Gerencia","Mendoza","Mar del Plata" ],
     
 }
 

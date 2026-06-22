@@ -34,8 +34,8 @@ def decrypt_files():
 a_representantes = [
         'Santiago Rocchi',
         'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Agustin Fleba',
-        'Yanina Cuezzo',  'Yamila Arreche', 'Emiliano Veiga',
-        'Mendoza', 'Vacante'
+        'Yanina Cuezzo',  'Yamila Arreche', 'Mar del Plata',
+        'Mendoza'
     ]
 
 def get_last_scrape_time():

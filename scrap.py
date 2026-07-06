@@ -28,24 +28,26 @@ STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV
 def setup_driver():
     options = Options()
     
-    # Configuraciones para la Nube (Linux)
+    # Configuraciones críticas para la Nube (Linux)
     if st.secrets["LOCAL"] == "FALSE":
         options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         
-        # ⚠️ Buscamos dinámicamente si existe en /usr/bin o en /usr/bin/chromium-browser
-        if os.path.exists("/usr/bin/chromium"):
-            options.binary_location = "/usr/bin/chromium"
-        elif os.path.exists("/usr/bin/chromium-browser"):
-            options.binary_location = "/usr/bin/chromium-browser"
-            
+        # 📌 Apuntamos EXACTAMENTE al binario de Chromium en Streamlit Cloud
+        options.binary_location = "/usr/bin/chromium-browser"
+        
+        # 📌 Apuntamos EXACTAMENTE al Driver de Chromium en Streamlit Cloud
+        service = Service("/usr/bin/chromedriver")
+        driver = webdriver.Chrome(service=service, options=options)
+        
     else:
-        # Configuración para tu Windows Local
+        # Configuración para tu Windows Local (Sin tocar nada que te funcione)
         options.add_argument("--headless=new") 
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
+        driver = webdriver.Chrome(options=options)
 
     # Asegurar directorio de descargas
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -56,13 +58,6 @@ def setup_driver():
         "directory_upgrade": True,
         "safebrowsing.enabled": True
     })
-
-    if st.secrets["LOCAL"] == "FALSE":
-        # REGLA DE ORO: Si 'packages.txt' instaló bien el driver, 
-        # omitir el argumento Service() hace que Selenium lo busque solo en el PATH de Linux.
-        driver = webdriver.Chrome(options=options)
-    else:
-        driver = webdriver.Chrome(options=options)
     
     return driver
 

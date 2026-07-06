@@ -34,7 +34,7 @@ def setup_driver():
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
 
-    # 2. Asegurar directorio y configurar preferencias de descarga (SIEMPRE ANTES DEL DRIVER)
+    # 2. Asegurar directorio y configurar preferencias de descarga
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
     options.add_experimental_option("prefs", {
         "download.default_directory": DOWNLOAD_DIR,
@@ -45,14 +45,15 @@ def setup_driver():
     
     # 3. Configuraciones específicas de rutas según el entorno
     if st.secrets["LOCAL"] == "FALSE":
-        # Apuntamos al binario de Chromium en Streamlit Cloud
-        options.binary_location = "/usr/bin/chromium-browser"
-        service = Service("/usr/bin/chromedriver")
+        # Con el paquete 'chromium', el binario se instala aquí:
+        options.binary_location = "/usr/bin/chromium"
         
-        # Inicializamos el driver con TODO ya cargado en las options
+        # Con el paquete 'chromium-driver', el driver se instala aquí:
+        service = Service("/usr/bin/chromium-driver")
+        
         driver = webdriver.Chrome(service=service, options=options)
     else:
-        # Configuración para tu Windows Local usando el autodiscovery moderno de Selenium 4
+        # Configuración para tu Windows Local
         driver = webdriver.Chrome(options=options)
     
     return driver

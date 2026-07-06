@@ -45,11 +45,17 @@ def setup_driver():
     
     # 3. Configuraciones específicas de rutas según el entorno
     if st.secrets["LOCAL"] == "FALSE":
-        # Con el paquete 'chromium', el binario se instala aquí:
+        # Apuntamos al binario de Chromium estándar
         options.binary_location = "/usr/bin/chromium"
         
-        # Con el paquete 'chromium-driver', el driver se instala aquí:
-        service = Service("/usr/bin/chromium-driver")
+        # Probamos la ruta global estándar de Debian para el driver
+        if os.path.exists("/usr/bin/chromedriver"):
+            service = Service("/usr/bin/chromedriver")
+        elif os.path.exists("/usr/bin/chromium-driver"):
+            service = Service("/usr/bin/chromium-driver")
+        else:
+            # Si no está en ninguna, dejamos que Selenium lo busque solo en el PATH del sistema
+            service = Service()
         
         driver = webdriver.Chrome(service=service, options=options)
     else:

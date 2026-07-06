@@ -2,56 +2,60 @@ name: Ejecutar Scraping y Encriptación Diaria
 
 on:
   schedule:
-    # Se ejecuta todos los días a las 05:00 UTC (02:00 AM de Argentina)
-    - cron: '0 5 * * *'
-  workflow_dispatch: # Permite ejecutar el proceso manualmente desde la web de GitHub
+    # ⏱️ Truco Cron para simular intervalos de 3 horas y media de forma alternada:
+    # Bloque 1: Horas pares (:00, 7:00, 14:00, 21:00 UTC)
+    - cron: '0 0,7,14,21 * * *'
+    # Bloque 2: Horas impares desfasadas 3.5 horas (:30, 10:30, 17:30 UTC)
+    - cron: '30 3,10,17 * * *'
+  workflow_dispatch: # Permite seguir ejecutando el proceso a mano con el botón
 
 jobs:
   build-and-run:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Copiar el código del repositorio en el servidor de GitHub
+    # 1. Copiar el código del repositorio en el servidor limpio de GitHub
     - name: Checkout del repositorio
       uses: actions/checkout@v4
 
-    # 2. Configurar Python en su versión estable
+    # 2. Configurar el entorno virtual de Python
     - name: Configurar Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
-    # 3. Instalar Google Chrome (necesario para Selenium Headless)
+    # 3. Instalar Google Chrome (Indispensable para Selenium en modo Headless)
     - name: Instalar Google Chrome
       run: |
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable
 
-    # 4. Instalar las librerías del proyecto
+    # 4. Instalar todas las librerías necesarias
     - name: Instalar dependencias
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # 5. Ejecutar el scraper pasándole las credenciales y la clave de cifrado
+    # 5. Ejecutar el scraper inyectando secretos del sistema (el bloque try/except de Python los tomará acá)
     - name: Ejecutar Scraper y Cifrado
       env:
         DISPRO_USER: ${{ secrets.DISPRO_USER }}
         DISPRO_PASSWORD: ${{ secrets.DISPRO_PASSWORD }}
         CAVIAHUE_SHOP_DOMAIN: ${{ secrets.CAVIAHUE_SHOP_DOMAIN }}
         CAVIAHUE_SHOP_TOKEN: ${{ secrets.CAVIAHUE_SHOP_TOKEN }}
-        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }} # 🔒 Inyección de la clave secreta
+        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+        GITHUB_ACTIONS: "true" # Flag para avisarle al setup_driver() que configure Linux correctamente
       run: python scraper.py
 
-    # 6. Guardar de forma segura los archivos encriptados y el log en tu repositorio
+    # 6. Sincronizar el repositorio guardando solo los reportes cifrados y la marca de tiempo
     - name: Subir cambios cifrados al repositorio
       run: |
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        # Agregamos solo los encriptados y el archivo de estado
+        # Agregamos los reportes .encrypted y el tracking horario
         git add descargas/*.encrypted last_scrape.txt
         
-        # Confirmamos cambios solo si el scraper generó datos nuevos
+        # Sube los cambios solo si hubo modificaciones reales en las descargas
         git diff-index --quiet HEAD || git commit -m "Actualización cifrada automática de reportes comerciales"
         git push

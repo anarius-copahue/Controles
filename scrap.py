@@ -29,17 +29,22 @@ def setup_driver():
     options = Options()
     
     if st.secrets["LOCAL"] == "FALSE":
+        if st.secrets["LOCAL"] == "FALSE":
+        # 1. Modo headless moderno
         options.add_argument("--headless=new")
+        
+        # 2. Desactivar por completo los mecanismos de Sandbox y Forking de Linux
         options.add_argument("--no-sandbox")
+        options.add_argument("--disable-setuid-sandbox")
+        options.add_argument("--disable-zygote") # 🌟 NUEVO: Evita que Chrome intente clonar procesos base
+        
+        # 3. Optimización de memoria y rendimiento en la nube
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
+        options.add_argument("--no-proxy-server")
+        options.add_argument("--disable-extensions")
         options.add_argument("--window-size=1920,1080")
         
-        # 🌟 LAS DOS LÍNEAS CLAVE PARA EVITAR EL TIMEOUT DE RED:
-        options.add_argument("--no-proxy-server")   # Desactiva la resolución de proxy (evita el cuelgue del V8)
-        options.add_argument("--disable-extensions") # Evita cargar extensiones que consuman hilos de fondo
-        
-        # Apuntar explícitamente al navegador instalado por packages.txt en Linux
         options.binary_location = "/usr/bin/chromium"
 
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)

@@ -1,8 +1,11 @@
 pandas
 streamlit
-selenium>=4.20.0
 cryptography
 numpy
+streamlit
+seleniumbase
+webdriver-manager
 openpyxl
 xlrd
 altair==4.2.2
+

@@ -25,17 +25,20 @@ VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Con
 PREVENTA_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorProducto.aspx"
 STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV2.aspx"
 
-def setup_driver():
-    options = Options()
-    
     if st.secrets["LOCAL"] == "FALSE":
-        options.add_argument("--headless")
+        # Volvemos al headless moderno porque el viejo ya está discontinuado en la v150
+        options.add_argument("--headless=new") 
+        
+        # Parches de seguridad obligatorios para Linux/Docker
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
         options.add_argument("--disable-zygote")
         
-        options.add_argument("--disable-gpu-sandbox") # Desactiva el sandbox solo para el proceso gráfico
+        # 🌟 LOS DOS ARGUMENTOS QUE ARREGLAN LA VERSIÓN 150:
+        options.add_argument("--disable-gpu-compositing")     # Prohíbe al proceso GPU intentar componer la página
+        options.add_argument("--disable-software-rasterizer")  # Desactiva el renderizado gráfico secundario por software
         
+        # Optimización de entorno y memoria
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-proxy-server")

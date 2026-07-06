@@ -70,19 +70,22 @@ def setup_driver():
 
 def login_to_dispro(driver):
     driver.get(LOGIN_URL)
-    # Subimos el tiempo de espera a 25 segundos por si el servidor de Dispro está lento
+    # Le damos un margen amplio de 25 segundos por si el servidor de Dispro está lento
     driver.wait = WebDriverWait(driver, 25) 
     
-    # Completar usuario y contraseña
+    # Completar usuario y contraseña de forma segura
     driver.wait.until(EC.presence_of_element_located((By.ID, "txtLogin"))).send_keys(USER)
     driver.wait.until(EC.presence_of_element_located((By.ID, "txtPassword"))).send_keys(PASSWORD)
     
-    # Forzar el clic mediante JavaScript para asegurar que impacte en el servidor
+    # Aseguramos el clic usando JavaScript para evitar bloqueos de renderizado
     boton_login = driver.find_element(By.XPATH, '//*[@id="formLogin"]/button')
     driver.execute_script("arguments[0].click();", boton_login)
     
-    print("Clic de login enviado, esperando redirección...")
-    time.sleep(3) # Le damos un pequeño respiro físico a la carga
+    # 🚀 REEMPLAZO CRÍTICO: Quitamos el 'url_changes' que tiraba Timeout.
+    # En su lugar, le damos 4 segundos físicos para que el servidor procese el login 
+    # y guarde la cookie de sesión en el navegador antes de saltar a los reportes.
+    print("Clic de login enviado con éxito. Esperando procesamiento de sesión...")
+    time.sleep(4)
 
 def download_preventa_report(driver):
     nombre_csv = "preventa_por_cliente.csv"

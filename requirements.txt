@@ -8,6 +8,4 @@ webdriver-manager
 openpyxl
 xlrd
 altair==4.2.2
-chromium
-chromium-driver
 

@@ -28,36 +28,32 @@ STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV
 def setup_driver():
     options = Options()
     
-    # Configuraciones críticas para la Nube (Linux)
-    if st.secrets["LOCAL"] == "FALSE":
-        options.add_argument("--headless=new")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-        
-        # 📌 Apuntamos EXACTAMENTE al binario de Chromium en Streamlit Cloud
-        options.binary_location = "/usr/bin/chromium-browser"
-        
-        # 📌 Apuntamos EXACTAMENTE al Driver de Chromium en Streamlit Cloud
-        service = Service("/usr/bin/chromedriver")
-        driver = webdriver.Chrome(service=service, options=options)
-        
-    else:
-        # Configuración para tu Windows Local (Sin tocar nada que te funcione)
-        options.add_argument("--headless=new") 
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        driver = webdriver.Chrome(options=options)
+    # 1. Configuraciones comunes de Headless y entorno
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
 
-    # Asegurar directorio de descargas
+    # 2. Asegurar directorio y configurar preferencias de descarga (SIEMPRE ANTES DEL DRIVER)
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-
     options.add_experimental_option("prefs", {
         "download.default_directory": DOWNLOAD_DIR,
         "download.prompt_for_download": False,
         "directory_upgrade": True,
         "safebrowsing.enabled": True
     })
+    
+    # 3. Configuraciones específicas de rutas según el entorno
+    if st.secrets["LOCAL"] == "FALSE":
+        # Apuntamos al binario de Chromium en Streamlit Cloud
+        options.binary_location = "/usr/bin/chromium-browser"
+        service = Service("/usr/bin/chromedriver")
+        
+        # Inicializamos el driver con TODO ya cargado en las options
+        driver = webdriver.Chrome(service=service, options=options)
+    else:
+        # Configuración para tu Windows Local usando el autodiscovery moderno de Selenium 4
+        driver = webdriver.Chrome(options=options)
     
     return driver
 

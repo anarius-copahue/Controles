@@ -25,70 +25,11 @@ VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Con
 PREVENTA_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorProducto.aspx"
 STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV2.aspx"
 
-import os
-import shutil
-import subprocess
-import streamlit as st
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
-
 def setup_driver():
-
-    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-
-    # -------------------------
-    # Diagnóstico
-    # -------------------------
-
-    st.write("## Diagnóstico Chrome")
-
-    for exe in [
-        "chromium",
-        "chromedriver",
-        "/usr/bin/chromium",
-        "/usr/bin/chromedriver",
-    ]:
-
-        if exe.startswith("/"):
-            exists = os.path.exists(exe)
-            st.write(f"{exe}: {exists}")
-
-            if exists:
-                try:
-                    r = subprocess.run(
-                        [exe, "--version"],
-                        capture_output=True,
-                        text=True,
-                    )
-                    st.write(r.stdout)
-                    st.write(r.stderr)
-                except Exception as e:
-                    st.write(e)
-
-        else:
-
-            path = shutil.which(exe)
-
-            st.write(f"{exe}: {path}")
-
-            if path:
-                try:
-                    r = subprocess.run(
-                        [path, "--version"],
-                        capture_output=True,
-                        text=True,
-                    )
-                    st.write(r.stdout)
-                    st.write(r.stderr)
-                except Exception as e:
-                    st.write(e)
-
-    # -------------------------
-    # Chrome Options
-    # -------------------------
 
     options = Options()
 
@@ -97,59 +38,15 @@ def setup_driver():
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-software-rasterizer")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--disable-setuid-sandbox")
-    options.add_argument("--disable-background-networking")
-    options.add_argument("--disable-sync")
-    options.add_argument("--disable-default-apps")
-    options.add_argument("--disable-popup-blocking")
-    options.add_argument("--disable-features=VizDisplayCompositor")
-    options.add_argument("--remote-debugging-port=9222")
-    options.add_argument("--window-size=1920,1080")
 
-    prefs = {
-        "download.default_directory": DOWNLOAD_DIR,
-        "download.prompt_for_download": False,
-        "download.directory_upgrade": True,
-        "safebrowsing.enabled": True,
-    }
+    service = Service("/usr/bin/chromedriver")
 
-    options.add_experimental_option("prefs", prefs)
+    driver = webdriver.Chrome(
+        service=service,
+        options=options
+    )
 
-    # -------------------------
-    # Crear Driver
-    # -------------------------
-
-    try:
-
-        service = Service(
-            executable_path="/usr/bin/chromedriver",
-            log_output="chromedriver.log"
-        )
-
-        driver = webdriver.Chrome(
-            service=service,
-            options=options,
-        )
-
-        st.success("Chrome iniciado correctamente")
-
-        return driver
-
-    except Exception as e:
-
-        st.error(e)
-
-        if os.path.exists("chromedriver.log"):
-
-            st.write("## ChromeDriver log")
-
-            with open("chromedriver.log", "r") as f:
-                st.code(f.read())
-
-        raise
+    return driver
 
 def login_to_dispro(driver):
     driver.get(LOGIN_URL)

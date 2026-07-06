@@ -25,6 +25,9 @@ VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Con
 PREVENTA_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorProducto.aspx"
 STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV2.aspx"
 
+def setup_driver():
+    options = Options()
+    
     if st.secrets["LOCAL"] == "FALSE":
         # Volvemos al headless moderno porque el viejo ya está discontinuado en la v150
         options.add_argument("--headless=new") 

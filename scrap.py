@@ -29,18 +29,15 @@ def setup_driver():
     options = Options()
     
     if st.secrets["LOCAL"] == "FALSE":
-        # Usar la nueva sintaxis para headless (más estable en versiones recientes)
         options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1920,1080")
-
-        options.add_argument("--disable-setuid-sandbox") # Deshabilita el sandbox secundario de Linux
-        options.add_argument("--remote-debugging-pipe")  # Recomendado por tu propio log para mejorar la comunicación
-
-        options.add_argument("--disable-software-rasterizer") # Evita que intente renderizar gráficos por software
-        options.add_argument("--single-process") # Fuerza a Chrome a correr en un solo hilo (evita bloqueos en contenedores)
+        
+        # 🌟 LAS DOS LÍNEAS CLAVE PARA EVITAR EL TIMEOUT DE RED:
+        options.add_argument("--no-proxy-server")   # Desactiva la resolución de proxy (evita el cuelgue del V8)
+        options.add_argument("--disable-extensions") # Evita cargar extensiones que consuman hilos de fondo
         
         # Apuntar explícitamente al navegador instalado por packages.txt en Linux
         options.binary_location = "/usr/bin/chromium"

@@ -29,7 +29,7 @@ def setup_driver():
     options = Options()
     
     if st.secrets["LOCAL"] == "FALSE":
-        options.add_argument("--headless=new")
+        options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
         options.add_argument("--disable-zygote")

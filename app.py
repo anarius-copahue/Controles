@@ -62,11 +62,33 @@ def get_last_scrape_time():
                 return None
     return None
 
-last_scrape = get_last_scrape_time()
-if last_scrape:
-    st.sidebar.success(f"📊 Datos actualizados el: {last_scrape.strftime('%d/%m/%Y %H:%M')}")
-else:
-    st.sidebar.warning("⚠️ Esperando actualización automática de datos.")
+def set_last_scrape_time(ts):
+    with open("last_scrape.txt", "w") as f:
+        f.write(ts.isoformat())
+
+def run_scraping_if_needed():
+    now = datetime.now()
+    last_scrape = get_last_scrape_time()
+
+    if (last_scrape is None) or (now - last_scrape > timedelta(hours=1)):
+        scraped_correctly = False
+        with st.spinner("Ejecutando scraping..."):
+            #Shopify api
+            try:
+                scrape_data()  # Ejecuta tu función de scraping
+                ventas_cav_shopify = scrap_shopify(st.secrets["CAVIAHUE_SHOP_DOMAIN"],st.secrets["CAVIAHUE_SHOP_TOKEN"])
+                ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
+                scraped_correctly = True
+            except Exception as e:
+                st.error("Error en el scraping, estamos trabajando para solucionarlo. Por favor, intentá nuevamente más tarde.")
+                scraped_correctly = False
+        if not scraped_correctly:
+            st.stop()
+        set_last_scrape_time(now)
+        
+    else:
+        tiempo_restante = timedelta(hours=1) - (now - last_scrape)
+        st.info(f"Último scraping fue hace menos de 1 hora. Próximo en {tiempo_restante}.")
 
 # Desencriptar TODOS los archivos al iniciar la aplicación (Bases + Reportes)
 decrypt_files()

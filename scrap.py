@@ -25,47 +25,28 @@ VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Con
 PREVENTA_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorProducto.aspx"
 STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV2.aspx"
 
-import shutil
-import subprocess
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 def setup_driver():
 
-    st.write("### Diagnóstico")
+    options = Options()
 
-    for exe in [
-        "chromium",
-        "chromium-browser",
-        "google-chrome",
-        "google-chrome-stable",
-    ]:
-        path = shutil.which(exe)
-        st.write(exe, "->", path)
-
-        if path:
-            try:
-                r = subprocess.run(
-                    [path, "--version"],
-                    capture_output=True,
-                    text=True,
-                )
-                st.write(r.stdout)
-                st.write(r.stderr)
-            except Exception as e:
-                st.write(e)
-
-    options = webdriver.ChromeOptions()
+    options.binary_location = "/usr/bin/chromium"
 
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
+    options.add_argument("--disable-software-rasterizer")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-setuid-sandbox")
+    options.add_argument("--disable-background-networking")
+    options.add_argument("--disable-features=VizDisplayCompositor")
     options.add_argument("--remote-debugging-port=9222")
     options.add_argument("--window-size=1920,1080")
 
-    driver = webdriver.Chrome(options=options)
-
-    return driver
+    return webdriver.Chrome(options=options)
 
 def login_to_dispro(driver):
     driver.get(LOGIN_URL)

@@ -58,7 +58,7 @@ def setup_driver():
         from selenium.webdriver.chrome.service import Service
         
         # El path típico donde packages.txt instala el driver en Streamlit Cloud
-        service = Service("/usr/bin/chromedriver")
+        service = Service("/usr/bin/chromedriver", log_output="chromedriver.log")
         driver = webdriver.Chrome(service=service, options=options)
         
         # NOTA: Si esto falla, puedes volver a tu bloque original de webdriver_manager aquí adentro, 

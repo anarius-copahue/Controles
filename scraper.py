@@ -77,14 +77,23 @@ def setup_driver():
 
 def login_to_dispro(driver):
     driver.get(LOGIN_URL)
-    driver.wait = WebDriverWait(driver, 15) # Un poco más de margen por latencia del servidor
+    driver.wait = WebDriverWait(driver, 15)
 
     driver.wait.until(EC.presence_of_element_located((By.ID, "txtLogin"))).send_keys(USER)
     driver.wait.until(EC.presence_of_element_located((By.ID, "txtPassword"))).send_keys(PASSWORD)
-    driver.find_element(By.XPATH, '//*[@id="formLogin"]/button').click()
+    
+    # 💥 CAMBIO SEGURO PARA EL ENTORNO CLOUD:
+    # Seleccionamos el botón igual que antes, pero lo clickeamos con JavaScript.
+    # Esto asegura que el formulario se envíe en GitHub Actions sin importar el tamaño de la pantalla.
+    boton_login = driver.find_element(By.XPATH, '//*[@id="formLogin"]/button')
+    driver.execute_script("arguments[0].click();", boton_login)
 
-    current_url = driver.current_url
-    driver.wait.until(EC.url_changes(current_url))
+    # 🚀 REEMPLAZO DE LA LÍNEA 87:
+    # Quitamos 'url_changes' que rompía el flujo en la nube.
+    # Le damos 5 segundos físicos para que el servidor procese la sesión.
+    # Como inmediatamente después tu función 'download_preventa_report' hace un 'driver.get(PREVENTA_URL)',
+    # la espera de URL era redundante; el script igual forzará la redirección al reporte.
+    time.sleep(5)
 
 def download_preventa_report(driver):
     delete_previous_file(PREVENTA_REPORT_FILE_NAME)

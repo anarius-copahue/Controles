@@ -28,22 +28,28 @@ STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV
 def setup_driver():
     options = Options()
     
-    # 1. Configuraciones críticas para evitar que Chrome se caiga en Linux/Nube
+    # Configuraciones para la Nube (Linux)
     if st.secrets["LOCAL"] == "FALSE":
-        options.add_argument("--headless=new")  # El modo headless moderno
+        options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
+        
+        # ⚠️ Buscamos dinámicamente si existe en /usr/bin o en /usr/bin/chromium-browser
+        if os.path.exists("/usr/bin/chromium"):
+            options.binary_location = "/usr/bin/chromium"
+        elif os.path.exists("/usr/bin/chromium-browser"):
+            options.binary_location = "/usr/bin/chromium-browser"
+            
     else:
-        # Si en local quieres ver qué hace el navegador, comenta la línea de abajo
+        # Configuración para tu Windows Local
         options.add_argument("--headless=new") 
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
 
-    # Asegurar que el directorio de descargas exista
+    # Asegurar directorio de descargas
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-    # 2. Configurar las preferencias de descarga automática
     options.add_experimental_option("prefs", {
         "download.default_directory": DOWNLOAD_DIR,
         "download.prompt_for_download": False,
@@ -51,14 +57,11 @@ def setup_driver():
         "safebrowsing.enabled": True
     })
 
-    # 3. Inicialización inteligente según el entorno
     if st.secrets["LOCAL"] == "FALSE":
-        # En la nube (Linux), usamos Chromium instalado mediante packages.txt
-        options.binary_location = "/usr/bin/chromium"
-        service = Service("/usr/bin/chromedriver")
-        driver = webdriver.Chrome(service=service, options=options)
+        # REGLA DE ORO: Si 'packages.txt' instaló bien el driver, 
+        # omitir el argumento Service() hace que Selenium lo busque solo en el PATH de Linux.
+        driver = webdriver.Chrome(options=options)
     else:
-        # En tu Windows local, Selenium gestiona automáticamente el Driver moderno
         driver = webdriver.Chrome(options=options)
     
     return driver

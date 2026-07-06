@@ -33,8 +33,11 @@ def setup_driver():
         options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu") # Evita errores en servidores sin interfaz gráfica
-        options.add_argument("--window-size=1920,1080") # Define un tamaño para evitar que elementos no sean clickeables
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920,1080")
+
+        options.add_argument("--disable-setuid-sandbox") # Deshabilita el sandbox secundario de Linux
+        options.add_argument("--remote-debugging-pipe")  # Recomendado por tu propio log para mejorar la comunicación
         
         # Apuntar explícitamente al navegador instalado por packages.txt en Linux
         options.binary_location = "/usr/bin/chromium"

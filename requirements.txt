@@ -3,7 +3,7 @@ streamlit
 cryptography
 numpy
 streamlit
-seleniumbase==4.40.0
+seleniumbase
 webdriver-manager
 openpyxl
 xlrd

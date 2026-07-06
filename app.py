@@ -17,17 +17,33 @@ with cols[7]:
     st.image("logo.png")
 
 def decrypt_files():
-    ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/db_SELL_IN_OUT.xlsx.encrypted",
-                "data/Historico.xlsx.encrypted","data/Cuota_Productos.xlsx.encrypted", "data/Historico_Productos.xlsx.encrypted"]
     key = st.secrets["ENCRYPTION_KEY"]
-
-    for archivo in ARCHIVOS:
+    
+    # 1. Desencriptar bases de datos fijas de la carpeta data/
+    ARCHIVOS_DATA = [
+        "data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/db_SELL_IN_OUT.xlsx.encrypted",
+        "data/Historico.xlsx.encrypted","data/Cuota_Productos.xlsx.encrypted", "data/Historico_Productos.xlsx.encrypted"
+    ]
+    for archivo in ARCHIVOS_DATA:
         if os.path.exists(archivo):
             decrypt_file(archivo, key.encode())
             
     tango_path = "data/TANGO.xlsx.encrypted"
     if os.path.exists(tango_path):
         decrypt_file(tango_path, key.encode())
+
+    # 2. Desencriptar nuevos reportes generados automáticamente en la carpeta descargas/
+    ARCHIVOS_DESCARGAS = [
+        "descargas/preventa_por_cliente.csv.encrypted",
+        "descargas/ventas_netas_por_periodo_cliente.csv.encrypted",
+        "descargas/venta_neta_por_periodo_producto_cliente.csv.encrypted",
+        "descargas/preventa_por_producto.csv.encrypted",
+        "descargas/stock_por_productos.csv.encrypted",
+        "descargas/ventas_caviahue_shopify.csv.encrypted"
+    ]
+    for archivo in ARCHIVOS_DESCARGAS:
+        if os.path.exists(archivo):
+            decrypt_file(archivo, key.encode())
         
 a_representantes = [
         'Santiago Rocchi',
@@ -52,7 +68,7 @@ if last_scrape:
 else:
     st.sidebar.warning("⚠️ Esperando actualización automática de datos.")
 
-# Desencriptar archivos al iniciar la aplicación
+# Desencriptar TODOS los archivos al iniciar la aplicación (Bases + Reportes)
 decrypt_files()
 
 # Password protection

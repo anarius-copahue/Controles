@@ -66,7 +66,7 @@ def run_scraping_if_needed():
                 ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
                 scraped_correctly = True
             except Exception as e:
-                st.error("Error en el scraping, estamos trabajando para solucionarlo. Por favor, intentá nuevamente más tarde.", e)
+                st.error(f"Error en el scraping, estamos trabajando para solucionarlo. Por favor, intentá nuevamente más tarde. \n Error: {e}")
                 scraped_correctly = False
         if not scraped_correctly:
             st.stop()

@@ -28,13 +28,12 @@ STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV
 def setup_driver():
     options = Options()
     
-    # 1. Configuraciones ultra-estrictas para el entorno Headless de Linux
+    # 1. Configuraciones comunes de Headless y entorno obligatorias para servidores
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
-    
-    # Evita que Chrome detecte que es un entorno automatizado (ayuda en servidores)
+    options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-blink-features=AutomationControlled")
 
     # 2. Asegurar directorio y configurar preferencias de descarga
@@ -46,14 +45,15 @@ def setup_driver():
         "safebrowsing.enabled": True
     })
     
-    # 3. Inicialización limpia
+    # 3. Inicialización inteligente según el entorno
     if st.secrets["LOCAL"] == "FALSE":
-        # 💡 NO DEFINIMOS BINARY_LOCATION NI SERVICE.
-        # Al estar instalados mediante packages.txt, Selenium los detecta
-        # en el PATH del sistema de forma nativa y empareja sus versiones perfectamente.
+        # Autoinstalador mágico para entornos Linux restringidos
+        import chromedriver_autoinstaller
+        chromedriver_autoinstaller.install() # Esto busca e instala el driver compatible al vuelo
+        
         driver = webdriver.Chrome(options=options)
     else:
-        # Configuración para tu Windows Local
+        # Configuración para tu Windows Local estándar
         driver = webdriver.Chrome(options=options)
     
     return driver

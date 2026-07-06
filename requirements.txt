@@ -1,6 +1,7 @@
 pandas
 streamlit
 selenium>=4.20.0
+chromedriver-autoinstaller
 cryptography
 numpy
 openpyxl

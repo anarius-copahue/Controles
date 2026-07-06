@@ -185,6 +185,10 @@ def scrape_data():
         # 🛒 DESCARGA Y ENCRIPTACIÓN DE SHOPIFY
         print("Iniciando Scraping de Shopify...")
         ventas_cav_shopify = scrap_shopify(SHOPIFY_DOMAIN, SHOPIFY_TOKEN)
+        
+        # 🔥 AGREGA ESTA LÍNEA AQUÍ ABAJO:
+        os.makedirs(DOWNLOAD_DIR, exist_ok=True) 
+        
         ruta_plana_shopify = os.path.join(DOWNLOAD_DIR, 'ventas_caviahue_shopify.csv')
         ventas_cav_shopify.to_csv(ruta_plana_shopify, index=False)
         

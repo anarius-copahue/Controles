@@ -28,7 +28,7 @@ STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV
 def setup_driver():
     options = Options()
     
-    # 1. Configuraciones comunes de Headless y entorno obligatorias para servidores
+    # 1. Configuraciones obligatorias para servidores Cloud
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -45,18 +45,14 @@ def setup_driver():
         "safebrowsing.enabled": True
     })
     
-    # 3. Inicialización inteligente según el entorno
+    # 3. Inicialización según el entorno
     if st.secrets["LOCAL"] == "FALSE":
-        import chromedriver_autoinstaller
-        
-        # 📌 TRUCO: Forzamos a que descargue el driver en tu carpeta 'descargas' 
-        # o en /tmp donde Linux SÍ permite escribir archivos libremente.
-        ruta_segura = "/tmp" if os.path.exists("/tmp") else DOWNLOAD_DIR
-        chromedriver_autoinstaller.install(path=ruta_segura)
-        
-        driver = webdriver.Chrome(options=options)
+        # Apuntamos DIRECTO a donde los instala packages.txt en el sistema global
+        options.binary_location = "/usr/bin/chromium"
+        service = Service("/usr/bin/chromedriver")
+        driver = webdriver.Chrome(service=service, options=options)
     else:
-        # Configuración para tu Windows Local estándar
+        # Configuración para tu Windows Local estándar (Selenium 4 busca Chrome solo)
         driver = webdriver.Chrome(options=options)
     
     return driver

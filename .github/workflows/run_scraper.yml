@@ -21,13 +21,15 @@ jobs:
       with:
         python-version: '3.10'
 
-    # 3. Instalar Google Chrome y limpiar Chromedrivers obsoletos del PATH
+# 3. Instalar Google Chrome y limpiar TODO Chromedriver obsoleto del sistema
     - name: Instalar Google Chrome
       run: |
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable
-        # Forzamos la eliminación del driver desactualizado para que Selenium use el suyo propio
+        # Forzamos la eliminación en todas las rutas comunes de GitHub Actions
         sudo rm -f /usr/bin/chromedriver
+        sudo rm -f /usr/local/bin/chromedriver
+        sudo rm -f /opt/hostedtoolcache/chromedriver
 
     # 4. Instalar todas las librerías necesarias desde tu requirements.txt
     - name: Instalar dependencias

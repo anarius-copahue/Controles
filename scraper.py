@@ -7,7 +7,7 @@ import os
 import time
 from datetime import datetime
 from shopify import scrap_shopify  
-from encrypt import encrypt_file  # 🔒 Lógica de encriptación integrada
+from encrypt import encrypt_file
 
 # --- CONTROL DUAL DE CREDENCIALES (LOCAL VS ACTIONS) ---
 try:

@@ -29,7 +29,6 @@ def setup_driver():
     options = Options()
     
     if st.secrets["LOCAL"] == "FALSE":
-        if st.secrets["LOCAL"] == "FALSE":
         # 1. Modo headless moderno
         options.add_argument("--headless=new")
         

@@ -28,11 +28,14 @@ STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV
 def setup_driver():
     options = Options()
     
-    # 1. Configuraciones comunes de Headless y entorno
+    # 1. Configuraciones ultra-estrictas para el entorno Headless de Linux
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
+    
+    # Evita que Chrome detecte que es un entorno automatizado (ayuda en servidores)
+    options.add_argument("--disable-blink-features=AutomationControlled")
 
     # 2. Asegurar directorio y configurar preferencias de descarga
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -43,21 +46,12 @@ def setup_driver():
         "safebrowsing.enabled": True
     })
     
-    # 3. Configuraciones específicas de rutas según el entorno
+    # 3. Inicialización limpia
     if st.secrets["LOCAL"] == "FALSE":
-        # Apuntamos al binario de Chromium estándar
-        options.binary_location = "/usr/bin/chromium"
-        
-        # Probamos la ruta global estándar de Debian para el driver
-        if os.path.exists("/usr/bin/chromedriver"):
-            service = Service("/usr/bin/chromedriver")
-        elif os.path.exists("/usr/bin/chromium-driver"):
-            service = Service("/usr/bin/chromium-driver")
-        else:
-            # Si no está en ninguna, dejamos que Selenium lo busque solo en el PATH del sistema
-            service = Service()
-        
-        driver = webdriver.Chrome(service=service, options=options)
+        # 💡 NO DEFINIMOS BINARY_LOCATION NI SERVICE.
+        # Al estar instalados mediante packages.txt, Selenium los detecta
+        # en el PATH del sistema de forma nativa y empareja sus versiones perfectamente.
+        driver = webdriver.Chrome(options=options)
     else:
         # Configuración para tu Windows Local
         driver = webdriver.Chrome(options=options)

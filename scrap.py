@@ -26,37 +26,27 @@ PREVENTA_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadist
 STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV2.aspx"
 
 def setup_driver():
-    options = Options()
-    
-    # 1. Configuraciones obligatorias para servidores Cloud
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--disable-blink-features=AutomationControlled")
+    try:
+        options = webdriver.ChromeOptions()
 
-    # 2. Asegurar directorio y configurar preferencias de descarga
-    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-    options.add_experimental_option("prefs", {
-        "download.default_directory": DOWNLOAD_DIR,
-        "download.prompt_for_download": False,
-        "directory_upgrade": True,
-        "safebrowsing.enabled": True
-    })
-    
-    # 3. Inicialización según el entorno
-    if st.secrets["LOCAL"] == "FALSE":
-        # Apuntamos DIRECTO a donde los instala packages.txt en el sistema global
-        options.binary_location = "/usr/bin/chromium"
-        service = Service("/usr/bin/chromedriver")
-        driver = webdriver.Chrome(service=service, options=options)
-    else:
-        # Configuración para tu Windows Local estándar (Selenium 4 busca Chrome solo)
+        if st.secrets["LOCAL"] == "FALSE":
+            options.add_argument("--headless=new")
+
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1920,1080")
+        options.add_argument("--remote-debugging-port=9222")
+
         driver = webdriver.Chrome(options=options)
-    
-    return driver
 
+        return driver
+
+    except Exception:
+        import traceback
+        st.code(traceback.format_exc())
+        raise
+    
 def login_to_dispro(driver):
     driver.get(LOGIN_URL)
     driver.wait = WebDriverWait(driver, 10)

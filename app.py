@@ -67,6 +67,7 @@ def run_scraping_if_needed():
                 scraped_correctly = True
             except Exception as e:
                 st.error("Error en el scraping, estamos trabajando para solucionarlo. Por favor, intentá nuevamente más tarde.")
+                print("Error en el scraping:", e)
                 scraped_correctly = False
         if not scraped_correctly:
             st.stop()

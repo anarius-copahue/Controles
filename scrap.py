@@ -29,15 +29,13 @@ def setup_driver():
     options = Options()
     
     if st.secrets["LOCAL"] == "FALSE":
-        # 1. Modo headless moderno
         options.add_argument("--headless=new")
-        
-        # 2. Desactivar por completo los mecanismos de Sandbox y Forking de Linux
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-setuid-sandbox")
-        options.add_argument("--disable-zygote") # 🌟 NUEVO: Evita que Chrome intente clonar procesos base
+        options.add_argument("--disable-zygote")
         
-        # 3. Optimización de memoria y rendimiento en la nube
+        options.add_argument("--disable-gpu-sandbox") # Desactiva el sandbox solo para el proceso gráfico
+        
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-proxy-server")

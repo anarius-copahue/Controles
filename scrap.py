@@ -47,9 +47,12 @@ def setup_driver():
     
     # 3. Inicialización inteligente según el entorno
     if st.secrets["LOCAL"] == "FALSE":
-        # Autoinstalador mágico para entornos Linux restringidos
         import chromedriver_autoinstaller
-        chromedriver_autoinstaller.install() # Esto busca e instala el driver compatible al vuelo
+        
+        # 📌 TRUCO: Forzamos a que descargue el driver en tu carpeta 'descargas' 
+        # o en /tmp donde Linux SÍ permite escribir archivos libremente.
+        ruta_segura = "/tmp" if os.path.exists("/tmp") else DOWNLOAD_DIR
+        chromedriver_autoinstaller.install(path=ruta_segura)
         
         driver = webdriver.Chrome(options=options)
     else:

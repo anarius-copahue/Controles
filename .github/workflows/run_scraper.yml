@@ -63,8 +63,13 @@ jobs:
           echo "No se encontraron archivos encriptados para agregar en esta corrida."
         fi
         
-        # Agregamos la marca de tiempo (este archivo siempre se genera)
-        git add last_scrape.txt
+        # Agregamos la marca de tiempo de forma segura (solo si existe)
+        if [ -f last_scrape.txt ]; then
+          git add last_scrape.txt
+          echo "Archivo last_scrape.txt encontrado y agregado."
+        else
+          echo "Aviso: No se generó last_scrape.txt en esta corrida."
+        fi
         
         # Confirma y sube los cambios solo si hubo modificaciones reales contra el repo
         git diff-index --quiet HEAD || git commit -m "Actualización cifrada automática de reportes comerciales"

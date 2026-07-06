@@ -46,6 +46,7 @@ def setup_driver():
     if st.secrets["LOCAL"] == "FALSE":
         from webdriver_manager.chrome import ChromeDriverManager
         from webdriver_manager.core.os_manager import ChromeType
+        st.write("Ejecutando en modo headless, descargando ChromeDriver...")
         driver = webdriver.Chrome(service=Service(
                     ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
                 ), options=options)

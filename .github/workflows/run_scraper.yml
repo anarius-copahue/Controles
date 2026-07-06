@@ -2,11 +2,8 @@ name: Ejecutar Scraping y Encriptación Diaria
 
 on:
   schedule:
-    # ⏱️ Truco Cron para simular intervalos de 3 horas y media de forma alternada:
-    # Bloque 1: Horas pares (:00, 7:00, 14:00, 21:00 UTC)
-    - cron: '0 0,7,14,21 * * *'
-    # Bloque 2: Horas impares desfasadas 3.5 horas (:30, 10:30, 17:30 UTC)
-    - cron: '30 3,10,17 * * *'
+    # ⏱️ Se ejecuta exactamente a las 8, 10, 13, 15 y 17 horas de Argentina (UTC-3)
+    - cron: '0 5,7,10,12,14 * * *'
   workflow_dispatch: # Permite seguir ejecutando el proceso a mano con el botón
 
 jobs:
@@ -24,19 +21,21 @@ jobs:
       with:
         python-version: '3.10'
 
-    # 3. Instalar Google Chrome (Indispensable para Selenium en modo Headless)
+    # 3. Instalar Google Chrome y limpiar Chromedrivers obsoletos del PATH
     - name: Instalar Google Chrome
       run: |
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable
+        # Forzamos la eliminación del driver desactualizado para que Selenium use el suyo propio
+        sudo rm -f /usr/bin/chromedriver
 
-    # 4. Instalar todas las librerías necesarias
+    # 4. Instalar todas las librerías necesarias desde tu requirements.txt
     - name: Instalar dependencias
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # 5. Ejecutar el scraper inyectando secretos del sistema (el bloque try/except de Python los tomará acá)
+    # 5. Ejecutar el scraper inyectando los secretos guardados en GitHub Settings
     - name: Ejecutar Scraper y Cifrado
       env:
         DISPRO_USER: ${{ secrets.DISPRO_USER }}
@@ -53,9 +52,25 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        # Agregamos los reportes .encrypted y el tracking horario
-        git add descargas/*.encrypted last_scrape.txt
+        # Aseguramos que la carpeta exista en el entorno virtual
+        mkdir -p descargas
         
-        # Sube los cambios solo si hubo modificaciones reales en las descargas
+        # Agrega los archivos encriptados de forma segura (solo si existen)
+        if ls descargas/*.encrypted 1> /dev/null 2>&1; then
+          git add descargas/*.encrypted
+          echo "Archivos encriptados encontrados y agregados a Git."
+        else
+          echo "No se encontraron archivos encriptados para agregar en esta corrida."
+        fi
+        
+        # Agregamos la marca de tiempo de forma segura (solo si existe)
+        if [ -f last_scrape.txt ]; then
+          git add last_scrape.txt
+          echo "Archivo last_scrape.txt encontrado y agregado."
+        else
+          echo "Aviso: No se generó last_scrape.txt en esta corrida."
+        fi
+        
+        # Confirma y sube los cambios solo si hubo modificaciones reales contra el repo
         git diff-index --quiet HEAD || git commit -m "Actualización cifrada automática de reportes comerciales"
         git push

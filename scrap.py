@@ -27,29 +27,42 @@ STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV
 
 def setup_driver():
     options = Options()
+    
     if st.secrets["LOCAL"] == "FALSE":
-        options.add_argument("--headless")  # Run in headless mode
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+        # Usar la nueva sintaxis para headless (más estable en versiones recientes)
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu") # Evita errores en servidores sin interfaz gráfica
+        options.add_argument("--window-size=1920,1080") # Define un tamaño para evitar que elementos no sean clickeables
+        
+        # Apuntar explícitamente al navegador instalado por packages.txt en Linux
+        options.binary_location = "/usr/bin/chromium"
 
-    # Set the path to the ChromeDriver executable
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
     # Set Chrome options for downloading files
     options.add_experimental_option("prefs", {
-    "download.default_directory": DOWNLOAD_DIR,
-    "download.prompt_for_download": False,
-    "directory_upgrade": True,
-    "safebrowsing.enabled": True
+        "download.default_directory": DOWNLOAD_DIR,
+        "download.prompt_for_download": False,
+        "directory_upgrade": True,
+        "safebrowsing.enabled": True
     })
 
     if st.secrets["LOCAL"] == "FALSE":
-        from webdriver_manager.chrome import ChromeDriverManager
-        from webdriver_manager.core.os_manager import ChromeType
-        st.write("Ejecutando en modo headless, descargando ChromeDriver...")
-        driver = webdriver.Chrome(service=Service(
-                    ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-                ), options=options)
+        st.write("Ejecutando en modo headless, configurando driver...")
+        
+        # Como instalamos chromium-driver via packages.txt, Selenium lo puede encontrar.
+        # Si prefieres seguir usando webdriver_manager, puedes hacerlo, 
+        # pero usar un Service apuntando al driver local suele evitar problemas de incompatibilidad de versiones.
+        from selenium.webdriver.chrome.service import Service
+        
+        # El path típico donde packages.txt instala el driver en Streamlit Cloud
+        service = Service("/usr/bin/chromedriver")
+        driver = webdriver.Chrome(service=service, options=options)
+        
+        # NOTA: Si esto falla, puedes volver a tu bloque original de webdriver_manager aquí adentro, 
+        # pero la clave era agregar options.binary_location = "/usr/bin/chromium" arriba.
     else:
         driver = webdriver.Chrome(options=options)
     

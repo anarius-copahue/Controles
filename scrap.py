@@ -25,28 +25,48 @@ VENTAS_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/inicio/Con
 PREVENTA_PRODUCTO_URL = "https://dispro360.disprofarma.com.ar/Dispro360/estadisticas/PreventaPorProducto.aspx"
 STOCK_URL = "https://dispro360.disprofarma.com.ar/Dispro360/stock/StockProductoV2.aspx"
 
+import shutil
+import subprocess
+from selenium import webdriver
+
 def setup_driver():
-    try:
-        options = webdriver.ChromeOptions()
 
-        if st.secrets["LOCAL"] == "FALSE":
-            options.add_argument("--headless=new")
+    st.write("### Diagnóstico")
 
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--window-size=1920,1080")
-        options.add_argument("--remote-debugging-port=9222")
+    for exe in [
+        "chromium",
+        "chromium-browser",
+        "google-chrome",
+        "google-chrome-stable",
+    ]:
+        path = shutil.which(exe)
+        st.write(exe, "->", path)
 
-        driver = webdriver.Chrome(options=options)
+        if path:
+            try:
+                r = subprocess.run(
+                    [path, "--version"],
+                    capture_output=True,
+                    text=True,
+                )
+                st.write(r.stdout)
+                st.write(r.stderr)
+            except Exception as e:
+                st.write(e)
 
-        return driver
+    options = webdriver.ChromeOptions()
 
-    except Exception:
-        import traceback
-        st.code(traceback.format_exc())
-        raise
-    
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--remote-debugging-port=9222")
+    options.add_argument("--window-size=1920,1080")
+
+    driver = webdriver.Chrome(options=options)
+
+    return driver
+
 def login_to_dispro(driver):
     driver.get(LOGIN_URL)
     driver.wait = WebDriverWait(driver, 10)

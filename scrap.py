@@ -195,7 +195,20 @@ def wait_for_report_download(file_name):
 
 def scrape_data():
 
-    driver = setup_driver()
+    try:
+        driver = setup_driver()
+    except Exception as e:
+        st.error(f"Error al iniciar Chrome: {e}")
+        
+        # Intentamos leer y mostrar el log
+        if os.path.exists("chromedriver.log"):
+            st.warning("Revisando el verbose log de ChromeDriver:")
+            with open("chromedriver.log", "r") as file:
+                log_content = file.read()
+                # Usamos st.code para que sea fácil de leer y scrollear
+                st.code(log_content, language="text")
+        else:
+            st.error("No se encontró el archivo chromedriver.log.")
 
     try:
         login_to_dispro(driver)

@@ -38,6 +38,9 @@ def setup_driver():
 
         options.add_argument("--disable-setuid-sandbox") # Deshabilita el sandbox secundario de Linux
         options.add_argument("--remote-debugging-pipe")  # Recomendado por tu propio log para mejorar la comunicación
+
+        options.add_argument("--disable-software-rasterizer") # Evita que intente renderizar gráficos por software
+        options.add_argument("--single-process") # Fuerza a Chrome a correr en un solo hilo (evita bloqueos en contenedores)
         
         # Apuntar explícitamente al navegador instalado por packages.txt en Linux
         options.binary_location = "/usr/bin/chromium"
@@ -198,6 +201,7 @@ def wait_for_report_download(file_name):
 
 def scrape_data():
 
+    driver = None
     try:
         driver = setup_driver()
     except Exception as e:

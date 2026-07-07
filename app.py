@@ -3,7 +3,7 @@ from cuotas import cuotas
 from ventas import ventas
 from update_data import update_data
 from mapa import mapa
-from scrap import scrape_data
+from scraper import scrape_data
 from encrypt import decrypt_file
 from productos import productos
 from datetime import datetime, timedelta

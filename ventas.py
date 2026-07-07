@@ -113,6 +113,9 @@ def ventas(representantes=[]):
     df_venta["CADENA"] = df_venta["Cliente"].map(mapa_cadenas)
 
     df_preventa["valor"] = df_preventa["Unidades"]
+    #pasar a numero "venta unid" y "unid bonif" de df_venta
+    df_venta["Venta Unid."] = df_venta["Venta Unid."].astype(float)
+    df_venta["Unid. Bonif."] = df_venta["Unid. Bonif."].astype(float)
     df_venta["valor"] = df_venta["Venta Unid."] - df_venta["Unid. Bonif."]
 
     ventas_y_preventas = pd.concat([

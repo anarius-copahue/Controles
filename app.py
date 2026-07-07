@@ -5,7 +5,7 @@ from update_data import update_data
 from mapa import mapa
 from scraper import scrape_data
 from encrypt import decrypt_file
-from productos import productos
+from productos_Caviahue import productos
 from datetime import datetime, timedelta
 from shopify import scrap_shopify
 from control_gerencial import control_gerencial 
@@ -112,16 +112,16 @@ st.success("Acceso concedido")
 
 if user_logged.upper() == "ADMIN":
     # Tabs
-    tab1, tab2, tab3, tab5, tab6 = st.tabs(["Ventas", "Cuota","Productos", "Cuadro de avance","Ventas y Stock"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Ventas", "Cuota","Venta por productos","Cuadro de avance","Stock y  ventas totales"])
     with tab1:
         ventas()
     with tab2:
         cuotas()
     with tab3:
         productos()
-    with tab5:
+    with tab4:
         control_gerencial()
-    with tab6:
+    with tab5:
         app_ventas_stock()
 
 elif user_logged.upper() == "ADMIN_DATA":

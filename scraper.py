@@ -4,6 +4,7 @@ import json
 import requests
 import streamlit as st
 from datetime import datetime, timedelta
+from login_dispro import get_auth_token
 
 # =====================================================================
 # 1. HERRAMIENTAS / FUNCIONES REUTILIZABLES (Para cualquier reporte)
@@ -323,7 +324,7 @@ def procesar_stock_productos(token, periodo=ayer_iso_stock):
 # =====================================================================
 def scrape_data():
 
-    token_dispro = st.secrets["TOKEN_DISPRO"]
+    token_dispro = get_auth_token()
    
     print("Iniciando la descarga en lote...")
     

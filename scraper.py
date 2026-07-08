@@ -25,7 +25,7 @@ def consultar_api(url, headers, cookies, payload):
         return response.json()
     except requests.exceptions.RequestException as e:
         st.error(f"Error crítico al conectar con el endpoint ({url.split('/')[-1]}): {e}")
-        return None
+        raise e
 
 def formatear_numero(val, con_signo=False):
     """Formatea números flotantes/enteros al sistema regional (1.234.567,89)."""
@@ -70,14 +70,9 @@ def procesar_preventa_por_cliente(token, fecha_desde=fecha_primero_mes, fecha_ha
     }
     
     response_data = consultar_api(url, headers, cookies, payload)
-    if not response_data: return False
         
-    try:
-        datos_json = json.loads(response_data.get('datos', '{}'))
-        items = datos_json.get('listadoPreventaPorCliente', [])
-    except (json.JSONDecodeError, TypeError):
-        st.error("Error al interpretar la respuesta interna de preventas por cliente.")
-        return False
+    datos_json = json.loads(response_data.get('datos', '{}'))
+    items = datos_json.get('listadoPreventaPorCliente', [])
 
     csv_headers = [
         "Neg", "Lab", "Pedido", "Clie", "Razón Social", "Fec Pedido", 
@@ -135,16 +130,11 @@ def procesar_ventas_netas_periodo(token, fecha_desde=fecha_primero_mes, fecha_ha
     
     # Realiza la petición usando tu función base
     response_data = consultar_api(url, headers, cookies, payload)
-    if not response_data: return False
         
-    try:
-        datos_json = json.loads(response_data.get('datos', '{}'))
-        # Procesa el "listado" interno de la respuesta provista
-        items = datos_json.get('listado', [])
-    except (json.JSONDecodeError, TypeError):
-        st.error("Error al interpretar la respuesta interna de la consulta dinámica.")
-        return False
-
+    datos_json = json.loads(response_data.get('datos', '{}'))
+    # Procesa el "listado" interno de la respuesta provista
+    items = datos_json.get('listado', [])
+        
     # Encabezados del CSV (Se mantienen intactos)
     csv_headers = [
         "Div", "Familia", "PRODU.", "Descripción", "Cliente",
@@ -217,15 +207,10 @@ def procesar_preventa_por_producto(token, fecha_desde=fecha_primero_mes, fecha_h
     
     # Realiza la petición usando tu función base
     response_data = consultar_api(url, headers, cookies, payload)
-    if not response_data: return False
         
-    try:
-        # El backend devuelve un JSON serializado como string dentro de la propiedad 'datos'
-        datos_json = json.loads(response_data.get('datos', '{}'))
-        items = datos_json.get('listadoPreventaPorProducto', [])
-    except (json.JSONDecodeError, TypeError):
-        st.error("Error al interpretar la respuesta interna de preventa por producto.")
-        return False
+    # El backend devuelve un JSON serializado como string dentro de la propiedad 'datos'
+    datos_json = json.loads(response_data.get('datos', '{}'))
+    items = datos_json.get('listadoPreventaPorProducto', [])
 
     # Encabezados del CSV idénticos a los de tu archivo original
     csv_headers = [
@@ -289,15 +274,10 @@ def procesar_stock_productos(token, periodo=ayer_iso_stock):
     
     # Realiza la petición usando tu función base
     response_data = consultar_api(url, headers, cookies, payload)
-    if not response_data: return False
         
-    try:
-        # El backend devuelve un JSON serializado como string dentro de 'datos'
-        datos_json = json.loads(response_data.get('datos', '{}'))
-        items = datos_json.get('listadoStockProducto', [])
-    except (json.JSONDecodeError, TypeError):
-        st.error("Error al interpretar la respuesta interna de stock por productos.")
-        return False
+    # El backend devuelve un JSON serializado como string dentro de 'datos'
+    datos_json = json.loads(response_data.get('datos', '{}'))
+    items = datos_json.get('listadoStockProducto', [])
 
     # Encabezados del CSV ordenados exactamente como en 'stock_por_productos.csv'
     csv_headers = [
@@ -353,5 +333,3 @@ def scrape_data():
     procesar_stock_productos(token_dispro)
     
     print("¡Proceso finalizado por completo!")
-
-scrape_data()

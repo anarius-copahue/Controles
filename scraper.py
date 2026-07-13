@@ -10,10 +10,24 @@ from login_dispro import get_auth_token
 # 1. HERRAMIENTAS / FUNCIONES REUTILIZABLES (Para cualquier reporte)
 # =====================================================================
 
-fecha_hoy = datetime.now().strftime("%d/%m/%Y")
-fecha_primero_mes = (datetime.now() - timedelta(days=datetime.now().day-1)).strftime("%d/%m/%Y")
-ayer = datetime.now() - timedelta(days=1)
+# 1. Obtener la fecha de hoy
+hoy = datetime.now()
+
+# 2. Calcular 'ayer' dependiendo de si hoy es lunes
+if hoy.weekday() == 0:
+    # Si hoy es lunes (0), restamos 3 días para ir al viernes
+    ayer = hoy - timedelta(days=3)
+else:
+    # Si es cualquier otro día, restamos 1 día
+    ayer = hoy - timedelta(days=1)
+
+# 3. Formatear la fecha en el formato ISO que necesitas
 ayer_iso_stock = ayer.strftime("%Y-%m-%dT00:00:00")
+
+# --- Tus otras variables se mantienen igual ---
+fecha_hoy = hoy.strftime("%d/%m/%Y")
+fecha_primero_mes = (hoy - timedelta(days=hoy.day-1)).strftime("%d/%m/%Y")
+
 
 print(f"Fecha de hoy: {fecha_hoy}, Fecha primero del mes: {fecha_primero_mes}")
 print(f"Fecha ISO de hoy: {ayer_iso_stock}")

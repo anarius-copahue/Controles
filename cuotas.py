@@ -9,7 +9,7 @@ import kits_config as KITS_ESTRUCTURA
 REPRESENTANTE_POR_USUARIO = {
     "MROSSELOT": ["Marcela Rosselot"],
     "PZACCA": ["Patricia Zacca"],
-    "YARRECHE": ["Yamila Arreche"],
+    "YARRECHE": ["Cuentas Claves"],
     "AFLEBA": ["Agustin Fleba"],
     "YCUEZZO": ["Yanina Cuezzo"],
     "SROCCHI": ["Santiago Rocchi"],

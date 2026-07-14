@@ -348,3 +348,4 @@ def scrape_data():
     procesar_stock_productos(token_dispro)
     
     print("¡Proceso finalizado por completo!")
+

@@ -1,10 +1,8 @@
 import streamlit as st
 from cuotas import cuotas
 from ventas import ventas
-from update_data import update_data
 from mapa import mapa
 from scraper import scrape_data
-from encrypt import decrypt_file
 from productos_Caviahue import productos
 from datetime import datetime, timedelta
 from shopify import scrap_shopify
@@ -112,21 +110,6 @@ if user_logged.upper() == "ADMIN":
     with tab5:
         app_ventas_stock()
 
-elif user_logged.upper() == "ADMIN_DATA":
-    # Tabs
-    tab1, tab2, tab3, tab5, tab4, tab6 = st.tabs(["Ventas", "Cuota", "Productos", "Cuadro de avance", "Actualizar Datos","Ventas y Stock"])
-    with tab1:
-        ventas()
-    with tab2:
-        cuotas()
-    with tab3:
-        productos()
-    with tab5:
-        control_gerencial()
-    with tab4:
-        update_data()
-    with tab6:
-        app_ventas_stock()
 
 elif user_logged.upper() == "DISPROADMIN":
     cuotas()

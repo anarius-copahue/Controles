@@ -20,7 +20,7 @@ def descargar_archivos_dropbox():
     
     archivos = {
         "TANGO.xlsx": f"{base_dropbox}/TANGO.xlsx",
-        "Cuota_productos.xlsx": f"{base_dropbox}/Cuota_productos.xlsx",
+        "Cuota_Productos.xlsx": f"{base_dropbox}/Cuota_Productos.xlsx",
         "Historico_Productos.xlsx": f"{base_dropbox}/Historico_Productos.xlsx",
         "diccionario.xlsx": f"{base_dropbox}/diccionario.xlsx",
         "db_SELL_IN_OUT.xlsx": f"{base_dropbox}/db_SELL_IN_OUT.xlsx",

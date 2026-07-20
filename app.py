@@ -82,7 +82,7 @@ run_scraping_if_needed()
 
 # --- CONTROL DE ACCESO / LOGIN ---
 def page_login():
-    st.title("🔐 Tablero de Avance de Ventas")
+    st.title("Tablero de Avance de Ventas")
 
     col_login, _ = st.columns([1, 1])
     with col_login:

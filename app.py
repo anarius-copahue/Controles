@@ -1,7 +1,7 @@
 import streamlit as st
 from cuotas import cuotas
 from ventas import ventas
-from mapa import mapa
+from recetas_medicas import recetas_medicas
 from scraper import scrape_data
 from productos_Caviahue import productos
 from datetime import datetime, timedelta
@@ -98,12 +98,12 @@ st.success("Acceso concedido")
 
 if user_logged.upper() == "ADMIN":
     # Tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Ventas", "Cuota","Venta por productos","Cuadro de avance","Stock y  ventas totales"])
+    tab1, tab6, tab2, tab3, tab4, tab5 = st.tabs(["Ventas", "Recetas por médico", "Cuota", "Venta por productos", "Cuadro de avance", "Stock y ventas totales"])
     with tab1:
         ventas()
+    with tab6:
+        recetas_medicas()
     with tab2:
-        cuotas()
-    with tab3:
         productos()
     with tab4:
         control_gerencial()
@@ -111,11 +111,7 @@ if user_logged.upper() == "ADMIN":
         app_ventas_stock()
 
 
-elif user_logged.upper() == "DISPROADMIN":
-    cuotas()
-    
-
 else:
     ventas([user_logged.upper()])
     cuotas([user_logged.upper()])
-    mapa(user_logged.upper())
+    recetas_medicas([user_logged.upper()], user_logged)

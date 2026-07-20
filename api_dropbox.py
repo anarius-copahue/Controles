@@ -25,7 +25,8 @@ def descargar_archivos_dropbox():
         "diccionario.xlsx": f"{base_dropbox}/diccionario.xlsx",
         "db_SELL_IN_OUT.xlsx": f"{base_dropbox}/db_SELL_IN_OUT.xlsx",
         "representante.xlsx": f"{base_dropbox}/representante.xlsx",
-        "Historico.xlsx": f"{base_dropbox}/Historico.xlsx"
+        "Historico.xlsx": f"{base_dropbox}/Historico.xlsx",
+        "Recetas_por_médico.xlsx" : f"{base_dropbox}/Recetas_por_médico.xlsx"
 
     }
 

@@ -14,7 +14,8 @@ REPRESENTANTE_POR_USUARIO = {
     "YCUEZZO": ["Yanina Cuezzo"],
     "SROCCHI": ["Santiago Rocchi"],
     "NBRIDI":["Natalia Bridi"],
-    "OTROS" : [ "Gerencia","Mendoza","Mar del Plata" ],
+    "MPUTZOLU" : ["Mar del Plata"],
+    "OTROS" : [ "Gerencia","Mendoza" ],
 }
 
 def resaltar_totales(row):

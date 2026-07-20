@@ -1,5 +1,4 @@
 import os
-import time
 from pathlib import Path
 import dropbox
 import streamlit as st
@@ -26,21 +25,22 @@ def descargar_archivos_dropbox():
         "db_SELL_IN_OUT.xlsx": f"{base_dropbox}/db_SELL_IN_OUT.xlsx",
         "representante.xlsx": f"{base_dropbox}/representante.xlsx",
         "Historico.xlsx": f"{base_dropbox}/Historico.xlsx",
-        "Recetas_por_médico.xlsx" : f"{base_dropbox}/Recetas_por_médico.xlsx"
-
+        "Recetas_por_médico.xlsx": f"{base_dropbox}/Recetas_por_médico.xlsx"
     }
 
-
-    # 4. Conexión usando solo ACCESS_TOKEN
-    access_token =  st.secrets["ACCESS_TOKEN"]
-    dbx_base = dropbox.Dropbox(access_token)
+    # 3. Conexión con renovación automática
+    dbx_base = dropbox.Dropbox(
+        app_key=st.secrets["APP_KEY"],
+        app_secret=st.secrets["APP_SECRET"],
+        oauth2_refresh_token=st.secrets["REFRESH_TOKEN"]
+    )
 
     # Configuración de Team Space para cuentas de equipo
     account = dbx_base.users_get_current_account()
     root_id = account.root_info.root_namespace_id
     dbx = dbx_base.with_path_root(dropbox.common.PathRoot.root(root_id))
 
-    # 5. Descarga de archivos
+    # 4. Descarga de archivos
     for nombre_archivo, ruta_remota in archivos.items():
         ruta_local = carpeta_destino / nombre_archivo
         try:

@@ -11,6 +11,7 @@ from shopify import scrap_shopify
 from control_gerencial import control_gerencial 
 from shopify import scrap_shopify
 from cuadro_stock import app_ventas_stock
+from api_dropbox import descargar_archivos_dropbox
 import os
 
 st.set_page_config(page_title="Caviahue Avance", layout="wide", page_icon="📦")
@@ -19,18 +20,6 @@ cols = st.columns([2, 3, 3, 3, 3, 3, 2, 2])
 with cols[7]:
         st.image("logo.png")
 
-def decrypt_files():
-    ARCHIVOS = ["data/diccionario.xlsx.encrypted", "data/representante.xlsx.encrypted", "data/db_SELL_IN_OUT.xlsx.encrypted",
-                "data/Historico.xlsx.encrypted","data/Cuota_Productos.xlsx.encrypted", "data/Historico_Productos.xlsx.encrypted"]
-    key = st.secrets["ENCRYPTION_KEY"]
-
-    for archivo in ARCHIVOS:
-        decrypt_file(archivo, key.encode())
-    #si existe desencriptar tambien el archivo TANGO si existe
-    tango_path = "data/TANGO.xlsx.encrypted"
-    if os.path.exists(tango_path):
-        decrypt_file(tango_path, key.encode())
-        
 a_representantes = [
         'Santiago Rocchi',
         'Gerencia', 'Patricia Zacca', 'Marcela Rosselot', 'Agustin Fleba',
@@ -62,6 +51,7 @@ def run_scraping_if_needed():
             #Shopify api
             try:
                 scrape_data()  # Ejecuta tu función de scraping
+                descargar_archivos_dropbox()
                 ventas_cav_shopify = scrap_shopify(st.secrets["CAVIAHUE_SHOP_DOMAIN"],st.secrets["CAVIAHUE_SHOP_TOKEN"])
                 ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
                 scraped_correctly = True
@@ -79,8 +69,6 @@ def run_scraping_if_needed():
 # Llamamos a la función para controlar el scraping
 run_scraping_if_needed()
 
-# Desencriptar archivos al iniciar la aplicación
-decrypt_files()
 
 # Password protection
 def page_login():

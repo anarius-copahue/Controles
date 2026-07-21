@@ -41,4 +41,5 @@ def get_auth_token():
         else:
             raise ValueError(f"Error HTTP {response.status_code}: {response.text}")
     except Exception as e:
+        st.error(f"Error al obtener el token de autenticación: {e}")
         print(f"Error: {e}")

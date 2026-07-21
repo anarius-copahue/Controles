@@ -138,11 +138,12 @@ def procesar_ventas_netas_periodo(token, fecha_desde=fecha_primero_mes, fecha_ha
                 {"nombre": "codigoLaboratorio", "valor": "62"},
                 {"nombre": "fechaDesde", "valor": fecha_desde},
                 {"nombre": "fechaHasta", "valor": fecha_hasta},
-                {"nombre": "Venta", "valor": "0"}
+                {"nombre": "Venta", "valor": "2"}
             ]
         }
     }
     
+
     # Realiza la petición usando tu función base
     response_data = consultar_api(url, headers, cookies, payload)
         

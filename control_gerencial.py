@@ -3,12 +3,31 @@ import streamlit as st
 from datetime import datetime
 from kits_config import KITS_ESTRUCTURA, KITS_SHOPIFY
 
+def limpiar_numero(serie):
+    """ Convierte una serie a numérico manejando formatos con comas, puntos y símbolos. """
+    if serie is None:
+        return pd.Series(dtype=float)
+    
+    s = serie.astype(str).str.strip()
+    s = s.str.replace("$", "", regex=False).str.replace(" ", "", regex=False)
+    
+    # Manejo de separadores decimales/miles
+    if s.str.contains(",").any() and s.str.contains(r"\.").any():
+        s = s.str.replace(".", "", regex=False).str.replace(",", ".", regex=False)
+    elif s.str.contains(",").any():
+        s = s.str.replace(",", ".", regex=False)
+        
+    return pd.to_numeric(s, errors="coerce").fillna(0)
+
 def mult_farma(df, col_prod, col_unid):
+    if df.empty or col_prod not in df.columns or col_unid not in df.columns:
+        return 0
+        
     df = df.copy()
     df[col_prod] = pd.to_numeric(df[col_prod], errors="coerce")
     df = df[df[col_prod].notna()]
     df[col_prod] = df[col_prod].astype(int)
-    df[col_unid] = pd.to_numeric(df[col_unid], errors="coerce").fillna(0)
+    df[col_unid] = limpiar_numero(df[col_unid])
     
     es_kit = df[col_prod].isin(KITS_ESTRUCTURA)
     df_kits = df[es_kit]
@@ -18,15 +37,19 @@ def mult_farma(df, col_prod, col_unid):
     for _, row in df_kits.iterrows():
         unidades = row[col_unid]
         kit = row[col_prod]
-        acumulado += unidades * len(KITS_ESTRUCTURA[kit])
+        if kit in KITS_ESTRUCTURA:
+            acumulado += unidades * len(KITS_ESTRUCTURA[kit])
         
     total = df_prod[col_unid].sum() + acumulado
     return total
 
 def mult_shopify(df, col_prod, col_unid):
+    if df.empty or col_prod not in df.columns or col_unid not in df.columns:
+        return 0
+        
     df = df.copy()
     df[col_prod] = df[col_prod].astype(str).str.strip().str.upper()
-    df[col_unid] = pd.to_numeric(df[col_unid], errors="coerce").fillna(0)
+    df[col_unid] = limpiar_numero(df[col_unid])
     
     dict_shop = {k.upper(): v for k, v in KITS_SHOPIFY.items()}
     es_kit = df[col_prod].isin(dict_shop)
@@ -35,7 +58,9 @@ def mult_shopify(df, col_prod, col_unid):
     
     acumulado = 0
     for _, r in df_kits.iterrows():
-        acumulado += r[col_unid] * len(dict_shop[r[col_prod]])
+        prod_key = r[col_prod]
+        if prod_key in dict_shop:
+            acumulado += r[col_unid] * len(dict_shop[prod_key])
         
     return df_prod[col_unid].sum() + acumulado
 
@@ -50,7 +75,6 @@ def control_gerencial():
         22717, 22709, 22708
     ]
 
-    # Estilos de las tablas HTML
     html_style = """
     <style>
         .report-container { font-family: 'Segoe UI', sans-serif; margin-top: 10px; margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
@@ -66,7 +90,7 @@ def control_gerencial():
     </style>
     """
 
-    def fmt_n(v): return f"{int(v):,}".replace(",", ".") if v != 0 else "-"
+    def fmt_n(v): return f"{int(round(v)):,}".replace(",", ".") if v != 0 else "-"
     def fmt_p(v): return f"{v:.1%}" if v != 0 else "-"
 
     # ==========================================
@@ -74,38 +98,64 @@ def control_gerencial():
     # ==========================================
     def cargar_csv(path, col_u, codigos_filtrar=None, col_cod=None):
         try:
-            df = pd.read_csv(path, sep="|", decimal=',', thousands='.', encoding='latin1', quotechar='"')
+            df = pd.read_csv(path, sep="|", encoding='latin1', quotechar='"', dtype=str)
             df.columns = [c.strip() for c in df.columns]
-            df = df.iloc[:-1] 
-            df = df[df["Importe Neto"] != 0] 
             
-            # Filtrado estricto por la columna indicada si se requiere para Cantabria
+            df = df.dropna(how='all')
+            if len(df) > 0:
+                df = df.iloc[:-1] 
+
+            if "Importe Neto" in df.columns:
+                df["Importe Neto"] = limpiar_numero(df["Importe Neto"])
+                df = df[df["Importe Neto"] != 0]
+
             if codigos_filtrar is not None and col_cod in df.columns:
                 df[col_cod] = pd.to_numeric(df[col_cod], errors='coerce').fillna(0).astype(int)
                 df = df[df[col_cod].isin(codigos_filtrar)]
-                
-            u = pd.to_numeric(df[col_u], errors='coerce').fillna(0).sum()
-            n = pd.to_numeric(df["Importe Neto"], errors='coerce').fillna(0).sum()
+
+            if col_cod in df.columns and col_u in df.columns:
+                u = mult_farma(df, col_prod=col_cod, col_unid=col_u)
+            elif col_u in df.columns:
+                u = limpiar_numero(df[col_u]).sum()
+            else:
+                u = 0
+
+            n = df["Importe Neto"].sum() if "Importe Neto" in df.columns else 0
             return u, n
-        except: return 0, 0
+        except Exception as e:
+            st.warning(f"Aviso al cargar {path}: {e}")
+            return 0, 0
 
     def obtener_valor_excel(path, hoja, anio, mes, codigos_filtrar=None):
         try:
             df = pd.read_excel(path, sheet_name=hoja)
-            
+            if df.empty:
+                return 0
+
+            # Si se solicita filtrar por códigos de producto (para Cantabria)
             if codigos_filtrar is not None:
-                col_codigo_plan = df.columns[0]
-                df[col_codigo_plan] = pd.to_numeric(df[col_codigo_plan], errors='coerce').fillna(0).astype(int)
-                df = df[df[col_codigo_plan].isin(codigos_filtrar)]
+                col_codigo = df.columns[0] # Se asume la primera columna como código
+                df_cods = pd.to_numeric(df[col_codigo], errors='coerce').fillna(-1).astype(int)
+                df = df[df_cods.isin(codigos_filtrar)]
 
             for col in df.columns:
+                col_str = str(col).strip()
                 dt = pd.to_datetime(col, dayfirst=True, errors='coerce')
+                
+                # Coincidencia 1: Cuando la columna es parseable como Timestamp de Pandas
                 if pd.notnull(dt):
                     a_real = dt.year + 2000 if dt.year < 100 else dt.year
                     if a_real == anio and dt.month == mes:
-                        return pd.to_numeric(df[col], errors='coerce').fillna(0).sum()
+                        return limpiar_numero(df[col]).sum()
+                
+                # Coincidencia 2: Cuando la columna viene formateada como texto (ej: "2026-07", "07/2026", etc.)
+                if str(anio) in col_str and (f"/{mes:02d}/" in col_str or f"-{mes:02d}-" in col_str or f"_{mes:02d}" in col_str or col_str.endswith(f"-{mes}") or col_str.endswith(f"/{mes}")):
+                    return limpiar_numero(df[col]).sum()
+
             return 0
-        except: return 0
+        except Exception as e:
+            st.warning(f"Aviso leyendo Excel ({hoja} en {path}): {e}")
+            return 0
 
 
     # =========================================================================
@@ -113,22 +163,32 @@ def control_gerencial():
     # =========================================================================
     st.markdown("### Cuadro de avance del mes - Caviahue")
     
-    u_dis, n_dis = cargar_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", "Venta Unid.")
-    u_pre, n_pre = cargar_csv("descargas/preventa_por_producto.csv", "Un. Reserv.")
+    u_dis, n_dis = cargar_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", "Venta Unid.", col_cod="PRODU.")
+    u_pre, n_pre = cargar_csv("descargas/preventa_por_producto.csv", "Un. Reserv.", col_cod="Producto")
 
     try:
         df_t = pd.read_excel("data/TANGO.xlsx", sheet_name="Datos")
+        df_t.columns = [c.strip() for c in df_t.columns]
         df_t["Cód. Artículo"] = pd.to_numeric(df_t["Cód. Artículo"], errors='coerce').fillna(0).astype(int)
         df_t = df_t[~df_t['Cód. Artículo'].isin([4, 10, 3, 12, 21302, 21304, 21633, 19039])]
-        u_tan = df_t.loc[df_t['Total'] != 0, 'Cantidad'].sum()
-        n_tan = df_t.loc[df_t['Total'] != 0, 'Total'].sum()
-    except: u_tan, n_tan = 0, 0
+        
+        df_t["Total"] = limpiar_numero(df_t["Total"])
+        df_t_act = df_t[df_t['Total'] != 0]
+        
+        u_tan = mult_farma(df_t_act, col_prod="Cód. Artículo", col_unid="Cantidad")
+        n_tan = df_t_act['Total'].sum()
+    except Exception as e: 
+        st.warning(f"Aviso en Tango Caviahue: {e}")
+        u_tan, n_tan = 0, 0
     
     try:
         df_s = pd.read_csv("descargas/ventas_caviahue_shopify.csv")
+        df_s.columns = [c.strip() for c in df_s.columns]
         u_shp = mult_shopify(df_s, col_prod="product_title", col_unid="unidades")
-        n_shp = pd.to_numeric(df_s["neta_sin_impuestos"], errors="coerce").fillna(0).sum()
-    except: u_shp, n_shp = 0, 0
+        n_shp = limpiar_numero(df_s["neta_sin_impuestos"]).sum() if "neta_sin_impuestos" in df_s.columns else 0
+    except Exception as e: 
+        st.warning(f"Aviso en Shopify Caviahue: {e}")
+        u_shp, n_shp = 0, 0
 
     v_plan_online = obtener_valor_excel("data/Cuota_Productos.xlsx", "ONLINE", 2026, mes_act)
     v_plan_farma = obtener_valor_excel("data/Cuota_Productos.xlsx", "FARMA", 2026, mes_act)
@@ -168,17 +228,23 @@ def control_gerencial():
     # =========================================================================
     st.markdown("### Cuadro de avance del mes - Cantabria")
 
-    # Filtros aplicados usando tus columnas exactas ("PRODU." en venta y "Producto" en preventa)
     u_dis_cant, n_dis_cant = cargar_csv("descargas/venta_neta_por_periodo_producto_cliente.csv", "Venta Unid.", CODIGOS_CANTABRIA, "PRODU.")
     u_pre_cant, n_pre_cant = cargar_csv("descargas/preventa_por_producto.csv", "Un. Reserv.", CODIGOS_CANTABRIA, "Producto")
 
     try:
         df_t_cant = pd.read_excel("data/TANGO.xlsx", sheet_name="Datos")
+        df_t_cant.columns = [c.strip() for c in df_t_cant.columns]
         df_t_cant["Cód. Artículo"] = pd.to_numeric(df_t_cant["Cód. Artículo"], errors='coerce').fillna(0).astype(int)
         df_t_cant = df_t_cant[df_t_cant['Cód. Artículo'].isin(CODIGOS_CANTABRIA)]
-        u_tan_cant = df_t_cant.loc[df_t_cant['Total'] != 0, 'Cantidad'].sum()
-        n_tan_cant = df_t_cant.loc[df_t_cant['Total'] != 0, 'Total'].sum()
-    except: u_tan_cant, n_tan_cant = 0, 0
+        
+        df_t_cant["Total"] = limpiar_numero(df_t_cant["Total"])
+        df_t_cant_act = df_t_cant[df_t_cant['Total'] != 0]
+        
+        u_tan_cant = mult_farma(df_t_cant_act, col_prod="Cód. Artículo", col_unid="Cantidad")
+        n_tan_cant = df_t_cant_act['Total'].sum()
+    except Exception as e: 
+        st.warning(f"Aviso en Tango Cantabria: {e}")
+        u_tan_cant, n_tan_cant = 0, 0
 
     v_plan_cantabria = obtener_valor_excel("data/Cuota_Productos.xlsx", "FARMA", 2026, mes_act, CODIGOS_CANTABRIA)
 
